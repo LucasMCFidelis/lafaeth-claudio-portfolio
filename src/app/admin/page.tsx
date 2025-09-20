@@ -1,11 +1,10 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { auth } from "@/lib/auth";
+import verifyUser from "../data/user/verify-user";
 
 const AdminHomePage = async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) {
+  const userLogged = await verifyUser();
+  if (!userLogged) {
     redirect("/admin/auth");
   }
 

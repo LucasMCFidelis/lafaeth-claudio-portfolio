@@ -1,8 +1,7 @@
 import { Menu } from "lucide-react";
-import { headers } from "next/headers";
 import Link from "next/link";
 
-import { auth } from "@/lib/auth";
+import verifyUser from "@/app/data/user/verify-user";
 
 import {
   Sheet,
@@ -16,7 +15,8 @@ import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
 
 const SheetMenu = async () => {
-  const session = await auth.api.getSession({ headers: await headers() });
+  const userLogged = await verifyUser();
+
   return (
     <Sheet>
       <SheetTrigger>
@@ -28,13 +28,13 @@ const SheetMenu = async () => {
         </SheetHeader>
         <div className="gap-2 flex flex-col items-start">
           <MenuItemsList />
-          {session && (
+          {userLogged && (
             <Link key={"/admin"} className="px-4" href={"/admin"}>
               Administração
             </Link>
           )}
         </div>
-        {session && (
+        {userLogged && (
           <SheetFooter>
             <LogoutButton typeComplexity="full" />
           </SheetFooter>
