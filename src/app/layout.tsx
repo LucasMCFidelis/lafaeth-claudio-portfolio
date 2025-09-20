@@ -2,7 +2,9 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+
+import Footer from "@/components/common/footer";
+import Header from "@/components/common/header";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,12 +31,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <header className="w-full p-5 flex justify-between items-center">
-            <h1 className="font-extrabold text-2xl md:text-3xl ">
-              Lafaeth Claudio
-            </h1>
-        </header>
-        {children}
+        <Header />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );
