@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import MenuItemsList from "./menu-items-list";
 import SheetMenu from "./sheet-menu";
+import ToggleTheme from "./toggle-theme";
 
 const Header = () => {
   return (
@@ -12,9 +13,11 @@ const Header = () => {
         </Link>
         <nav className="gap-4 hidden lg:flex font-semibold">
           <MenuItemsList />
+          <ToggleTheme/>
         </nav>
 
-        <nav className="flex lg:hidden">
+        <nav className="flex gap-4 lg:hidden">
+          <ToggleTheme/>
           <SheetMenu />
         </nav>
       </header>

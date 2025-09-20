@@ -2,6 +2,7 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import Footer from "@/components/common/footer";
 import Header from "@/components/common/header";
@@ -31,9 +32,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <NuqsAdapter>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </NuqsAdapter>
       </body>
     </html>
   );

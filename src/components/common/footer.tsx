@@ -33,7 +33,7 @@ function FooterComponent() {
       {socialLinks.map(({ href, img, alt }) => (
         <Button key={href} variant="ghost" size="icon" asChild>
           <Link href={href} target="_blank" className="relative">
-            <Image fill src={img} alt={alt ?? ""} />
+            <Image fill src={img} alt={alt ?? ""} className="dark:invert" />
           </Link>
         </Button>
       ))}
