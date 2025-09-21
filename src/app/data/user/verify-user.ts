@@ -5,21 +5,14 @@ import { cache } from "react";
 
 import { auth } from "@/lib/auth";
 
-import { UserDTO } from "./user-dto";
-
-const verifyUser = cache(async (): Promise<UserDTO | null> => {
+const verifyUserLogged = cache(async (): Promise<boolean> => {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
-    return null;
+    return false;
   }
 
-  return {
-    id: session.user.id,
-    name: session.user.name,
-    email: session.user.email,
-    image: session.user.image,
-  };
+  return true;
 });
 
-export default verifyUser;
+export default verifyUserLogged;

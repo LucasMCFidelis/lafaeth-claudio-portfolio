@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 
-import verifyUser from "../data/user/verify-user";
+import verifyUserLogged from "../data/user/verify-user";
 
 const AdminHomePage = async () => {
-  const userLogged = await verifyUser();
+  const userLogged = await verifyUserLogged();
   if (!userLogged) {
     redirect("/admin/auth");
   }

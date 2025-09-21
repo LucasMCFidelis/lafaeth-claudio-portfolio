@@ -12,6 +12,10 @@ export const auth = betterAuth({
   }),
   user: {
     modelName: "userTable",
+    additionalFields: {
+      description: {type: "string"},
+      birthDate: {type: "date"}
+    }
   },
   session: {
     modelName: "sessionTable",

@@ -1,7 +1,7 @@
 import { Menu } from "lucide-react";
 import Link from "next/link";
 
-import verifyUser from "@/app/data/user/verify-user";
+import verifyUserLogged from "@/app/data/user/verify-user";
 
 import {
   Sheet,
@@ -15,7 +15,7 @@ import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
 
 const SheetMenu = async () => {
-  const userLogged = await verifyUser();
+  const userLogged = await verifyUserLogged();
 
   return (
     <Sheet>

@@ -3,4 +3,6 @@ export interface UserDTO {
   name: string;
   email: string;
   image?: string | null;
+  description: string | null;
+  birthDate: Date | null;
 }

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import verifyUser from "@/app/data/user/verify-user";
+import verifyUserLogged from "@/app/data/user/verify-user";
 
 import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
@@ -8,7 +8,7 @@ import SheetMenu from "./sheet-menu";
 import ToggleTheme from "./toggle-theme";
 
 const Header = async () => {
-  const userLogged = await verifyUser();
+  const userLogged = await verifyUserLogged();
 
   return (
     <>
