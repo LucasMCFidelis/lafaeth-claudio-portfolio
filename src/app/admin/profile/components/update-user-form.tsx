@@ -2,9 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import z from "zod";
+import { toast } from "sonner";
 
+import { updateUserSchema } from "@/app/data/schemas/update-user-schema";
 import { UserDTO } from "@/app/data/user/user-dto";
+import { UserUpdateDTO } from "@/app/data/user/user-update-dto";
 import ProfileImage from "@/components/common/profile-image";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,26 +20,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateToInput } from "@/helpers/format-date-to-input";
-
-const formUpdate = z.object({
-  name: z.string("Nome inválido.").trim().min(1, "Nome é obrigatório."),
-  email: z.email("E-mail inválido!"),
-  image: z.string(),
-  description: z.string(),
-  birthDate: z.string().refine((val) => new Date(val) <= new Date(), {
-    message: "Data de nascimento não pode estar no futuro",
-  }),
-});
-
-type FormUpdateValues = z.infer<typeof formUpdate>;
+import { useUpdateUserData } from "@/hooks/mutations/use-update-user-data";
 
 interface UpdateUserFormProps {
   initialData: UserDTO;
 }
 
 const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
-  const form = useForm<FormUpdateValues>({
-    resolver: zodResolver(formUpdate),
+  const updateUserDataMutation = useUpdateUserData();
+  const form = useForm<UserUpdateDTO>({
+    resolver: zodResolver(updateUserSchema),
     defaultValues: {
       name: initialData.name,
       email: initialData.email,
@@ -47,9 +39,14 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
     },
   });
 
-  function onSubmit(data: FormUpdateValues) {
+  async function onSubmit(data: UserUpdateDTO) {
     const birthDate = new Date(data.birthDate);
     console.log({ ...data, birthDate });
+    await updateUserDataMutation.mutateAsync(data, {
+      onSuccess: () => toast.success("Perfil atualizado com sucesso"),
+      onError: (error) =>
+        toast.error(error.message || "Erro ao atualizar perfil"),
+    });
   }
 
   return (
@@ -128,7 +125,11 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full max-w-lg md:col-span-full justify-self-center md:mt-5">
+        <Button
+          type="submit"
+          className="w-full max-w-lg md:col-span-full justify-self-center md:mt-5"
+          disabled={updateUserDataMutation.isPending}
+        >
           Atualizar
         </Button>
       </form>

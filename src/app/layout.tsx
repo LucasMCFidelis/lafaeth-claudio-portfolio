@@ -7,6 +7,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import Footer from "@/components/common/footer";
 import Header from "@/components/common/header";
 import { Toaster } from "@/components/ui/sonner";
+import ReactQueryProvider from "@/providers/react-query";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,14 +34,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        <NuqsAdapter>
-          <Header />
-          <main className="flex flex-1 flex-col">
-            {children}
-            <Toaster />
-          </main>
-          <Footer />
-        </NuqsAdapter>
+        <ReactQueryProvider>
+          <NuqsAdapter>
+            <Header />
+            <main className="flex flex-1 flex-col">
+              {children}
+              <Toaster />
+            </main>
+            <Footer />
+          </NuqsAdapter>
+        </ReactQueryProvider>
       </body>
     </html>
   );
