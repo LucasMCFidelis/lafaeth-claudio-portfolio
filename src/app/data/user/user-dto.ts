@@ -5,4 +5,5 @@ export interface UserDTO {
   image?: string | null;
   description: string | null;
   birthDate: Date | null;
+  age: number | null
 }
