@@ -8,7 +8,11 @@ const AdminHomePage = async () => {
     redirect("/admin/auth");
   }
 
-  return <div>Home Page Admin</div>;
+  return (
+    <>
+      <div>Home Page Admin</div>
+    </>
+  );
 };
 
 export default AdminHomePage;

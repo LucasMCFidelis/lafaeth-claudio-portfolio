@@ -9,7 +9,7 @@ import { calculateAge } from "@/helpers/calculate-age";
 
 import { UserDTO } from "./user-dto";
 
-const getUserData = cache(async (): Promise<UserDTO | null> => {
+const getUserData = cache(async (): Promise<UserDTO> => {
   const userId = process.env.NEXT_PUBLIC_USER_ID;
   if (!userId) throw new Error("Public userId not defined in env variables");
 
