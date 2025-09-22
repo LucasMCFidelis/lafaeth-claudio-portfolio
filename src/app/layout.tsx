@@ -37,7 +37,7 @@ export default function RootLayout({
         <ReactQueryProvider>
           <NuqsAdapter>
             <Header />
-            <main className="flex flex-1 flex-col">
+            <main className="flex-1">
               {children}
               <Toaster />
             </main>
