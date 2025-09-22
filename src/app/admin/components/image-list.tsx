@@ -17,13 +17,19 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useQueryClient } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryStates } from "nuqs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import ContainerImageHome from "@/components/common/image-home/container-image-home";
 import ImageHome from "@/components/common/image-home/image-home";
 import { Button } from "@/components/ui/button";
+import { useUpdateHomeImagesOrder } from "@/hooks/mutations/use-update-home-images-order";
+import {
+  getHomeImagesQueryKey,
+  useHomeImages,
+} from "@/hooks/queries/use-home-images";
 
 interface SortableImageProps {
   image: ImageDTO;
@@ -57,7 +63,9 @@ interface ImageListProps {
 }
 
 export default function ImageList({ initialData }: ImageListProps) {
-  const [images, setImages] = useState<Array<ImageDTO>>(initialData);
+  const queryClient = useQueryClient();
+  const { data: images = [] } = useHomeImages({ initialData });
+  const updateHomeImagesOrderMutation = useUpdateHomeImagesOrder();
   const [imageListStates, setImageListStates] = useQueryStates({
     mounted: parseAsBoolean.withDefault(false),
     sortingIsDisabled: parseAsBoolean.withDefault(true),
@@ -78,11 +86,15 @@ export default function ImageList({ initialData }: ImageListProps) {
     const { active, over } = event;
 
     if (active.id !== over?.id) {
-      setImages((items) => {
-        const oldIndex = items.findIndex((i) => i.id === active.id);
-        const newIndex = items.findIndex((i) => i.id === over!.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      queryClient.setQueryData<Array<ImageDTO>>(
+        getHomeImagesQueryKey(),
+        (items) => {
+          if (!items) return;
+          const oldIndex = items.findIndex((i) => i.id === active.id);
+          const newIndex = items.findIndex((i) => i.id === over!.id);
+          return arrayMove(items, oldIndex, newIndex);
+        }
+      );
     }
   };
 
@@ -128,7 +140,16 @@ export default function ImageList({ initialData }: ImageListProps) {
           )}
         </Button>
         {imageListStates.sortingIsDisabled === false && (
-          <Button className="w-full">Salvar Ordenação</Button>
+          <Button
+            className="w-full"
+            disabled={updateHomeImagesOrderMutation.isPending}
+            onClick={async () => {
+              await updateHomeImagesOrderMutation.mutateAsync(images);
+              setImageListStates({ sortingIsDisabled: true });
+            }}
+          >
+            Salvar Ordenação
+          </Button>
         )}
       </div>
     </>
