@@ -1,4 +1,12 @@
-import { boolean, date, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  date,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
   id: text("id").primaryKey(),
@@ -60,4 +68,14 @@ export const verificationTable = pgTable("verification", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+});
+
+export const imagesTable = pgTable("images", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  imageUrl: text("image_url").notNull(),
+  visibleInHome: boolean("visible_in_home").notNull().default(false),
+  indexInHome: numeric("index_in_home"),
+  createdAt: date("created_at").defaultNow().notNull(),
 });
