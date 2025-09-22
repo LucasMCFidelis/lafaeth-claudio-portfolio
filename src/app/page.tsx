@@ -1,6 +1,3 @@
-import { eq } from "drizzle-orm";
-import Image from "next/image";
-
 import ContainerImageHome from "@/components/common/image-home/container-image-home";
 import ImageHome from "@/components/common/image-home/image-home";
 import ProfileImage from "@/components/common/profile-image";
@@ -11,16 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { db } from "@/db";
-import { imagesTable } from "@/db/schema";
 
+import getHomeImages from "./data/image/get-home-images";
 import getUserData from "./data/user/get-user-data";
 
 export default async function Home() {
   const user = await getUserData();
-  const imagesHome = await db.query.imagesTable.findMany({
-    where: eq(imagesTable.visibleInHome, true),
-  });
+  const imagesHome = await getHomeImages();
 
   return (
     <div className="w-full max-w-screen flex flex-col gap-5 md:gap-10 items-center px-5 mx-auto my-5">

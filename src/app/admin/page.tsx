@@ -1,9 +1,6 @@
-import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
-import { db } from "@/db";
-import { imagesTable } from "@/db/schema";
-
+import getHomeImages from "../data/image/get-home-images";
 import verifyUserLogged from "../data/user/verify-user";
 import ImageList from "./components/image-list";
 
@@ -13,9 +10,7 @@ const AdminHomePage = async () => {
     redirect("/admin/auth");
   }
 
-  const imagesHome = await db.query.imagesTable.findMany({
-    where: eq(imagesTable.visibleInHome, true),
-  });
+  const imagesHome = await getHomeImages();
 
   return (
     <>
