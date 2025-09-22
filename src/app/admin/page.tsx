@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import getHomeImages from "../data/image/get-home-images";
+import getManyImages from "../data/image/get-many-images";
 import verifyUserLogged from "../data/user/verify-user";
 import ImageList from "./components/image-list";
 
@@ -10,7 +10,9 @@ const AdminHomePage = async () => {
     redirect("/admin/auth");
   }
 
-  const imagesHome = await getHomeImages();
+  const imagesHome = await getManyImages({
+    where: { field: "visibleInHome", value: true },
+  });
 
   return (
     <>

@@ -1,11 +1,10 @@
 import {
   boolean,
   date,
-  numeric,
-  pgTable,
+  integer, pgTable,
   text,
   timestamp,
-  uuid,
+  uuid
 } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
@@ -76,6 +75,6 @@ export const imagesTable = pgTable("images", {
   description: text("description").notNull(),
   imageUrl: text("image_url").notNull(),
   visibleInHome: boolean("visible_in_home").notNull().default(false),
-  indexInHome: numeric("index_in_home"),
+  indexInHome: integer("index_in_home"),
   createdAt: date("created_at").defaultNow().notNull(),
 });

@@ -9,12 +9,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import getHomeImages from "./data/image/get-home-images";
+import getManyImages from "./data/image/get-many-images";
 import getUserData from "./data/user/get-user-data";
 
 export default async function Home() {
   const user = await getUserData();
-  const imagesHome = await getHomeImages();
+  const imagesHome = await getManyImages({
+    where: { field: "visibleInHome", value: true },
+  });
 
   return (
     <div className="w-full max-w-screen flex flex-col gap-5 md:gap-10 items-center px-5 mx-auto my-5">
