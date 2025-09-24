@@ -47,6 +47,7 @@ const SortableImage = ({ image, disabled }: SortableImageProps) => {
 
   return (
     <ContainerImageHome
+      imageId={image.id}
       ref={setNodeRef}
       style={style}
       {...attributes}

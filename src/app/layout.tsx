@@ -32,12 +32,12 @@ export default function RootLayout({
   return (
     <html lang="pt">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col justify-start`}
       >
         <ReactQueryProvider>
           <NuqsAdapter>
             <Header />
-            <main className="flex-1">
+            <main className="flex flex-col flex-1">
               {children}
               <Toaster />
             </main>

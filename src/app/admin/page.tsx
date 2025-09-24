@@ -15,11 +15,11 @@ const AdminHomePage = async () => {
   });
 
   return (
-    <>
+    <div className="flex flex-col flex-1 w-full gap-6">
       <div>Home Page Admin</div>
 
       <ImageList initialData={imagesHome} />
-    </>
+    </div>
   );
 };
 
