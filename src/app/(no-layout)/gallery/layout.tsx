@@ -1,7 +1,6 @@
-import { ExpandIcon } from "lucide-react";
 import type { Metadata } from "next";
 
-import { Button } from "@/components/ui/button";
+import ExpandFullSizeButton from "./components/expand-full-size-button";
 
 export const metadata: Metadata = {
   title: "Galeria de projetos",
@@ -15,14 +14,11 @@ export default function GalleryLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="relative flex flex-col flex-1">
-      <Button
-        size="icon"
-        className="absolute translate-5"
-      >
-        <ExpandIcon />
-      </Button>
-      <div className="flex flex-col flex-1 p-5 w-full sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10">{children}</div>
+    <main id="gallery-container" className="relative flex flex-col flex-1 ">
+      <ExpandFullSizeButton />
+      <div className="flex flex-col flex-1 p-5 w-full sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10">
+        {children}
+      </div>
     </main>
   );
 }
