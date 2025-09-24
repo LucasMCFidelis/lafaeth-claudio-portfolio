@@ -12,14 +12,14 @@ export default function GalleryPage() {
   const { data: image } = useImage(id);
 
   return (
-    <div className="w-full flex-1 grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10 px-5">
-      <div className="h-full w-full relative flex flex-1 overflow-hidden rounded-xl shadow-md">
+    <div className="w-full flex-1 flex flex-col sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10 px-5">
+      <div className="flex-1 relative">
         {image && (
           <Image
             src={image?.imageUrl}
             alt={"teste"}
             fill
-            className="object-contain h-full w-full"
+            className="object-contain"
           />
         )}
       </div>
