@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
-import getManyImages from "../data/image/get-many-images";
-import verifyUserLogged from "../data/user/verify-user";
+import getManyImages from "../../data/image/get-many-images";
+import verifyUserLogged from "../../data/user/verify-user";
 import ImageList from "./components/image-list";
 
 const AdminHomePage = async () => {

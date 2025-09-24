@@ -9,8 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import getManyImages from "./data/image/get-many-images";
-import getUserData from "./data/user/get-user-data";
+import getManyImages from "../data/image/get-many-images";
+import getUserData from "../data/user/get-user-data";
 
 export default async function Home() {
   const user = await getUserData();

@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, X } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { parseAsString, useQueryState } from "nuqs";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -46,7 +47,20 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
           />
         )}
       </div>
-      <div className="font-sans">
+      <div className="font-sans flex flex-col justify-between">
+        <Button size="icon" className="self-end" asChild>
+          <Link href={"/"}>
+            <X />
+          </Link>
+        </Button>
+        {image && (
+          <div className="flex-1">
+            <h2 className="font-extrabold text-xl md:text-3xl ">
+              {image.title}
+            </h2>
+            <p>{image.description}</p>
+          </div>
+        )}
         <div className="flex w-full justify-between items-center mb-2">
           <Button size="icon" onClick={goPrev}>
             <ArrowBigLeft />
@@ -55,14 +69,6 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
             <ArrowBigRight />
           </Button>
         </div>
-        {image && (
-          <>
-            <h2 className="font-extrabold text-xl md:text-3xl ">
-              {image.title}
-            </h2>
-            <p>{image.description}</p>
-          </>
-        )}
       </div>
     </>
   );
