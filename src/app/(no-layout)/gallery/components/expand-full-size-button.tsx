@@ -5,10 +5,8 @@ import { parseAsBoolean, useQueryState } from "nuqs";
 import { ButtonHTMLAttributes, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 
 const ExpandFullSizeButton = ({
-  className,
   onClick,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement>) => {
@@ -37,7 +35,6 @@ const ExpandFullSizeButton = ({
   return (
     <Button
       size="icon"
-      className={cn("absolute translate-5 z-10", className)}
       onClick={(e) => (onClick ? onClick(e) : toggleFullscreen())}
       {...rest}
     >

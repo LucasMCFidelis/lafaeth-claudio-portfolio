@@ -54,11 +54,6 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
         )}
       </div>
       <div className="font-sans flex flex-col justify-between">
-        <Button size="icon" className="self-end" asChild>
-          <Link href={"/"}>
-            <X />
-          </Link>
-        </Button>
         {image && (
           <div
             className={`flex-1 sm:mt-10 ${
