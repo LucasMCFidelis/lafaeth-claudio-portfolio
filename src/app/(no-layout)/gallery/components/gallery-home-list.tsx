@@ -1,9 +1,8 @@
 "use client";
 
-import { ArrowBigLeft, ArrowBigRight, X } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { parseAsString, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,14 @@ interface GalleryHomeListProps {
 }
 
 const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
-  const [id, setId] = useQueryState("id", parseAsString);
+  const [
+    { id, darkTheme: isDarkTheme, "full-screen": isFullscreen },
+    setValues,
+  ] = useQueryStates({
+    id: parseAsString,
+    darkTheme: parseAsBoolean,
+    "full-screen": parseAsBoolean,
+  });
   if (!id) throw new Error("id is required");
 
   const { data: images = [] } = useHomeImages(initialData && { initialData });
@@ -24,7 +30,7 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
   const goToImage = (newIndex: number) => {
     const target = images[newIndex];
     if (target) {
-      setId(target.id);
+      setValues({ id: target.id });
     }
   };
 
@@ -54,7 +60,11 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
           </Link>
         </Button>
         {image && (
-          <div className="flex-1">
+          <div
+            className={`flex-1 sm:mt-10 ${
+              isFullscreen && !isDarkTheme && "text-white"
+            }`}
+          >
             <h2 className="font-extrabold text-xl md:text-3xl ">
               {image.title}
             </h2>
