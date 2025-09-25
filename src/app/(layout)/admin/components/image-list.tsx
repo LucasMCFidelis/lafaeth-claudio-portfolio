@@ -52,6 +52,7 @@ const SortableImage = ({ image, disabled }: SortableImageProps) => {
       style={style}
       {...attributes}
       {...(!disabled ? listeners : {})}
+      disableLink={!disabled}
       className="cursor-move"
     >
       <ImageHome src={image.imageUrl} alt={image.title} />

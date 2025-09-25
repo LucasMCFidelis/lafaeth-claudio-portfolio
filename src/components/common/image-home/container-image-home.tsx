@@ -7,27 +7,31 @@ interface ContainerImageHomeProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   children: React.ReactNode;
   imageId: string;
+  disableLink?: boolean; // <-- novo
 }
 
 const ContainerImageHome = ({
   children,
   imageId,
   className,
+  disableLink = false,
   ...rest
 }: ContainerImageHomeProps) => {
-  return (
-    <Link href={`/gallery?id=${imageId}`}>
-      <div
-        {...rest}
-        className={cn(
-          "relative aspect-square overflow-hidden rounded-xl bg-muted shadow-md",
-          className
-        )}
-      >
-        {children}
-      </div>
-    </Link>
+  const content = (
+    <div
+      {...rest}
+      className={cn(
+        "relative aspect-square overflow-hidden rounded-xl bg-muted shadow-md",
+        className
+      )}
+    >
+      {children}
+    </div>
   );
+
+  if (disableLink) return content;
+
+  return <Link href={`/gallery?id=${imageId}`}>{content}</Link>;
 };
 
 export default ContainerImageHome;
