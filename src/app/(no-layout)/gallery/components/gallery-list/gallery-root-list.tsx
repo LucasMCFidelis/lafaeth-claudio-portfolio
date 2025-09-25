@@ -6,13 +6,16 @@ import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
-import { useHomeImages } from "@/hooks/queries/use-home-images";
 
-interface GalleryHomeListProps {
-  initialData?: Array<ImageDTO>;
+interface GalleryRootListProps<T extends ImageDTO> {
+  imagesList: Array<T>;
+  children?: React.ReactNode;
 }
 
-const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
+const GalleryRootList = <T extends ImageDTO>({
+  imagesList,
+  children,
+}: GalleryRootListProps<T>) => {
   const [
     { id, darkTheme: isDarkTheme, "full-screen": isFullscreen },
     setValues,
@@ -23,23 +26,24 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
   });
   if (!id) throw new Error("id is required");
 
-  const { data: images = [] } = useHomeImages(initialData && { initialData });
-  const currentIndex = images.findIndex((img) => img.id === id);
-  const image = images[currentIndex];
+  const currentIndex = imagesList.findIndex((img) => img.id === id);
+  const startIndex = 0;
+  const endIndex = imagesList.length - 1;
+  const image = imagesList[currentIndex];
 
   const goToImage = (newIndex: number) => {
-    const target = images[newIndex];
+    const target = imagesList[newIndex];
     if (target) {
       setValues({ id: target.id });
     }
   };
 
   const goPrev = () => {
-    goToImage(currentIndex > 0 ? currentIndex - 1 : images.length - 1);
+    goToImage(currentIndex > startIndex ? currentIndex - 1 : endIndex);
   };
 
   const goNext = () => {
-    goToImage(currentIndex < images.length - 1 ? currentIndex + 1 : 0);
+    goToImage(currentIndex < endIndex ? currentIndex + 1 : startIndex);
   };
   return (
     <>
@@ -53,19 +57,24 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
           />
         )}
       </div>
-      <div className="font-sans flex flex-col justify-between">
-        {image && (
-          <div
-            className={`flex-1 sm:mt-10 ${
-              isFullscreen && !isDarkTheme && "text-white"
-            }`}
-          >
-            <h2 className="font-extrabold text-xl md:text-3xl ">
-              {image.title}
-            </h2>
-            <p>{image.description}</p>
-          </div>
-        )}
+      <div
+        className={`font-sans flex flex-col justify-between sm:mt-10 ${
+          isFullscreen && !isDarkTheme && "text-white"
+        }`}
+      >
+        <div className="flex-1">
+          {children ? (
+            children
+          ) : (
+            <>
+              <h2 className="font-extrabold text-xl md:text-3xl ">
+                {image.title}
+              </h2>
+              <p>{image.description}</p>
+            </>
+          )}
+        </div>
+
         <div className="flex w-full justify-between items-center mb-2">
           <Button size="icon" onClick={goPrev}>
             <ArrowBigLeft />
@@ -79,4 +88,4 @@ const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
   );
 };
 
-export default GalleryHomeList;
+export default GalleryRootList;

@@ -1,5 +1,5 @@
 import getManyImages from "../../data/image/get-many-images";
-import GalleryHomeList from "./components/gallery-home-list";
+import GalleryHomeList from "./components/gallery-list/gallery-home-list";
 
 export default async function GalleryPage() {
   const imagesHome = await getManyImages({
