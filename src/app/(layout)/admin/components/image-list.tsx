@@ -129,6 +129,11 @@ export default function ImageList({ initialData }: ImageListProps) {
             setImageListStates((prev) => {
               return { sortingIsDisabled: !prev.sortingIsDisabled };
             });
+            if (!imageListStates.sortingIsDisabled) {
+              queryClient.invalidateQueries({
+                queryKey: getHomeImagesQueryKey(),
+              });
+            }
           }}
           variant={
             imageListStates.sortingIsDisabled ? "default" : "destructive"
