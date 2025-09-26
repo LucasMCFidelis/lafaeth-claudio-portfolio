@@ -1,7 +1,5 @@
 "use client";
 
-import { parseAsIndex, useQueryState } from "nuqs";
-
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { useHomeImages } from "@/hooks/queries/use-home-images";
 
