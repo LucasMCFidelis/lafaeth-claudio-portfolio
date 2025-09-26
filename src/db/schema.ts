@@ -1,10 +1,12 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   date,
-  integer, pgTable,
+  integer,
+  pgTable,
   text,
   timestamp,
-  uuid
+  uuid,
 } from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("user", {
@@ -78,3 +80,30 @@ export const imagesTable = pgTable("images", {
   indexInHome: integer("index_in_home"),
   createdAt: date("created_at").defaultNow().notNull(),
 });
+
+export const flatTable = pgTable("flat", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  frontImageId: uuid("front_image_id").references(() => imagesTable.id, {
+    onDelete: "set null",
+  }),
+  backImageId: uuid("back_image_id").references(() => imagesTable.id, {
+    onDelete: "set null",
+  }),
+  artist: text("artist").notNull(),
+  screenwriter: text("screenwriter"),
+  horizontalPage: boolean("horizontal_page").notNull().default(false),
+  visibleInFlat: boolean("visible_in_flat").notNull().default(false),
+});
+
+export const flatRelations = relations(flatTable, ({ one }) => ({
+  frontImage: one(imagesTable, {
+    fields: [flatTable.frontImageId],
+    references: [imagesTable.id],
+  }),
+  backImage: one(imagesTable, {
+    fields: [flatTable.backImageId],
+    references: [imagesTable.id],
+  }),
+}));
