@@ -31,6 +31,8 @@ import {
   useHomeImages,
 } from "@/hooks/queries/use-home-images";
 
+import CadastreImageModal from "./cadastre-image-modal";
+
 interface SortableImageProps {
   image: ImageDTO;
   disabled?: boolean;
@@ -131,9 +133,7 @@ export default function ImageList({ initialData }: ImageListProps) {
           variant={
             imageListStates.sortingIsDisabled ? "default" : "destructive"
           }
-          className={`w-full ${
-            imageListStates.sortingIsDisabled && "col-span-2"
-          }`}
+          className="w-full"
         >
           {imageListStates.sortingIsDisabled ? (
             <>Habilitar edição de imagens da Home</>
@@ -141,7 +141,7 @@ export default function ImageList({ initialData }: ImageListProps) {
             <>Cancelar edição</>
           )}
         </Button>
-        {imageListStates.sortingIsDisabled === false && (
+        {!imageListStates.sortingIsDisabled ? (
           <Button
             className="w-full"
             disabled={updateHomeImagesOrderMutation.isPending}
@@ -152,6 +152,8 @@ export default function ImageList({ initialData }: ImageListProps) {
           >
             Salvar Ordenação
           </Button>
+        ) : (
+          <CadastreImageModal />
         )}
       </div>
     </>

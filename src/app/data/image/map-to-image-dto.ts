@@ -13,6 +13,7 @@ export function mapToImageDTO({ image }: MapImageDTOProps): ImageDTO {
     description: image.description,
     imageUrl: image.imageUrl,
     visibleInHome: !!image.visibleInHome,
+    indexInHome: image.indexInHome,
     createdAt: image.createdAt,
   };
 }
