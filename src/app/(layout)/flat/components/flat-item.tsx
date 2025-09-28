@@ -36,7 +36,7 @@ const FlatItem = memo(({ flat, children }: FlatItemProps) => {
       onMouseMove={onDrag}
       onMouseUp={stopDrag}
       onMouseLeave={stopDrag}
-      className={`relative flex mx-auto ${
+      className={`relative flex mx-auto select-none ${
         flat.horizontalPage
           ? // horizontal
             "h-[200px] w-[311px] sm:h-[300px] sm:w-[466px] md:h-[400px] md:w-[622px] lg:h-[500px] lg:w-[777px] xl:h-[600px] xl:w-[933px]"
@@ -45,7 +45,7 @@ const FlatItem = memo(({ flat, children }: FlatItemProps) => {
       }`}
     >
       <div
-        className="absolute top-0 bottom-0 z-30 w-px bg-primary select-none"
+        className="absolute top-0 bottom-0 z-30 w-px bg-primary"
         style={{ left: `${dividerX}%`, transform: "translateX(-50%)" }}
       >
         <div
@@ -68,7 +68,7 @@ const FlatItem = memo(({ flat, children }: FlatItemProps) => {
             src={flat.frontImage?.imageUrl}
             alt={`${flat.title} - line`}
             fill
-            className={`object-cover object-left`}
+            className={`object-cover object-left pointer-events-none`}
           />
         </div>
       )}

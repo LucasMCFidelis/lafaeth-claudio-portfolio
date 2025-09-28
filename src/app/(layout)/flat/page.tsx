@@ -20,7 +20,7 @@ const FlatPage = async () => {
                 src={flat.backImage?.imageUrl}
                 alt={`${flat.title} - flat`}
                 fill
-                className={`object-contain overflow-hidden object-left z-10`}
+                className={`object-contain overflow-hidden object-left z-10 pointer-events-none`}
               />
             )}
 
