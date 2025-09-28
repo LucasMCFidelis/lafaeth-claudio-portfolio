@@ -6,6 +6,7 @@ import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
+import getPreferenceTheme from "@/helpers/get-theme-preference";
 
 interface GalleryRootListProps<T extends ImageDTO> {
   imagesList: Array<T>;
@@ -16,12 +17,9 @@ const GalleryRootList = <T extends ImageDTO>({
   imagesList,
   children,
 }: GalleryRootListProps<T>) => {
-  const [
-    { id, darkTheme: isDarkTheme, "full-screen": isFullscreen },
-    setValues,
-  ] = useQueryStates({
+  const isDarkTheme = getPreferenceTheme();
+  const [{ id, "full-screen": isFullscreen }, setValues] = useQueryStates({
     id: parseAsString,
-    darkTheme: parseAsBoolean,
     "full-screen": parseAsBoolean,
   });
   if (!id) throw new Error("id is required");

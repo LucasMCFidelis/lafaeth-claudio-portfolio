@@ -1,18 +1,17 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+import getPreferenceTheme from "@/helpers/get-theme-preference";
 
 import { Button } from "../ui/button";
 
 const ToggleTheme = () => {
-  const [darkTheme, setDarkTheme] = useQueryState(
-    "darkTheme",
-    parseAsBoolean.withDefault(true)
-  );
+  const [darkTheme, setDarkTheme] = useState<boolean>(getPreferenceTheme());
 
   useEffect(() => {
+    localStorage.setItem("darkTheme", `${darkTheme}`);
     if (darkTheme) {
       document.documentElement.classList.add("dark");
     } else {
