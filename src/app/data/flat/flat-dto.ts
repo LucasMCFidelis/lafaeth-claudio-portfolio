@@ -6,10 +6,9 @@ export type FlatDTO<WithImages extends boolean = true> = {
   description: string;
   frontImageId: string | null;
   backImageId: string | null;
-  artist: string;
-  screenwriter: string | null;
   horizontalPage: boolean;
   visibleInFlat: boolean;
+  indexInFlat: number | null;
 
   frontImage?: ImageDTO | null;
   backImage?: ImageDTO | null;

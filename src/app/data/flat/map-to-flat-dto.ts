@@ -19,10 +19,9 @@ const mapToFlatDTO = <WithImages extends boolean = false>({
     id: data.id,
     title: data.title,
     description: data.description,
-    artist: data.artist,
-    screenwriter: data.screenwriter,
-    horizontalPage: data.horizontalPage,
     visibleInFlat: data.visibleInFlat,
+    indexInFlat: data.indexInFlat,
+    horizontalPage: data.backImage?.horizontalPage === data.frontImage?.horizontalPage,
     backImageId: data.backImageId,
     frontImageId: data.frontImageId,
     ...(withImages && {

@@ -4,6 +4,10 @@ export type ImageDTO = {
   description: string;
   createdAt: string;
   imageUrl: string;
+  artist: string;
+  screenwriter: string | null;
+  colorist: string | null;
+  horizontalPage: boolean;
   visibleInHome: boolean;
   indexInHome: number | null
 } 

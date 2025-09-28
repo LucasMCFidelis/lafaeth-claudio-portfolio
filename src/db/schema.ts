@@ -76,6 +76,10 @@ export const imagesTable = pgTable("images", {
   title: text("title").notNull(),
   description: text("description").notNull(),
   imageUrl: text("image_url").notNull(),
+  artist: text("artist").notNull(),
+  screenwriter: text("screenwriter"),
+  colorist: text("colorist"),
+  horizontalPage: boolean("horizontal_page").notNull().default(false),
   visibleInHome: boolean("visible_in_home").notNull().default(false),
   indexInHome: integer("index_in_home"),
   createdAt: date("created_at").defaultNow().notNull(),
@@ -91,10 +95,8 @@ export const flatTable = pgTable("flat", {
   backImageId: uuid("back_image_id").references(() => imagesTable.id, {
     onDelete: "set null",
   }),
-  artist: text("artist").notNull(),
-  screenwriter: text("screenwriter"),
-  horizontalPage: boolean("horizontal_page").notNull().default(false),
   visibleInFlat: boolean("visible_in_flat").notNull().default(false),
+  indexInFlat: integer("index_in_flat"),
 });
 
 export const flatRelations = relations(flatTable, ({ one }) => ({
@@ -107,3 +109,48 @@ export const flatRelations = relations(flatTable, ({ one }) => ({
     references: [imagesTable.id],
   }),
 }));
+
+export const comicsTable = pgTable("comic", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  imageId: uuid("image_id").references(() => imagesTable.id, {
+    onDelete: "set null",
+  }),
+  productionYear: integer("production_year")
+    .notNull()
+    .default(new Date().getFullYear()),
+  productionSizePages: integer("production_size_pages").notNull(),
+  visibleInComics: boolean("visible_in_comics").notNull().default(false),
+  indexInComics: integer("index_in_comics"),
+});
+
+export const comicsRelations = relations(comicsTable, ({ one }) => ({
+  image: one(imagesTable, {
+    fields: [comicsTable.imageId],
+    references: [imagesTable.id],
+  }),
+}));
+
+export const colorizationTable = pgTable("colorization", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  imageId: uuid("image_id").references(() => imagesTable.id, {
+    onDelete: "set null",
+  }),
+  productionYear: integer("production_year")
+    .notNull()
+    .default(new Date().getFullYear()),
+    observations: text("observations"),
+  visibleInColorization: boolean("visible_in_colorization")
+    .notNull()
+    .default(false),
+  indexInColorization: integer("index_in_comics"),
+});
+
+export const colorizationRelations = relations(
+  colorizationTable,
+  ({ one }) => ({
+    image: one(imagesTable, {
+      fields: [colorizationTable.imageId],
+      references: [imagesTable.id],
+    }),
+  })
+);
