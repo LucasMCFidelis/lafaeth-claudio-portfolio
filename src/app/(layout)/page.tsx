@@ -1,3 +1,5 @@
+import { Metadata } from "next";
+
 import ContainerImageHome from "@/components/common/image-home/container-image-home";
 import ImageHome from "@/components/common/image-home/image-home";
 import ProfileImage from "@/components/common/profile-image";
@@ -11,6 +13,12 @@ import {
 
 import getManyImages from "../data/image/get-many-images";
 import getUserData from "../data/user/get-user-data";
+
+export const metadata: Metadata = {
+  title: "Portfolio Lafaeth Claudio - Inicio",
+  description:
+    "Página inicial do portfolio do Design, Ilustrador e Quadrinista Lafaeth Claudio. Essa página inclui um breve sobre e images destacadas com possibilidade de abertura em galeria",
+};
 
 export default async function Home() {
   const user = await getUserData();

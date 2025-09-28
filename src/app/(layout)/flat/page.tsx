@@ -1,8 +1,15 @@
+import { Metadata } from "next";
 import Image from "next/image";
 
 import getManyFlats from "@/app/data/flat/get-many-flats";
 
 import FlatItem from "./components/flat-item";
+
+export const metadata: Metadata = {
+  title: "Portfolio Lafaeth Claudio - Flat",
+  description:
+    "Página dos projetos de Flat no portfolio do Design, Ilustrador e Quadrinista Lafaeth Claudio. Essa página é destinada aos projetos de Flat com suporte a comparação das imagens de flat e line",
+};
 
 const FlatPage = async () => {
   const flats = await getManyFlats({
