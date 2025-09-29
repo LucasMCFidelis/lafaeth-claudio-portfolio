@@ -23,6 +23,10 @@ export const postImage = async (data: CadastreImageDTO): Promise<ImageDTO> => {
       description: dataValidated.description,
       imageUrl: dataValidated.imageUrl,
       visibleInHome: dataValidated.visibleInHome,
+      artist: dataValidated.artist,
+      screenwriter: dataValidated.screenwriter,
+      colorist: dataValidated.colorist,
+      horizontalPage: dataValidated.horizontalPage
     })
     .returning();
 

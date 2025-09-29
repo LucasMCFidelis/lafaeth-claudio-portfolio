@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { matchUrlDrive } from "@/helpers/match-url-drive";
 import { usePostHomeImage } from "@/hooks/mutations/use-post-home-image";
 
@@ -54,6 +55,8 @@ const CadastreImageModal = () => {
     setCadastreImageModalIsOpen(false);
   }
 
+  const valueImageUrl = formCadastreImage.watch("imageUrl");
+
   return (
     <>
       <Dialog
@@ -73,10 +76,10 @@ const CadastreImageModal = () => {
             Adicionar imagem
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="md:max-w-3xl">
           <DialogHeader>
             <DialogTitle>Cadastro de imagem</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="hidden md:block">
               Preencha os todos os campos abaixo, você pode definir a ordem da
               imagem na galeria
             </DialogDescription>
@@ -84,8 +87,38 @@ const CadastreImageModal = () => {
           <Form {...formCadastreImage}>
             <form
               onSubmit={formCadastreImage.handleSubmit(onSubmit)}
-              className="space-y-6"
+              className="grid sm:grid-cols-2 gap-4"
             >
+              {valueImageUrl && (
+                <ContainerImageHome
+                  imageId=""
+                  disableLink={true}
+                  className="size-22 sm:size-32 md:size-48 mx-auto"
+                >
+                  <ImageHome
+                    src={matchUrlDrive(valueImageUrl)}
+                    alt="Imagem que será salva"
+                  />
+                </ContainerImageHome>
+              )}
+              <FormField
+                control={formCadastreImage.control}
+                name="imageUrl"
+                render={({ field }) => (
+                  <FormItem className="sm:col-span-2 sm:flex ">
+                    <div
+                      className="flex-1 flex gap-2 flex-col justify-end
+                    "
+                    >
+                      <FormLabel>Url da Imagem</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Insira a url" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </div>
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={formCadastreImage.control}
                 name="title"
@@ -103,55 +136,101 @@ const CadastreImageModal = () => {
                 control={formCadastreImage.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="row-span-2 flex flex-col row-start-4">
                     <FormLabel>Descrição</FormLabel>
                     <FormControl>
-                      <Input placeholder="Insira a descrição" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formCadastreImage.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    {field.value && (
-                      <ContainerImageHome imageId="" disableLink={true} className="size-32 sm:size-48 mx-auto">
-                        <ImageHome
-                          src={matchUrlDrive(field.value)}
-                          alt="Imagem que será salva"
-                        />
-                      </ContainerImageHome>
-                    )}
-                    <FormLabel>Url da Imagem</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Insira a url" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formCadastreImage.control}
-                name="visibleInHome"
-                render={({ field }) => (
-                  <FormItem className="flex">
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
+                      <Textarea
+                        placeholder="Insira a descrição"
+                        className=" resize-none flex-1"
+                        {...field}
                       />
                     </FormControl>
-                    <FormLabel>Exibir na home</FormLabel>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <FormField
+                control={formCadastreImage.control}
+                name="artist"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Artista</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Insira o artista" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={formCadastreImage.control}
+                name="screenwriter"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Roteirista</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Insira o roteirista" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={formCadastreImage.control}
+                name="colorist"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Colorista</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Insira o colorista" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div
+                className={`flex justify-between gap-2 ${
+                  !valueImageUrl
+                    ? "sm:col-start-1 col-span-full"
+                    : "sm:col-start-2 sm:flex-col sm:justify-center"
+                } sm:row-start-1`}
+              >
+                <FormField
+                  control={formCadastreImage.control}
+                  name="visibleInHome"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center">
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel>Exibir na home</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formCadastreImage.control}
+                  name="horizontalPage"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center">
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel>Página horizontal</FormLabel>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full col-span-full"
                 disabled={postHomeImageMutation.isPending}
               >
                 Cadastrar Imagem

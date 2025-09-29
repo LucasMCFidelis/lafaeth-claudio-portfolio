@@ -17,7 +17,7 @@ export const cadastreImageSchema = z.object({
     .refine(
       (val) =>
         val.includes("https://drive.google.com/") &&
-        z.string().url().safeParse(val).success,
+        z.url().safeParse(val).success,
       {
         message: "Url da imagem deve ser uma URL válida do drive",
       }
@@ -26,6 +26,12 @@ export const cadastreImageSchema = z.object({
       return matchUrlDrive(val);
     }),
   visibleInHome: z.boolean().catch(false),
+  artist: z
+    .string({ message: "Artista inválido" })
+    .min(1, "Artista é obrigatório"),
+  screenwriter: z.string({ message: "Roteirista inválido" }).optional(),
+  colorist: z.string({ message: "Colorista inválido" }).optional(),
+  horizontalPage: z.boolean().catch(false),
 });
 
 export type CadastreImageDTO = z.infer<typeof cadastreImageSchema>;
