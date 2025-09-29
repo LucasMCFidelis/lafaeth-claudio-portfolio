@@ -9,13 +9,11 @@ import { Button } from "@/components/ui/button";
 import getPreferenceTheme from "@/helpers/get-theme-preference";
 
 interface GalleryRootListProps<T extends ImageDTO> {
-  imagesList: Array<T>;
-  children?: React.ReactNode;
+  itemsList: Array<T>;
 }
 
 const GalleryRootList = <T extends ImageDTO>({
-  imagesList,
-  children,
+  itemsList,
 }: GalleryRootListProps<T>) => {
   const isDarkTheme = getPreferenceTheme();
   const [{ id, "full-screen": isFullscreen }, setValues] = useQueryStates({
@@ -24,31 +22,31 @@ const GalleryRootList = <T extends ImageDTO>({
   });
   if (!id) throw new Error("id is required");
 
-  const currentIndex = imagesList.findIndex((img) => img.id === id);
+  const currentIndex = itemsList.findIndex((img) => img.id === id);
   const startIndex = 0;
-  const endIndex = imagesList.length - 1;
-  const image = imagesList[currentIndex];
+  const endIndex = itemsList.length - 1;
+  const item = itemsList[currentIndex];
 
-  const goToImage = (newIndex: number) => {
-    const target = imagesList[newIndex];
+  const goToItem = (newIndex: number) => {
+    const target = itemsList[newIndex];
     if (target) {
       setValues({ id: target.id });
     }
   };
 
   const goPrev = () => {
-    goToImage(currentIndex > startIndex ? currentIndex - 1 : endIndex);
+    goToItem(currentIndex > startIndex ? currentIndex - 1 : endIndex);
   };
 
   const goNext = () => {
-    goToImage(currentIndex < endIndex ? currentIndex + 1 : startIndex);
+    goToItem(currentIndex < endIndex ? currentIndex + 1 : startIndex);
   };
   return (
     <>
       <div className="flex-1 relative">
-        {image && (
+        {item && (
           <Image
-            src={image.imageUrl}
+            src={item.imageUrl}
             alt={"teste"}
             fill
             className="object-contain"
@@ -61,16 +59,24 @@ const GalleryRootList = <T extends ImageDTO>({
         }`}
       >
         <div className="flex-1">
-          {children ? (
-            children
-          ) : (
-            <>
-              <h2 className="font-extrabold text-xl md:text-3xl ">
-                {image.title}
-              </h2>
-              <p>{image.description}</p>
-            </>
-          )}
+          <h2 className="font-extrabold text-xl md:text-3xl first-letter:uppercase">
+            {item.title}
+          </h2>
+          <div className="text-xs lg:text-sm">
+            <p className="first-letter:uppercase">{item.description}</p>
+            {item.screenwriter && <p>Roteiro: {item.screenwriter}</p>}
+            {item.colorist && <p>Cor: {item.colorist}</p>}
+
+            {"productionYear" in item &&
+              typeof item.productionYear === "number" && (
+                <p>Ano: {item.productionYear}</p>
+              )}
+
+            {"productionSizePages" in item &&
+              typeof item.productionSizePages === "number" && (
+                <p>Tamanho: {item.productionSizePages} páginas</p>
+              )}
+          </div>
         </div>
 
         <div className="flex w-full justify-between items-center mb-2">

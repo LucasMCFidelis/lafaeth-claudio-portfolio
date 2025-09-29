@@ -12,7 +12,7 @@ interface GalleryHomeListProps {
 const GalleryHomeList = ({ initialData }: GalleryHomeListProps) => {
   const { data: images = [] } = useHomeImages(initialData && { initialData });
 
-  return <GalleryRootList imagesList={images} />;
+  return <GalleryRootList itemsList={images} />;
 };
 
 export default GalleryHomeList;
