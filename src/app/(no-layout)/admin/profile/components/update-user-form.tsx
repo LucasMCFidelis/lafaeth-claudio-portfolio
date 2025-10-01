@@ -49,26 +49,35 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
     });
   }
 
+  const valueImageUrl = form.watch("image");
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full max-w-7xl grid gap-6 md:gap-y-0 md:grid-cols-2 md:grid-rows-5"
+        className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6"
       >
-        <FormField
-          control={form.control}
-          name="image"
-          render={({ field }) => (
-            <FormItem className="md:row-span-4 place-items-center md:gap-0">
-              <FormLabel>Imagem</FormLabel>
-              <ProfileImage src={field.value} alt={`Perfil ${field.name}`} />
-              <FormControl>
-                <Input placeholder="Url para sua foto de perfil" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-col lg:flex-row lg:col-span-2 gap-6">
+          <ProfileImage
+            src={valueImageUrl}
+            alt="imagem do Perfil"
+            className="mx-auto"
+          />
+          <FormField
+            control={form.control}
+            name="image"
+            render={({ field }) => (
+              <FormItem className="flex-1 h-fit lg:self-end">
+                <FormLabel>Imagem</FormLabel>
+                <FormControl>
+                  <Input placeholder="Url para sua foto de perfil" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name="name"
@@ -95,11 +104,12 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="lg:col-span-2">
               <FormLabel>Descrição</FormLabel>
               <FormControl>
                 <Textarea placeholder="Descrição" {...field} />
@@ -108,6 +118,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="birthDate"
@@ -125,9 +136,10 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             </FormItem>
           )}
         />
+
         <Button
           type="submit"
-          className="w-full max-w-lg md:col-span-full justify-self-center md:mt-5"
+          className="w-full max-w-md lg:col-span-2 justify-self-center mt-4"
           disabled={updateUserDataMutation.isPending}
         >
           Atualizar
