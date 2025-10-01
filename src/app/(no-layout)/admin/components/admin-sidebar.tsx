@@ -1,10 +1,8 @@
-import {
-  Home,
-  Image, SkipBack
-} from "lucide-react";
+import { Home, Image, SkipBack } from "lucide-react";
 import Link from "next/link";
 
 import getUserData from "@/app/data/user/get-user-data";
+import verifyUserLogged from "@/app/data/user/verify-user";
 import ToggleTheme from "@/components/common/toggle-theme";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -36,7 +34,13 @@ const items = [
 ];
 
 const AdminSidebar = async () => {
-  const userData = await getUserData();
+  const [userLogged, userData] = await Promise.all([
+    verifyUserLogged(),
+    getUserData(),
+  ]);
+
+  if (!userLogged) return;
+
   return (
     <Sidebar className="text-sm font-sans">
       <SidebarHeader>
