@@ -55,7 +55,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6"
+        className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 mx-auto"
       >
         <div className="flex flex-col lg:flex-row lg:col-span-2 gap-6">
           <ProfileImage

@@ -14,7 +14,7 @@ const AdminHomePage = async () => {
   const imagesHome = await getHomeImages();
 
   return (
-    <div className="flex flex-col flex-1 w-full gap-6">
+    <div className="flex flex-col flex-1 w-full gap-6 mt-12">
       <SortableImagesHome initialData={imagesHome} />
     </div>
   );
