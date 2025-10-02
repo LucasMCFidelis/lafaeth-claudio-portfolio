@@ -1,4 +1,4 @@
-import { Home, Image, SkipBack } from "lucide-react";
+import { Home, Image, Images, SkipBack } from "lucide-react";
 import Link from "next/link";
 
 import getUserData from "@/app/data/user/get-user-data";
@@ -29,6 +29,11 @@ const items = [
   {
     title: "Imagens",
     url: "/admin/images",
+    icon: Images,
+  },
+  {
+    title: "Flats",
+    url: "/admin/flat",
     icon: Image,
   },
 ];
