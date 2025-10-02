@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 
-import getManyImages from "../../data/image/get-many-images";
+import { getHomeImages } from "@/actions/get-home-images";
+
 import verifyUserLogged from "../../data/user/verify-user";
-import ImageList from "./components/image-list";
+import SortableImagesHome from "./components/sortable-items/sortable-images-home";
 
 const AdminHomePage = async () => {
   const userLogged = await verifyUserLogged();
@@ -10,13 +11,11 @@ const AdminHomePage = async () => {
     redirect("/admin/auth");
   }
 
-  const imagesHome = await getManyImages({
-    where: { field: "visibleInHome", value: true },
-  });
+  const imagesHome = await getHomeImages();
 
   return (
     <div className="flex flex-col flex-1 w-full gap-6">
-      <ImageList initialData={imagesHome} />
+      <SortableImagesHome initialData={imagesHome} />
     </div>
   );
 };

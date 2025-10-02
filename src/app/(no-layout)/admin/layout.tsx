@@ -10,12 +10,10 @@ export default function AdminLayout({
   return (
     <SidebarProvider>
       <AdminSidebar />
-      <main className="flex-1 flex flex-col ">
-        <SidebarTrigger className="size-9 m-2" />
-        <div className="relative flex flex-1 w-full justify-center items-center flex-col gap-6 p-5">
-          {children}
-        </div>
-      </main>
+      <div className="relative flex flex-1 w-full flex-col gap-6 p-5">
+        <SidebarTrigger className="absolute size-9 m-2 top-0 left-0" />
+        {children}
+      </div>
     </SidebarProvider>
   );
 }

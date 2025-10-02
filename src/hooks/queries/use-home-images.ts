@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getHomeImages } from "@/actions/get-many-images";
+import { getHomeImages } from "@/actions/get-home-images";
 
 export const getHomeImagesQueryKey = () => ["home-images"] as const;
 
