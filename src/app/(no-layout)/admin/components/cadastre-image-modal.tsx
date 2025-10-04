@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { parseAsBoolean, useQueryState } from "nuqs";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   CadastreImageDTO,
   cadastreImageSchema,
@@ -33,7 +35,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { matchUrlDrive } from "@/helpers/match-url-drive";
 import { usePostHomeImage } from "@/hooks/mutations/use-post-home-image";
 
-const CadastreImageModal = () => {
+interface CadastreImageModalProps {
+  initialData?: Partial<ImageDTO>;
+  saveIdQuery?: (imageId: string) => void;
+}
+
+const CadastreImageModal = ({
+  initialData,
+  saveIdQuery,
+}: CadastreImageModalProps) => {
   const [cadastreImageModalIsOpen, setCadastreImageModalIsOpen] = useQueryState(
     "cadastreImageModalIsOpen",
     parseAsBoolean.withDefault(false)
@@ -47,12 +57,33 @@ const CadastreImageModal = () => {
       description: "",
       imageUrl: "",
       visibleInHome: false,
+      ...(initialData && {
+        artist: initialData.artist,
+        screenwriter: initialData.screenwriter || "",
+        colorist: initialData.colorist || "",
+        horizontalPage: initialData.horizontalPage,
+      }),
     },
   });
 
+  useEffect(() => {
+    if (initialData) {
+      formCadastreImage.reset({
+        ...formCadastreImage.getValues(),
+        artist: initialData.artist ?? "",
+        screenwriter: initialData.screenwriter ?? "",
+        colorist: initialData.colorist ?? "",
+        horizontalPage: initialData.horizontalPage ?? false,
+      });
+    }
+  }, [initialData, formCadastreImage]);
+
   async function onSubmit(data: CadastreImageDTO) {
-    await postHomeImageMutation.mutateAsync(data);
+    const newImage = await postHomeImageMutation.mutateAsync(data);
     setCadastreImageModalIsOpen(false);
+    if (saveIdQuery) {
+      saveIdQuery(newImage.id);
+    }
   }
 
   const valueImageUrl = formCadastreImage.watch("imageUrl");
