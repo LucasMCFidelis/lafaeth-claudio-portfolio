@@ -18,10 +18,7 @@ const FlatsPage = async () => {
       </Link>
 
       <div className="flex-1 max-w-full grid md:grid-cols-[20%_1fr] gap-6 mt-12">
-        <div className="space-y-4">
-          <h3>Disposição na página</h3>
-          <SortableFlats initialData={flats} />
-        </div>
+        <SortableFlats initialData={flats} />
         <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
           <FlatList initialData={flats} maxSizeItemsMd={true} />
         </div>

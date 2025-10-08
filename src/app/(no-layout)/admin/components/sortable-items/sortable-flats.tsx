@@ -12,7 +12,9 @@ import {
 } from "@/hooks/queries/use-flats-visible";
 
 import SortableItem from "./sortable-item";
-import SortableRootList, { getSortingIsDisabledQueryStateParams } from "./sortable-root-list";
+import SortableRootList, {
+  getSortingIsDisabledQueryStateParams,
+} from "./sortable-root-list";
 
 interface SortableFlatsProps {
   initialData?: Array<FlatDTO>;
@@ -34,11 +36,14 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
   });
 
   return (
-    <>
+    <div className="space-y-4">
+      <h3 className={`${sortingIsDisabled && "hidden"} md:block`}>
+        Disposição na página
+      </h3>
       <SortableRootList
         items={sortableFlats}
         getQueryKeyFunction={getFlatsVisibleQueryKey}
-        className="max-w-full"
+        className={`max-w-full ${sortingIsDisabled && "hidden"} md:block`}
       >
         {sortableFlats.map((item) => (
           <SortableItem
@@ -81,7 +86,7 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
           </Button>
         )}
       </div>
-    </>
+    </div>
   );
 };
 
