@@ -1,8 +1,9 @@
+import Link from "next/link";
+
 import { getFlatsVisible } from "@/actions/get-flats-visible";
 import FlatList from "@/components/common/flat-list";
 import { Button } from "@/components/ui/button";
 
-import CadastreFlatModal from "../components/cadastre-flat-modal";
 import SortableFlats from "../components/sortable-items/sortable-flats";
 
 const FlatsPage = async () => {
@@ -10,10 +11,11 @@ const FlatsPage = async () => {
 
   return (
     <>
-      {/* <Button className="absolute top-0 right-0 -translate-x-4 translate-y-4">
-        Cadastrar Flat
-      </Button> */}
-      <CadastreFlatModal />
+      <Link href={"/admin/flat/cadastre"}>
+        <Button className="absolute top-0 right-0 -translate-x-4 translate-y-4">
+          Adicionar Flat
+        </Button>
+      </Link>
 
       <div className="flex-1 max-w-full grid md:grid-cols-[20%_1fr] gap-6 mt-12">
         <div className="space-y-4">
