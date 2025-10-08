@@ -30,6 +30,9 @@ interface SortableRootListProps<T extends BasicItemToSortable> {
   children: React.ReactNode;
 }
 
+export const getSortingIsDisabledQueryStateParams = () =>
+  ["sortingIsDisabled", parseAsBoolean.withDefault(true)] as const;
+
 export default function SortableRootList<T extends BasicItemToSortable>({
   items,
   getQueryKeyFunction,
@@ -37,10 +40,13 @@ export default function SortableRootList<T extends BasicItemToSortable>({
   children,
 }: SortableRootListProps<T>) {
   const queryClient = useQueryClient();
-  const [mounted, setMounted] = useQueryState("mounted", parseAsBoolean.withDefault(false))
+  const [mounted, setMounted] = useQueryState(
+    "mounted",
+    parseAsBoolean.withDefault(false)
+  );
 
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
   }, []);
 
   const sensors = useSensors(

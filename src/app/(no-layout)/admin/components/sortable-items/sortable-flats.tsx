@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useQueryState } from "nuqs";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
 } from "@/hooks/queries/use-flats-visible";
 
 import SortableItem from "./sortable-item";
-import SortableRootList from "./sortable-root-list";
+import SortableRootList, { getSortingIsDisabledQueryStateParams } from "./sortable-root-list";
 
 interface SortableFlatsProps {
   initialData?: Array<FlatDTO>;
@@ -22,8 +22,7 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
   const { data: flats = [] } = useFlatsVisible(initialData && { initialData });
   const updateFlatsOrderMutation = useUpdateFlatsOrder();
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
-    "sortingIsDisabled",
-    parseAsBoolean.withDefault(true)
+    ...getSortingIsDisabledQueryStateParams()
   );
   const queryClient = useQueryClient();
   const sortableFlats = flats.map((flat) => {

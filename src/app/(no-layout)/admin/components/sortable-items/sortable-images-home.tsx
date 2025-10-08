@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { parseAsBoolean, useQueryState } from "nuqs";
+import { useQueryState } from "nuqs";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,9 @@ import {
 
 import CadastreImageModal from "../cadastre-image-modal";
 import SortableItem from "./sortable-item";
-import SortableRootList from "./sortable-root-list";
+import SortableRootList, {
+  getSortingIsDisabledQueryStateParams,
+} from "./sortable-root-list";
 
 interface SortableImagesHomeProps {
   initialData?: Array<ImageDTO>;
@@ -27,8 +29,7 @@ const SortableImagesHome = ({ initialData }: SortableImagesHomeProps) => {
   const updateHomeImagesOrderMutation = useUpdateHomeImagesOrder();
 
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
-    "sortingIsDisabled",
-    parseAsBoolean.withDefault(true)
+    ...getSortingIsDisabledQueryStateParams()
   );
 
   return (
