@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { usePostFlat } from "@/hooks/mutations/use-post-flat";
 import { useImage } from "@/hooks/queries/use-image";
 
 import CadastreImageModal from "../../components/cadastre-image-modal";
@@ -38,6 +39,7 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
   });
   const { data: frontImage } = useImage(cadastreFlatStates.frontImageId || "");
   const { data: backImage } = useImage(cadastreFlatStates.backImageId || "");
+  const postFlatMutation = usePostFlat();
 
   const formCadastreFlat = useForm<CadastreFlatDTO>({
     resolver: zodResolver(cadastreFlatSchema),
@@ -50,10 +52,10 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
     },
   });
 
-  async function onSubmit(data: CadastreFlatDTO) {
-    console.log(data);
-
-    setCadastreFlatStates({ cadastreFlatModalIsOpen: false });
+  function onSubmit(data: CadastreFlatDTO) {
+    postFlatMutation.mutate(data);
+    setCadastreFlatStates({ cadastreFlatModalIsOpen: false, frontImageId: null, backImageId: null });
+    formCadastreFlat.reset()
   }
 
   return (
@@ -186,7 +188,11 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
               )}
             />
           </div>
-          <Button type="submit" className="w-full col-span-full">
+          <Button
+            type="submit"
+            className="w-full col-span-full"
+            disabled={postFlatMutation.isPending}
+          >
             Cadastrar Flat
           </Button>
         </form>
