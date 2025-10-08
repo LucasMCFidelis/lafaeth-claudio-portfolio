@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
+import AllImageList from "@/components/common/all-image-list";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,19 +13,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAllImages } from "@/hooks/queries/use-all-images";
-import { cn } from "@/lib/utils";
 
 interface SelectImageDialogProps {
   trigger?: React.ReactNode;
   onSelect: (image: ImageDTO) => void;
+  imagesToSelect?: Array<ImageDTO>;
 }
 
 export function SelectImageDialog({
   trigger,
   onSelect,
+  imagesToSelect
 }: SelectImageDialogProps) {
-  const { data: images } = useAllImages();
   const [open, setOpen] = useState(false);
 
   const handleSelect = (image: ImageDTO) => {
@@ -43,24 +42,7 @@ export function SelectImageDialog({
           <DialogTitle>Selecione uma imagem</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh]">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-2">
-            {images?.map((image) => (
-              <button
-                key={image.id}
-                onClick={() => handleSelect(image)}
-                className={cn(
-                  "relative aspect-square overflow-hidden rounded-lg border hover:ring-2 hover:ring-primary"
-                )}
-              >
-                <Image
-                  src={image.imageUrl}
-                  alt={image.title}
-                  fill
-                  className="object-cover"
-                />
-              </button>
-            ))}
-          </div>
+          <AllImageList actionOnClick={handleSelect} initialData={imagesToSelect}/>
         </ScrollArea>
       </DialogContent>
     </Dialog>
