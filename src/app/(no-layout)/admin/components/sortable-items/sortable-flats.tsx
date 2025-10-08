@@ -1,6 +1,11 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
+import { parseAsBoolean, useQueryState } from "nuqs";
+
 import { FlatDTO } from "@/app/data/flat/flat-dto";
+import { Button } from "@/components/ui/button";
+import { useUpdateFlatsOrder } from "@/hooks/mutations/use-update-flats-order";
 import {
   getFlatsVisibleQueryKey,
   useFlatsVisible,
@@ -15,6 +20,12 @@ interface SortableFlatsProps {
 
 const SortableFlats = ({ initialData }: SortableFlatsProps) => {
   const { data: flats = [] } = useFlatsVisible(initialData && { initialData });
+  const updateFlatsOrderMutation = useUpdateFlatsOrder();
+  const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
+    "sortingIsDisabled",
+    parseAsBoolean.withDefault(true)
+  );
+  const queryClient = useQueryClient();
   const sortableFlats = flats.map((flat) => {
     return {
       id: flat.id,
@@ -24,18 +35,54 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
   });
 
   return (
-    <SortableRootList
-      items={sortableFlats}
-      getQueryKeyFunction={getFlatsVisibleQueryKey} className="max-w-full"
-    >
-      {sortableFlats.map((item) => (
-        <SortableItem
-          key={item.id}
-          item={item}
-          className="w-full"
-        />
-      ))}
-    </SortableRootList>
+    <>
+      <SortableRootList
+        items={sortableFlats}
+        getQueryKeyFunction={getFlatsVisibleQueryKey}
+        className="max-w-full"
+      >
+        {sortableFlats.map((item) => (
+          <SortableItem
+            key={item.id}
+            item={item}
+            disabled={sortingIsDisabled}
+            className="w-full"
+          />
+        ))}
+      </SortableRootList>
+      <div className="w-full grid gap-4 md:grid-cols-2">
+        <Button
+          onClick={() => {
+            setSortingIsDisabled((prev) => !prev);
+            if (!sortingIsDisabled) {
+              queryClient.invalidateQueries({
+                queryKey: getFlatsVisibleQueryKey(),
+              });
+            }
+          }}
+          variant={sortingIsDisabled ? "default" : "destructive"}
+          className={`w-full ${sortingIsDisabled && "md:col-span-full"}`}
+        >
+          {sortingIsDisabled ? (
+            <>Habilitar edição de ordem</>
+          ) : (
+            <>Cancelar edição</>
+          )}
+        </Button>
+        {!sortingIsDisabled && (
+          <Button
+            className="w-full"
+            disabled={updateFlatsOrderMutation.isPending}
+            onClick={async () => {
+              await updateFlatsOrderMutation.mutateAsync(flats);
+              setSortingIsDisabled(true);
+            }}
+          >
+            Salvar Ordenação
+          </Button>
+        )}
+      </div>
+    </>
   );
 };
 
