@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateImage } from "@/hooks/mutations/use-update-image";
+import { getHomeImagesQueryKey } from "@/hooks/queries/use-home-images";
 
 interface UpdateImageFormProps {
   initialData: ImageDTO;
@@ -49,10 +51,17 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
     "formIsEditable",
     parseAsBoolean.withDefault(false)
   );
+  const queryClient = useQueryClient();
   const updateImageMutation = useUpdateImage(formDefaultValues.id);
 
   async function onSubmit(data: UpdateImageDTO) {
-    updateImageMutation.mutate(data);
+    updateImageMutation.mutate(data, {
+      onSuccess: (data) => {
+        if (data.visibleInHome !== formDefaultValues.visibleInHome) {
+          queryClient.invalidateQueries({ queryKey: getHomeImagesQueryKey() });
+        }
+      },
+    });
     setFormIsEditable(false);
   }
 
