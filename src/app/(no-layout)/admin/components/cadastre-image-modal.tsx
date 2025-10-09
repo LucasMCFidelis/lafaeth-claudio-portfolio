@@ -36,13 +36,17 @@ import { matchUrlDrive } from "@/helpers/match-url-drive";
 import { usePostHomeImage } from "@/hooks/mutations/use-post-home-image";
 
 interface CadastreImageModalProps {
+  textToTrigger?: string;
   initialData?: Partial<ImageDTO>;
   saveIdQuery?: (imageId: string) => void;
+  disabled?: boolean
 }
 
 const CadastreImageModal = ({
+  textToTrigger,
   initialData,
   saveIdQuery,
+  disabled
 }: CadastreImageModalProps) => {
   const [cadastreImageModalIsOpen, setCadastreImageModalIsOpen] = useQueryState(
     "cadastreImageModalIsOpen",
@@ -103,8 +107,9 @@ const CadastreImageModal = ({
             onClick={() => {
               setCadastreImageModalIsOpen(true);
             }}
+            disabled={disabled}
           >
-            Adicionar imagem
+            {textToTrigger ? textToTrigger : "Adicionar imagem"}
           </Button>
         </DialogTrigger>
         <DialogContent className="md:max-w-3xl">
