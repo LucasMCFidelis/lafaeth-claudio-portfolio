@@ -1,18 +1,16 @@
 import "server-only";
 
-import { eq, SQLWrapper } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { flatTable } from "@/db/schema";
 
+import { WhereCondition } from "../where-condition";
 import { FlatDTO } from "./flat-dto";
 import mapToFlatDTO from "./map-to-flat-dto";
 
 interface GetManyFlatsProps<WithImages extends boolean> {
-  where?: {
-    field: keyof typeof flatTable.$inferSelect;
-    value: string | boolean | SQLWrapper;
-  };
+  where?: WhereCondition<typeof flatTable>;
   withImages: WithImages;
 }
 

@@ -1,13 +1,14 @@
 import Link from "next/link";
 
 import { getFlatsVisible } from "@/actions/get-flats-visible";
+import { getFlats } from "@/actions/get-many-flats";
 import FlatList from "@/components/common/flat-list";
 import { Button } from "@/components/ui/button";
 
 import SortableFlats from "../components/sortable-items/sortable-flats";
 
 const FlatsPage = async () => {
-  const flats = await getFlatsVisible();
+  const [flats, allFlats] = await Promise.all([getFlatsVisible(), getFlats()]);
 
   return (
     <>
@@ -20,7 +21,11 @@ const FlatsPage = async () => {
       <div className="flex-1 max-w-full grid md:grid-cols-[20%_1fr] gap-6 mt-12">
         <SortableFlats initialData={flats} />
         <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
-          <FlatList initialData={flats} maxSizeItemsMd={true} />
+          <FlatList
+            initialData={allFlats}
+            maxSizeItemsMd={true}
+            displayButtonOpenModal={true}
+          />
         </div>
       </div>
     </>

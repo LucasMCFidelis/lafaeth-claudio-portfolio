@@ -1,7 +1,9 @@
 import { Metadata } from "next";
 
-import { getFlatsVisible } from "@/actions/get-flats-visible";
+import { getFlats } from "@/actions/get-many-flats";
+import { WhereCondition } from "@/app/data/where-condition";
 import FlatList from "@/components/common/flat-list";
+import { flatTable } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Flat",
@@ -10,12 +12,16 @@ export const metadata: Metadata = {
 };
 
 const FlatPage = async () => {
-  const flats = await getFlatsVisible();
+  const where: WhereCondition<typeof flatTable> = {
+    field: "visibleInFlat",
+    value: true,
+  };
+  const flats = await getFlats(where);
 
   return (
     <div className="px-5 flex-1 flex flex-col">
       <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
-        <FlatList initialData={flats} />
+        <FlatList initialData={flats} where={where} />
       </div>
     </div>
   );

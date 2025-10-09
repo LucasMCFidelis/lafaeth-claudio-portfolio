@@ -6,23 +6,26 @@ import { memo, useRef, useState } from "react";
 
 interface FlatItemProps {
   horizontalPage?: boolean;
+  visibleInFlat?: boolean;
   title: string;
   artist: string;
   screenwriter?: string;
   frontImageUrl?: string;
   backImageUrl?: string;
   maxSizeItemsMd?: boolean
+  children?: React.ReactNode
 }
 
 const FlatItem = memo(
   ({
     horizontalPage,
+    visibleInFlat,
     title,
     artist,
     screenwriter,
     frontImageUrl,
     backImageUrl,
-    maxSizeItemsMd
+    maxSizeItemsMd, children
   }: FlatItemProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dividerX, setDividerX] = useState(50);
@@ -54,7 +57,7 @@ const FlatItem = memo(
               `h-[200px] w-[311px] sm:h-[300px] sm:w-[466px] md:h-[400px] md:w-[622px] ${!maxSizeItemsMd && "lg:h-[500px] lg:w-[777px] xl:h-[600px] xl:w-[933px]"}`
             : // vertical
               `h-[250px] w-[177px] sm:h-[350px] sm:w-[248px] md:h-[450px] md:w-[318px] ${!maxSizeItemsMd && "lg:h-[600px] lg:w-[424px] xl:h-[750px] xl:w-[530px]"}`
-        }`}
+        } ${!visibleInFlat && "opacity-50"}`}
       >
         <div
           className="absolute top-0 bottom-0 z-30 w-px bg-primary"
@@ -94,6 +97,8 @@ const FlatItem = memo(
             className={`object-cover object-left pointer-events-none`}
           />
         </div>
+
+        {children}
       </div>
     );
   }
