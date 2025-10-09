@@ -18,7 +18,7 @@ const mapToComicDTO = <WithImage extends boolean>({
     id: data.id,
     productionYear: data.productionYear,
     visibleInComics: data.visibleInComics,
-    indexInComics: data.indexInComics,
+    index: data.index,
     productionSizePages: data.productionSizePages,
     imageId: data.imageId,
     image:

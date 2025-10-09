@@ -6,7 +6,7 @@ export type ComicDTO<WithImage extends boolean = true> = {
   productionYear: number;
   productionSizePages: number;
   visibleInComics: boolean;
-  indexInComics: number | null;
+  index: number | null;
 } & (WithImage extends true
   ? { image: ImageDTO | null }
   : { image?: ImageDTO | null });

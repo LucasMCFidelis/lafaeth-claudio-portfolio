@@ -8,7 +8,7 @@ export type FlatDTO<WithImages extends boolean = true> = {
   backImageId: string | null;
   horizontalPage: boolean;
   visibleInFlat: boolean;
-  indexInFlat: number | null;
+  index: number | null;
 
   frontImage?: ImageDTO | null;
   backImage?: ImageDTO | null;

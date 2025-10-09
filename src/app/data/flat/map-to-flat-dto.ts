@@ -20,7 +20,7 @@ const mapToFlatDTO = <WithImages extends boolean = false>({
     title: data.title,
     description: data.description,
     visibleInFlat: data.visibleInFlat,
-    indexInFlat: data.indexInFlat,
+    index: data.index,
     horizontalPage: data.backImage?.horizontalPage === data.frontImage?.horizontalPage,
     backImageId: data.backImageId,
     frontImageId: data.frontImageId,

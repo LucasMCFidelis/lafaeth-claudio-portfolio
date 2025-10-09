@@ -81,7 +81,7 @@ export const imagesTable = pgTable("images", {
   colorist: text("colorist"),
   horizontalPage: boolean("horizontal_page").notNull().default(false),
   visibleInHome: boolean("visible_in_home").notNull().default(false),
-  indexInHome: integer("index_in_home"),
+  index: integer("index"),
   createdAt: date("created_at").defaultNow().notNull(),
 });
 
@@ -96,7 +96,7 @@ export const flatTable = pgTable("flat", {
     onDelete: "set null",
   }),
   visibleInFlat: boolean("visible_in_flat").notNull().default(false),
-  indexInFlat: integer("index_in_flat"),
+  index: integer("index"),
 });
 
 export const flatRelations = relations(flatTable, ({ one }) => ({
@@ -120,7 +120,7 @@ export const comicsTable = pgTable("comic", {
     .default(new Date().getFullYear()),
   productionSizePages: integer("production_size_pages").notNull(),
   visibleInComics: boolean("visible_in_comics").notNull().default(false),
-  indexInComics: integer("index_in_comics"),
+  index: integer("index"),
 });
 
 export const comicsRelations = relations(comicsTable, ({ one }) => ({
@@ -142,7 +142,7 @@ export const colorizationTable = pgTable("colorization", {
   visibleInColorization: boolean("visible_in_colorization")
     .notNull()
     .default(false),
-  indexInColorization: integer("index_in_comics"),
+  index: integer("index"),
 });
 
 export const colorizationRelations = relations(

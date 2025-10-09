@@ -9,5 +9,5 @@ export type ImageDTO = {
   colorist: string | null;
   horizontalPage: boolean;
   visibleInHome: boolean;
-  indexInHome: number | null
+  index: number | null
 } 

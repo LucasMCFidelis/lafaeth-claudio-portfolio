@@ -17,7 +17,7 @@ export function mapToImageDTO({ image }: MapImageDTOProps): ImageDTO {
     colorist: image.colorist,
     horizontalPage: image.horizontalPage,
     visibleInHome: !!image.visibleInHome,
-    indexInHome: image.indexInHome,
+    index: image.index,
     createdAt: image.createdAt,
   };
 }
