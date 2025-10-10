@@ -38,15 +38,15 @@ import { usePostHomeImage } from "@/hooks/mutations/use-post-home-image";
 interface CadastreImageModalProps {
   textToTrigger?: string;
   initialData?: Partial<ImageDTO>;
-  saveIdQuery?: (imageId: string) => void;
-  disabled?: boolean
+  saveImageId?: (imageId: string) => void;
+  disabled?: boolean;
 }
 
 const CadastreImageModal = ({
   textToTrigger,
   initialData,
-  saveIdQuery,
-  disabled
+  saveImageId,
+  disabled,
 }: CadastreImageModalProps) => {
   const [cadastreImageModalIsOpen, setCadastreImageModalIsOpen] = useQueryState(
     "cadastreImageModalIsOpen",
@@ -85,8 +85,8 @@ const CadastreImageModal = ({
   async function onSubmit(data: CadastreImageDTO) {
     const newImage = await postHomeImageMutation.mutateAsync(data);
     setCadastreImageModalIsOpen(false);
-    if (saveIdQuery) {
-      saveIdQuery(newImage.id);
+    if (saveImageId) {
+      saveImageId(newImage.id);
     }
   }
 

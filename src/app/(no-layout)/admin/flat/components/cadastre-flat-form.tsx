@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 import { useForm } from "react-hook-form";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -32,15 +31,7 @@ interface CadastreFlatFormProps {
 }
 
 const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
-  const [cadastreFlatStates, setCadastreFlatStates] = useQueryStates({
-    cadastreFlatModalIsOpen: parseAsBoolean.withDefault(false),
-    frontImageId: parseAsString,
-    backImageId: parseAsString,
-  });
-  const { data: frontImage } = useImage(cadastreFlatStates.frontImageId || "");
-  const { data: backImage } = useImage(cadastreFlatStates.backImageId || "");
   const postFlatMutation = usePostFlat();
-
   const formCadastreFlat = useForm<CadastreFlatDTO>({
     resolver: zodResolver(cadastreFlatSchema),
     defaultValues: {
@@ -52,10 +43,15 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
     },
   });
 
+  const { data: frontImage } = useImage(formCadastreFlat.watch("frontImageId"));
+  const { data: backImage } = useImage(formCadastreFlat.watch("backImageId"));
+
   function onSubmit(data: CadastreFlatDTO) {
-    postFlatMutation.mutate(data);
-    setCadastreFlatStates({ cadastreFlatModalIsOpen: false, frontImageId: null, backImageId: null });
-    formCadastreFlat.reset()
+    postFlatMutation.mutate(data, {
+      onSuccess: () => {
+        formCadastreFlat.reset();
+      },
+    });
   }
 
   return (
@@ -70,42 +66,43 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
               control={formCadastreFlat.control}
               name="frontImageId"
               render={() => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col h-72">
                   <FormLabel>Imagem da Line</FormLabel>
-                  {frontImage ? (
-                    <div className="flex-1 relative mb-2">
+                  <div className="flex-1 relative mb-2 bg-accent rounded-lg">
+                    {frontImage && (
                       <Image
                         src={frontImage.imageUrl}
                         alt="Selected image"
                         fill
                         className="object-cover rounded-lg"
                       />
-                    </div>
-                  ) : (
-                    <div className="w-full grid gap-4">
-                      <CadastreImageModal
-                        initialData={
-                          backImage && {
-                            artist: backImage.artist,
-                            screenwriter: backImage.screenwriter,
-                            colorist: backImage.colorist,
-                            horizontalPage: backImage.horizontalPage,
-                          }
+                    )}
+                  </div>
+                  <div className="w-full grid gap-4">
+                    <CadastreImageModal
+                      initialData={
+                        backImage && {
+                          artist: backImage.artist,
+                          screenwriter: backImage.screenwriter,
+                          colorist: backImage.colorist,
+                          horizontalPage: backImage.horizontalPage,
                         }
-                        saveIdQuery={(imageId) => {
-                          setCadastreFlatStates({ frontImageId: imageId });
-                          formCadastreFlat.setValue("frontImageId", imageId);
-                        }}
-                      />
-                      <SelectImageDialog
-                        imagesToSelect={imagesToSelect}
-                        onSelect={(image) => {
-                          setCadastreFlatStates({ frontImageId: image.id });
-                          formCadastreFlat.setValue("frontImageId", image.id);
-                        }}
-                      />
-                    </div>
-                  )}
+                      }
+                      saveImageId={(imageId) => {
+                        formCadastreFlat.setValue("frontImageId", imageId);
+                      }}
+                      textToTrigger={
+                        frontImage ? "Cadastrar outra imagem" : undefined
+                      }
+                    />
+                    <SelectImageDialog
+                      imagesToSelect={imagesToSelect}
+                      onSelect={(image) => {
+                        formCadastreFlat.setValue("frontImageId", image.id);
+                      }}
+                    />
+                  </div>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -114,42 +111,44 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
               control={formCadastreFlat.control}
               name="backImageId"
               render={() => (
-                <FormItem className="flex flex-col">
+                <FormItem className="flex flex-col h-72">
                   <FormLabel>Imagem do Flat</FormLabel>
-                  {backImage ? (
-                    <div className="flex-1 relative mb-2">
+                  <div className="flex-1 relative mb-2 bg-accent rounded-lg">
+                    {backImage && (
                       <Image
                         src={backImage.imageUrl}
                         alt="Selected image"
                         fill
                         className="object-cover rounded-lg"
                       />
-                    </div>
-                  ) : (
-                    <div className="w-full grid gap-4">
-                      <CadastreImageModal
-                        initialData={
-                          frontImage && {
-                            artist: frontImage.artist,
-                            screenwriter: frontImage.screenwriter,
-                            colorist: frontImage.colorist,
-                            horizontalPage: frontImage.horizontalPage,
-                          }
+                    )}
+                  </div>
+
+                  <div className="w-full grid gap-4">
+                    <CadastreImageModal
+                      initialData={
+                        frontImage && {
+                          artist: frontImage.artist,
+                          screenwriter: frontImage.screenwriter,
+                          colorist: frontImage.colorist,
+                          horizontalPage: frontImage.horizontalPage,
                         }
-                        saveIdQuery={(imageId) => {
-                          setCadastreFlatStates({ backImageId: imageId });
-                          formCadastreFlat.setValue("backImageId", imageId);
-                        }}
-                      />
-                      <SelectImageDialog
-                        imagesToSelect={imagesToSelect}
-                        onSelect={(image) => {
-                          setCadastreFlatStates({ backImageId: image.id });
-                          formCadastreFlat.setValue("backImageId", image.id);
-                        }}
-                      />
-                    </div>
-                  )}
+                      }
+                      saveImageId={(imageId) => {
+                        formCadastreFlat.setValue("backImageId", imageId);
+                      }}
+                      textToTrigger={
+                        frontImage ? "Cadastrar outra imagem" : undefined
+                      }
+                    />
+                    <SelectImageDialog
+                      imagesToSelect={imagesToSelect}
+                      onSelect={(image) => {
+                        formCadastreFlat.setValue("backImageId", image.id);
+                      }}
+                    />
+                  </div>
+
                   <FormMessage />
                 </FormItem>
               )}

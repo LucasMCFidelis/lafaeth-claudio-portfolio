@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
@@ -44,18 +44,9 @@ const UpdateFlatForm = ({
   const { data: currentFlat } = useFlat(initialData.id, { initialData });
   if (!currentFlat) throw new Error(`Flat ${initialData.id} not found`);
 
-  const [updateFlatStates, setUpdateFlatStates] = useQueryStates({
-    formIsEditable: parseAsBoolean.withDefault(false),
-    frontImageId: parseAsString.withDefault(currentFlat.frontImageId!),
-    backImageId: parseAsString.withDefault(currentFlat.backImageId!),
-  });
-  const { data: frontImage } = useImage(
-    updateFlatStates.frontImageId,
-    currentFlat.frontImage ? { initialData: currentFlat.frontImage } : undefined
-  );
-  const { data: backImage } = useImage(
-    updateFlatStates.backImageId,
-    currentFlat.backImage ? { initialData: currentFlat.backImage } : undefined
+  const [formIsEditable, setFormIsEditable] = useQueryState(
+    "formIsEditable",
+    parseAsBoolean.withDefault(false)
   );
   const updateFlatMutation = useUpdateFlat(currentFlat.id);
   const queryClient = useQueryClient();
@@ -74,6 +65,15 @@ const UpdateFlatForm = ({
     defaultValues: formDefaultValues,
   });
 
+  const { data: frontImage } = useImage(
+    formUpdateFlat.watch("frontImageId"),
+    currentFlat.frontImage ? { initialData: currentFlat.frontImage } : undefined
+  );
+  const { data: backImage } = useImage(
+    formUpdateFlat.watch("backImageId"),
+    currentFlat.backImage ? { initialData: currentFlat.backImage } : undefined
+  );
+
   function onSubmit(data: UpdateFlatDTO) {
     updateFlatMutation.mutate(data, {
       onSuccess: (flatUpdated) => {
@@ -88,11 +88,7 @@ const UpdateFlatForm = ({
         );
       },
     });
-    setUpdateFlatStates({
-      formIsEditable: false,
-      frontImageId: null,
-      backImageId: null,
-    });
+    setFormIsEditable(false);
   }
 
   return (
@@ -119,7 +115,7 @@ const UpdateFlatForm = ({
                     />
                   </div>
 
-                  {updateFlatStates.formIsEditable && (
+                  {formIsEditable && (
                     <>
                       <CadastreImageModal
                         initialData={
@@ -130,25 +126,20 @@ const UpdateFlatForm = ({
                             horizontalPage: backImage.horizontalPage,
                           }
                         }
-                        saveIdQuery={(imageId) => {
-                          setUpdateFlatStates({ frontImageId: imageId });
+                        saveImageId={(imageId) => {
                           formUpdateFlat.setValue("frontImageId", imageId);
                         }}
-                        disabled={!updateFlatStates.formIsEditable}
+                        disabled={!formIsEditable}
                         textToTrigger="Alterar com nova Imagem"
                       />
 
                       <SelectImageDialog
                         imagesToSelect={imagesToSelect}
                         onSelect={(image) => {
-                          setUpdateFlatStates({ frontImageId: image.id });
                           formUpdateFlat.setValue("frontImageId", image.id);
                         }}
                         trigger={
-                          <Button
-                            variant="outline"
-                            disabled={!updateFlatStates.formIsEditable}
-                          >
+                          <Button variant="outline" disabled={!formIsEditable}>
                             Selecionar outra imagem para Line
                           </Button>
                         }
@@ -175,7 +166,7 @@ const UpdateFlatForm = ({
                     />
                   </div>
 
-                  {updateFlatStates.formIsEditable && (
+                  {formIsEditable && (
                     <>
                       <CadastreImageModal
                         initialData={
@@ -186,25 +177,20 @@ const UpdateFlatForm = ({
                             horizontalPage: frontImage.horizontalPage,
                           }
                         }
-                        saveIdQuery={(imageId) => {
-                          setUpdateFlatStates({ backImageId: imageId });
+                        saveImageId={(imageId) => {
                           formUpdateFlat.setValue("backImageId", imageId);
                         }}
-                        disabled={!updateFlatStates.formIsEditable}
+                        disabled={!formIsEditable}
                         textToTrigger="Alterar com nova Imagem"
                       />
 
                       <SelectImageDialog
                         imagesToSelect={imagesToSelect}
                         onSelect={(image) => {
-                          setUpdateFlatStates({ backImageId: image.id });
                           formUpdateFlat.setValue("backImageId", image.id);
                         }}
                         trigger={
-                          <Button
-                            variant="outline"
-                            disabled={!updateFlatStates.formIsEditable}
-                          >
+                          <Button variant="outline" disabled={!formIsEditable}>
                             Selecionar outra imagem para Flat
                           </Button>
                         }
@@ -228,7 +214,7 @@ const UpdateFlatForm = ({
                     <Switch
                       checked={field.value}
                       onCheckedChange={field.onChange}
-                      disabled={!updateFlatStates.formIsEditable}
+                      disabled={!formIsEditable}
                     />
                   </FormControl>
                   <FormLabel>Exibir na página de flats</FormLabel>
@@ -245,7 +231,7 @@ const UpdateFlatForm = ({
                   <FormControl>
                     <Input
                       placeholder="Insira um titulo"
-                      disabled={!updateFlatStates.formIsEditable}
+                      disabled={!formIsEditable}
                       {...field}
                     />
                   </FormControl>
@@ -263,7 +249,7 @@ const UpdateFlatForm = ({
                     <Textarea
                       placeholder="Insira a descrição"
                       className=" resize-none"
-                      disabled={!updateFlatStates.formIsEditable}
+                      disabled={!formIsEditable}
                       {...field}
                     />
                   </FormControl>
@@ -276,24 +262,20 @@ const UpdateFlatForm = ({
           <Button
             type="button"
             onClick={() =>
-              setUpdateFlatStates((oldValues) => {
-                const newValue = !oldValues.formIsEditable;
+              setFormIsEditable((old) => {
+                const newValue = !old;
                 if (newValue === false) {
                   formUpdateFlat.reset(formDefaultValues);
                 }
-                return { formIsEditable: newValue };
+                return newValue;
               })
             }
-            variant={
-              updateFlatStates.formIsEditable ? "destructive" : "default"
-            }
-            className={`${!updateFlatStates.formIsEditable && "col-span-full"}`}
+            variant={formIsEditable ? "destructive" : "default"}
+            className={`${!formIsEditable && "col-span-full"}`}
           >
-            {updateFlatStates.formIsEditable
-              ? "Cancelar edição"
-              : "Habilitar edição"}
+            {formIsEditable ? "Cancelar edição" : "Habilitar edição"}
           </Button>
-          {updateFlatStates.formIsEditable && (
+          {formIsEditable && (
             <Button
               type="submit"
               className="w-full col-span-full"
