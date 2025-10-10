@@ -13,7 +13,7 @@ export const useFlat = (
 ) => {
   return useQuery({
     queryKey: getFlatQueryKey(flatId),
-    queryFn: () => getFlat({ flatId }),
+    queryFn: async() => await getFlat({ flatId }),
     initialData: params?.initialData,
   });
 };
