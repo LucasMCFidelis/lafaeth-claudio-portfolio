@@ -4,6 +4,7 @@ import { Expand } from "lucide-react";
 import Link from "next/link";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
+import { OrderByCondition } from "@/app/data/order-by-condition";
 import { WhereCondition } from "@/app/data/where-condition";
 import { flatTable } from "@/db/schema";
 import { useManyFlats } from "@/hooks/queries/use-many-flats";
@@ -16,6 +17,7 @@ interface FlatListProps {
   maxSizeItemsMd?: boolean;
   displayButtonOpenModal?: boolean;
   where?: WhereCondition<typeof flatTable>;
+  orderBy?: OrderByCondition<typeof flatTable>;
 }
 
 const FlatList = ({
@@ -23,8 +25,13 @@ const FlatList = ({
   maxSizeItemsMd,
   displayButtonOpenModal,
   where,
+  orderBy,
 }: FlatListProps) => {
-  const { data: flats } = useManyFlats(where, { initialData });
+  const { data: flats } = useManyFlats({
+    where,
+    orderBy,
+    params: { initialData },
+  });
   return (
     <>
       {flats &&

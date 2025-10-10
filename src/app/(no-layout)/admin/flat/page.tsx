@@ -2,13 +2,22 @@ import Link from "next/link";
 
 import { getFlatsVisible } from "@/actions/get-flats-visible";
 import { getFlats } from "@/actions/get-many-flats";
+import { OrderByCondition } from "@/app/data/order-by-condition";
 import FlatList from "@/components/common/flat-list";
 import { Button } from "@/components/ui/button";
+import { flatTable } from "@/db/schema";
 
 import SortableFlats from "../components/sortable-items/sortable-flats";
 
 const FlatsPage = async () => {
-  const [flats, allFlats] = await Promise.all([getFlatsVisible(), getFlats()]);
+  const orderBy: OrderByCondition<typeof flatTable> = {
+    field: "visibleInFlat",
+    type: "desc",
+  };
+  const [flats, allFlats] = await Promise.all([
+    getFlatsVisible(),
+    getFlats({ orderBy }),
+  ]);
 
   return (
     <>
@@ -25,6 +34,7 @@ const FlatsPage = async () => {
             initialData={allFlats}
             maxSizeItemsMd={true}
             displayButtonOpenModal={true}
+            orderBy={orderBy}
           />
         </div>
       </div>

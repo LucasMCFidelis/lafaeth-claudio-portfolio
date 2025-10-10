@@ -16,7 +16,7 @@ const FlatPage = async () => {
     field: "visibleInFlat",
     value: true,
   };
-  const flats = await getFlats(where);
+  const flats = await getFlats({where});
 
   return (
     <div className="px-5 flex-1 flex flex-col">
