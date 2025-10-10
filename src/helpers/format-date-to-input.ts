@@ -1,4 +1,4 @@
 export function formatDateToInput(date?: Date | null) {
-  if (!date) return undefined;
+  if (!date) return null;
   return date.toISOString().split("T")[0];
 }

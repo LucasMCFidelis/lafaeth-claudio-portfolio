@@ -2,6 +2,7 @@
 
 import { eq } from "drizzle-orm";
 
+import { updateUserSchema } from "@/app/data/schemas/update-user-schema";
 import getUserData from "@/app/data/user/get-user-data";
 import { UserUpdateDTO } from "@/app/data/user/user-update-dto";
 import verifyUserLogged from "@/app/data/user/verify-user";
@@ -9,6 +10,7 @@ import { db } from "@/db";
 import { userTable } from "@/db/schema";
 
 export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
+  const dataValidated = updateUserSchema.parse(dataUpdate);
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
@@ -17,11 +19,11 @@ export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
   await db
     .update(userTable)
     .set({
-      email: dataUpdate.email,
-      name: dataUpdate.name,
-      description: dataUpdate.description,
-      image: dataUpdate.image,
-      birthDate: dataUpdate.birthDate,
+      email: dataValidated.email,
+      name: dataValidated.name,
+      description: dataValidated.description,
+      image: dataValidated.image,
+      birthDate: dataValidated.birthDate,
     })
     .where(eq(userTable.id, user.id));
 

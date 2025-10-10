@@ -35,13 +35,13 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
       email: initialData.email,
       image: initialData.image || "",
       description: initialData.description || "",
-      birthDate: formatDateToInput(initialData.birthDate),
+      birthDate: initialData.birthDate
+        ? formatDateToInput(initialData.birthDate)
+        : null,
     },
   });
 
   async function onSubmit(data: UserUpdateDTO) {
-    const birthDate = new Date(data.birthDate);
-    console.log({ ...data, birthDate });
     await updateUserDataMutation.mutateAsync(data, {
       onSuccess: () => toast.success("Perfil atualizado com sucesso"),
       onError: (error) =>
@@ -130,6 +130,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
                   type="date"
                   placeholder="Data de Nascimento"
                   {...field}
+                  value={field.value ?? ""} 
                 />
               </FormControl>
               <FormMessage />
