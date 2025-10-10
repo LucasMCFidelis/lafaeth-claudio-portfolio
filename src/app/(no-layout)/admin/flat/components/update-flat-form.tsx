@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 import { useForm } from "react-hook-form";
@@ -23,6 +24,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useUpdateFlat } from "@/hooks/mutations/use-update-flat";
+import { getFlatQueryKey, useFlat } from "@/hooks/queries/use-flat";
+import { getFlatsVisibleQueryKey } from "@/hooks/queries/use-flats-visible";
 import { useImage } from "@/hooks/queries/use-image";
 
 import CadastreImageModal from "../../components/cadastre-image-modal";
@@ -37,19 +41,24 @@ const UpdateFlatForm = ({
   imagesToSelect,
   initialData,
 }: UpdateFlatFormProps) => {
+  const { data: currentFlat } = useFlat(initialData.id, { initialData });
+  if (!currentFlat) throw new Error(`Flat ${initialData.id} not found`);
+
   const [updateFlatStates, setUpdateFlatStates] = useQueryStates({
     formIsEditable: parseAsBoolean.withDefault(false),
-    frontImageId: parseAsString.withDefault(initialData.frontImageId!),
-    backImageId: parseAsString.withDefault(initialData.backImageId!),
+    frontImageId: parseAsString.withDefault(currentFlat.frontImageId!),
+    backImageId: parseAsString.withDefault(currentFlat.backImageId!),
   });
   const { data: frontImage } = useImage(
     updateFlatStates.frontImageId,
-    initialData.frontImage ? { initialData: initialData.frontImage } : undefined
+    currentFlat.frontImage ? { initialData: currentFlat.frontImage } : undefined
   );
   const { data: backImage } = useImage(
     updateFlatStates.backImageId,
-    initialData.backImage ? { initialData: initialData.backImage } : undefined
+    currentFlat.backImage ? { initialData: currentFlat.backImage } : undefined
   );
+  const updateFlatMutation = useUpdateFlat(currentFlat.id);
+  const queryClient = useQueryClient();
 
   const formDefaultValues = {
     id: initialData.id,
@@ -66,12 +75,24 @@ const UpdateFlatForm = ({
   });
 
   function onSubmit(data: UpdateFlatDTO) {
-    console.log(data);
+    updateFlatMutation.mutate(data, {
+      onSuccess: (flatUpdated) => {
+        if (flatUpdated.visibleInFlat != formDefaultValues.visibleInFlat) {
+          queryClient.invalidateQueries({
+            queryKey: getFlatsVisibleQueryKey(),
+          });
+        }
+        queryClient.setQueryData<FlatDTO>(
+          getFlatQueryKey(data.id),
+          flatUpdated
+        );
+      },
+    });
     setUpdateFlatStates({
+      formIsEditable: false,
       frontImageId: null,
       backImageId: null,
     });
-    formUpdateFlat.reset();
   }
 
   return (
@@ -273,7 +294,11 @@ const UpdateFlatForm = ({
               : "Habilitar edição"}
           </Button>
           {updateFlatStates.formIsEditable && (
-            <Button type="submit" className="w-full col-span-full">
+            <Button
+              type="submit"
+              className="w-full col-span-full"
+              disabled={updateFlatMutation.isPending}
+            >
               Atualizar Flat
             </Button>
           )}
