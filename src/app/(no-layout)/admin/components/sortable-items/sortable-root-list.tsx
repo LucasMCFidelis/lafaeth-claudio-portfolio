@@ -47,7 +47,7 @@ export default function SortableRootList<T extends BasicItemToSortable>({
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+  }, [setMounted]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),

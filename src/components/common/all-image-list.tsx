@@ -2,7 +2,7 @@
 
 import { Expand } from "lucide-react";
 import Image from "next/image";
-import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
 import DetailImageModal from "@/app/(no-layout)/admin/components/detail-image-modal";
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -18,14 +18,10 @@ interface AllImageListProps {
 
 const AllImageList = ({ initialData, actionOnClick }: AllImageListProps) => {
   const { data: images } = useAllImages(initialData && { initialData });
-  const [imageSelected, setImageSelected] = useQueryState(
-    "imageId",
-    parseAsString
-  );
-  const [_, setOpenDetailImage] = useQueryState(
-    "openDetailImage",
-    parseAsBoolean.withDefault(false)
-  );
+  const [{ imageId: imageSelected }, setStates] = useQueryStates({
+    imageId: parseAsString,
+    openDetailImage: parseAsBoolean.withDefault(false),
+  });
 
   return (
     <>
@@ -35,33 +31,32 @@ const AllImageList = ({ initialData, actionOnClick }: AllImageListProps) => {
             key={image.id}
             className="relative aspect-square overflow-hidden rounded-lg border hover:ring-2 hover:ring-primary"
           >
-
-          <button
-            onClick={() => actionOnClick?.(image)}
-            className={cn(
-              "relative aspect-square h-full"
-            )}
+            <button
+              onClick={() => actionOnClick?.(image)}
+              className={cn("relative aspect-square h-full")}
             >
-            <Image
-              src={image.imageUrl}
-              alt={image.title}
-              fill
-              className="object-cover"
-            />
-          </button>
+              <Image
+                src={image.imageUrl}
+                alt={image.title}
+                fill
+                className="object-cover"
+              />
+            </button>
             <Button
-              onClick={() => {
-                setImageSelected(image.id);
-                setOpenDetailImage(true);
-              }}
+              onClick={() =>
+                setStates({ imageId: image.id, openDetailImage: true })
+              }
               className="absolute top-0 right-0 z-20"
-              >
+            >
               <Expand />
             </Button>
-              </div>
+          </div>
         ))}
       </div>
-      <DetailImageModal imageId={imageSelected || ""} initialData={images?.find(img => img.id === imageSelected)}/>
+      <DetailImageModal
+        imageId={imageSelected || ""}
+        initialData={images?.find((img) => img.id === imageSelected)}
+      />
     </>
   );
 };

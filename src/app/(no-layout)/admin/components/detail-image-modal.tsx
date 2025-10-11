@@ -1,6 +1,6 @@
 "use client";
 
-import { parseAsBoolean, parseAsString, useQueryState } from "nuqs";
+import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import {
@@ -20,23 +20,19 @@ interface DetailImageModalProps {
 
 const DetailImageModal = ({ imageId, initialData }: DetailImageModalProps) => {
   const { data: image } = useImage(imageId, initialData && { initialData });
-  const [_, setImageSelected] = useQueryState(
-    "imageId",
-    parseAsString
-  );
-  const [openDetailImage, setOpenDetailImage] = useQueryState(
-    "openDetailImage",
-    parseAsBoolean.withDefault(false)
-  );
+
+  const [{ openDetailImage }, setDetailStates] = useQueryStates({
+    openDetailImage: parseAsBoolean.withDefault(false),
+    imageId: parseAsString,
+  });
 
   return (
     <>
       <Dialog
         open={openDetailImage}
-        onOpenChange={(value) => {
-          setOpenDetailImage(value);
-          setImageSelected(null);
-        }}
+        onOpenChange={(value) =>
+          setDetailStates({ imageId: null, openDetailImage: value })
+        }
       >
         <DialogContent className="md:max-w-full h-full flex flex-col">
           <DialogHeader>

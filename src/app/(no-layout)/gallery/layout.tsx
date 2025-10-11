@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Galeria de projetos",
@@ -13,7 +14,7 @@ export default async function GalleryLayout({
 }>) {
   return (
     <main id="gallery-container" className="relative flex flex-col flex-1 ">
-      {children}
+      <Suspense fallback={<p>Carregando galeria...</p>}>{children}</Suspense>
     </main>
   );
 }
