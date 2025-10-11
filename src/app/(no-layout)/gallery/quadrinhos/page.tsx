@@ -20,5 +20,5 @@ export default async function GalleryComicsPage() {
 
   if (itemsList.length === 0) return <p>Lista de itens vazia</p>;
 
-  return <GalleryRootList itemsList={itemsList} />;
+  return <GalleryRootList itemsList={itemsList} hrefBackToClose="/quadrinhos" />;
 }
