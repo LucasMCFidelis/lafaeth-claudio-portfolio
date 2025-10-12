@@ -5,5 +5,10 @@ export interface UserDTO {
   image?: string | null;
   description: string | null;
   birthDate: Date | null;
-  age: number | null
+  age: number | null;
+  instagram: string | null;
+  behance: string | null;
+  whatsappMessage: string | null;
+  whatsappNumber: number | null;
+  lattes: string | null;
 }

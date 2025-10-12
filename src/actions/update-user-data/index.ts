@@ -24,6 +24,11 @@ export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
       description: dataValidated.description,
       image: dataValidated.image,
       birthDate: dataValidated.birthDate,
+      behance: dataValidated.behance,
+      instagram: dataValidated.instagram,
+      lattes: dataValidated.lattes,
+      whatsappMessage: dataValidated.whatsappMessage,
+      whatsappNumber: dataValidated.whatsappNumber,
     })
     .where(eq(userTable.id, user.id));
 

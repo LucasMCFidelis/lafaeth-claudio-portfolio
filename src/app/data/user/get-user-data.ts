@@ -31,6 +31,11 @@ const getUserData = cache(async (): Promise<UserDTO> => {
     description: user.description,
     birthDate,
     age: birthDate ? calculateAge(birthDate) : null,
+    instagram: user.instagram,
+    behance: user.behance,
+    whatsappMessage: user.whatsappMessage,
+    whatsappNumber: user.whatsappNumber,
+    lattes: user.lattes,
   };
 });
 

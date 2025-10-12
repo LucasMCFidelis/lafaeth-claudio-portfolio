@@ -2,7 +2,7 @@ import z from "zod";
 
 export const updateUserSchema = z.object({
   name: z.string("Nome inválido.").trim().min(1, "Nome é obrigatório."),
-  email: z.string().email("E-mail inválido!"),
+  email: z.email("E-mail inválido!"),
   image: z
     .string()
     .refine(
@@ -13,18 +13,23 @@ export const updateUserSchema = z.object({
         message: "Url da imagem deve ser uma URL válida do drive",
       }
     ),
-  description: z.string(),
+  description: z.string().optional(),
   birthDate: z
-    .union([z.string(), z.null()]) 
+    .union([z.string(), z.null()])
     .transform((val) => {
       if (!val || val === "") return null;
       return val;
     })
     .refine(
       (val) => {
-        if (val === null) return true; 
+        if (val === null) return true;
         return new Date(val) <= new Date();
       },
       { message: "Data de nascimento não pode estar no futuro" }
     ),
+  instagram: z.string().optional(),
+  behance: z.string().optional(),
+  whatsappNumber: z.number().optional(),
+  whatsappMessage: z.string().optional(),
+  lattes: z.string().optional(),
 });

@@ -13,9 +13,14 @@ export const auth = betterAuth({
   user: {
     modelName: "userTable",
     additionalFields: {
-      description: {type: "string", required: false},
-      birthDate: {type: "date", required: false}
-    }
+      description: { type: "string", required: false },
+      behance: { type: "string", required: false },
+      instagram: { type: "string", required: false },
+      whatsappNumber: { type: "number", required: false },
+      whatsappMessage: { type: "string", required: false },
+      lattes: { type: "string", required: false },
+      birthDate: { type: "date", required: false },
+    },
   },
   session: {
     modelName: "sessionTable",

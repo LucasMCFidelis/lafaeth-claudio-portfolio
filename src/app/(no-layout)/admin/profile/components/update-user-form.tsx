@@ -38,6 +38,11 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
       birthDate: initialData.birthDate
         ? formatDateToInput(initialData.birthDate)
         : null,
+        behance: initialData.behance || "",
+        instagram: initialData.instagram || "",
+        lattes: initialData.lattes || "",
+        whatsappMessage: initialData.whatsappMessage || "",
+        whatsappNumber: initialData.whatsappNumber || undefined,
     },
   });
 
@@ -130,8 +135,77 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
                   type="date"
                   placeholder="Data de Nascimento"
                   {...field}
-                  value={field.value ?? ""} 
+                  value={field.value ?? ""}
                 />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="behance"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Behance</FormLabel>
+              <FormControl>
+                <Input placeholder="Behance" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="instagram"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instagram</FormLabel>
+              <FormControl>
+                <Input placeholder="Instagram" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="lattes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Lattes</FormLabel>
+              <FormControl>
+                <Input placeholder="Lattes" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="whatsappNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Número do Whatsapp</FormLabel>
+              <FormControl>
+                <Input placeholder="Número do Whatsapp" type="number" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="whatsappMessage"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mensagem padrão para Whatsapp</FormLabel>
+              <FormControl>
+                <Input placeholder="Adicione uma mensagem padrão para Whatsapp" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

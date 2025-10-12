@@ -17,6 +17,11 @@ export const userTable = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  instagram: text("instagram"),
+  behance: text("behance"),
+  whatsappMessage: text("whatsapp_message"),
+  whatsappNumber: integer("whatsapp_number"),
+  lattes: text("lattes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
