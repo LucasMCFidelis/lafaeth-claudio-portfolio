@@ -38,11 +38,14 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
       birthDate: initialData.birthDate
         ? formatDateToInput(initialData.birthDate)
         : null,
-        behance: initialData.behance || "",
-        instagram: initialData.instagram || "",
-        lattes: initialData.lattes || "",
-        whatsappMessage: initialData.whatsappMessage || "",
-        whatsappNumber: initialData.whatsappNumber || undefined,
+      behance: initialData.behance || "",
+      instagram: initialData.instagram || "",
+      lattes: initialData.lattes || "",
+      whatsappMessage: initialData.whatsappMessage || "",
+      whatsappNumber:
+        typeof initialData.whatsappNumber === "number"
+          ? initialData.whatsappNumber
+          : undefined,
     },
   });
 
@@ -192,7 +195,15 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             <FormItem>
               <FormLabel>Número do Whatsapp</FormLabel>
               <FormControl>
-                <Input placeholder="Número do Whatsapp" type="number" {...field} />
+                <Input
+                  placeholder="Número do Whatsapp"
+                  type="number"
+                  {...field}
+                  value={field.value ?? ""}
+                  onChange={(e) =>
+                    field.onChange(e.target.valueAsNumber || undefined)
+                  }
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -205,7 +216,10 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             <FormItem>
               <FormLabel>Mensagem padrão para Whatsapp</FormLabel>
               <FormControl>
-                <Input placeholder="Adicione uma mensagem padrão para Whatsapp" {...field} />
+                <Input
+                  placeholder="Adicione uma mensagem padrão para Whatsapp"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

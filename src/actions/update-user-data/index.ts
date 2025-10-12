@@ -10,6 +10,8 @@ import { db } from "@/db";
 import { userTable } from "@/db/schema";
 
 export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
+  console.log( "aaaa");
+  
   const dataValidated = updateUserSchema.parse(dataUpdate);
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
@@ -21,14 +23,16 @@ export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
     .set({
       email: dataValidated.email,
       name: dataValidated.name,
-      description: dataValidated.description,
+      description: dataValidated.description ?? null,
       image: dataValidated.image,
-      birthDate: dataValidated.birthDate,
-      behance: dataValidated.behance,
-      instagram: dataValidated.instagram,
-      lattes: dataValidated.lattes,
-      whatsappMessage: dataValidated.whatsappMessage,
-      whatsappNumber: dataValidated.whatsappNumber,
+      birthDate: dataValidated.birthDate ?? null,
+      behance: dataValidated.behance ?? null,
+      instagram: dataValidated.instagram ?? null,
+      lattes: dataValidated.lattes ?? null,
+      whatsappMessage: dataValidated.whatsappMessage
+        ? dataValidated.whatsappMessage
+        : null,
+      whatsappNumber: dataValidated.whatsappNumber ?? null,
     })
     .where(eq(userTable.id, user.id));
 

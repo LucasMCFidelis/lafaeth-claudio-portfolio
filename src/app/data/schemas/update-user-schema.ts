@@ -29,7 +29,11 @@ export const updateUserSchema = z.object({
     ),
   instagram: z.string().optional(),
   behance: z.string().optional(),
-  whatsappNumber: z.number().optional(),
+  whatsappNumber: z.union([z.number(), z.null()]).transform((val) => {
+    if (val === undefined || val === null) return null;
+    const num = Number(val);
+    return Number.isNaN(num) ? null : num;
+  }),
   whatsappMessage: z.string().optional(),
   lattes: z.string().optional(),
 });
