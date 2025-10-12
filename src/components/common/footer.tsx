@@ -2,41 +2,48 @@ import Image from "next/image";
 import Link from "next/link";
 import { memo } from "react";
 
+import getUserMediaData from "@/app/data/user/get-user-medias-data";
+
 import { Button } from "../ui/button";
 
-const socialLinks: Array<{ href: string; img: string; alt?: string }> = [
-  {
-    href: "https://www.behance.net/lafaethcludio",
-    img: "/behance.png",
-    alt: "Behance",
-  },
-  {
-    href: "https://www.instagram.com/lafaethclaudio/",
-    img: "/instagram.png",
-    alt: "Instagram",
-  },
-  {
-    href: "https://lattes.cnpq.br/2094330076158828",
-    img: "/lattes.png",
-    alt: "Lattes",
-  },
-  {
-    href: "https://wa.me/5583991729253?text=Olá,%20tenho%20interesse%20no%20seu%20portfólio",
-    img: "/whatsapp.png",
-    alt: "WhatsApp",
-  },
-];
+async function FooterComponent() {
+  const mediasUrls = await getUserMediaData();
+  const socialLinks: Array<{ href: string | null; img: string; alt?: string }> =
+    [
+      {
+        href: mediasUrls.behance,
+        img: "/behance.png",
+        alt: "Behance",
+      },
+      {
+        href: mediasUrls.instagram,
+        img: "/instagram.png",
+        alt: "Instagram",
+      },
+      {
+        href: mediasUrls.lattes,
+        img: "/lattes.png",
+        alt: "Lattes",
+      },
+      {
+        href: mediasUrls.whatsapp,
+        img: "/whatsapp.png",
+        alt: "WhatsApp",
+      },
+    ];
 
-function FooterComponent() {
   return (
     <footer className="flex w-full p-5 gap-2 justify-center">
-      {socialLinks.map(({ href, img, alt }) => (
-        <Button key={href} variant="ghost" size="icon" asChild>
-          <Link href={href} target="_blank" className="relative">
-            <Image fill src={img} alt={alt ?? ""} className="dark:invert" />
-          </Link>
-        </Button>
-      ))}
+      {socialLinks.map(
+        ({ href, img, alt }) =>
+          href && (
+            <Button key={href} variant="ghost" size="icon" asChild>
+              <Link href={href} target="_blank" className="relative">
+                <Image fill src={img} alt={alt ?? ""} className="dark:invert" />
+              </Link>
+            </Button>
+          )
+      )}
     </footer>
   );
 }

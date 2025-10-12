@@ -1,4 +1,6 @@
-export interface UserDTO {
+import { UserMediasUrlsDTO } from "./user-medias-dto";
+
+export type UserDTO = {
   id: string;
   name: string;
   email: string;
@@ -6,9 +8,6 @@ export interface UserDTO {
   description: string | null;
   birthDate: Date | null;
   age: number | null;
-  instagram: string | null;
-  behance: string | null;
   whatsappMessage: string | null;
   whatsappNumber: number | null;
-  lattes: string | null;
-}
+} & UserMediasUrlsDTO;

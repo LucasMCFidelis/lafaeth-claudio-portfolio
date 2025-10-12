@@ -6,6 +6,7 @@ import { cache } from "react";
 import { db } from "@/db";
 import { userTable } from "@/db/schema";
 import { calculateAge } from "@/helpers/calculate-age";
+import { mountWhatsappUrl } from "@/helpers/mount-whatsapp-url";
 
 import { UserDTO } from "./user-dto";
 
@@ -22,6 +23,12 @@ const getUserData = cache(async (): Promise<UserDTO> => {
   }
 
   const birthDate = user.birthDate ? new Date(user.birthDate) : null;
+  const whatsappUrl = user.whatsappNumber
+    ? mountWhatsappUrl({
+        number: user.whatsappNumber,
+        ...(user.whatsappMessage && { message: user.whatsappMessage }),
+      })
+    : null;
 
   return {
     id: user.id,
@@ -33,6 +40,7 @@ const getUserData = cache(async (): Promise<UserDTO> => {
     age: birthDate ? calculateAge(birthDate) : null,
     instagram: user.instagram,
     behance: user.behance,
+    whatsapp: whatsappUrl,
     whatsappMessage: user.whatsappMessage,
     whatsappNumber: user.whatsappNumber,
     lattes: user.lattes,

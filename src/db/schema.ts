@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   date,
   integer,
@@ -20,7 +21,7 @@ export const userTable = pgTable("user", {
   instagram: text("instagram"),
   behance: text("behance"),
   whatsappMessage: text("whatsapp_message"),
-  whatsappNumber: integer("whatsapp_number"),
+  whatsappNumber: bigint("whatsapp_number", { mode: "number" }),
   lattes: text("lattes"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
