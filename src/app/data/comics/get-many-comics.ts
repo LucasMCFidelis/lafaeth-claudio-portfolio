@@ -1,18 +1,22 @@
 import "server-only";
 
-import { eq, SQLWrapper } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { comicsTable } from "@/db/schema";
 
+import { OrderByCondition } from "../order-by-condition";
+import { WhereCondition } from "../where-condition";
 import { ComicDTO } from "./comic-dto";
 import mapToComicDTO from "./map-to-comic";
 
-interface GetManyComicsProps<WithImage extends boolean> {
-  where?: {
-    field: keyof typeof comicsTable.$inferSelect;
-    value: string | number | boolean | SQLWrapper;
-  };
+export interface GetComicsProps {
+  where?: WhereCondition<typeof comicsTable>;
+  orderBy?: OrderByCondition<typeof comicsTable>;
+}
+
+export interface GetManyComicsProps<WithImage extends boolean = boolean>
+  extends GetComicsProps {
   withImage?: WithImage;
 }
 

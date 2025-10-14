@@ -36,6 +36,11 @@ const items = [
     url: "/admin/flat",
     icon: Image,
   },
+  {
+    title: "Quadrinhos",
+    url: "/admin/quadrinhos",
+    icon: Image,
+  },
 ];
 
 const AdminSidebar = async () => {
