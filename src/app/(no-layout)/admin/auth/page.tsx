@@ -1,3 +1,6 @@
+import { redirect } from "next/navigation";
+
+import verifyUserLogged from "@/app/data/user/verify-user";
 import {
   Card,
   CardContent,
@@ -8,7 +11,12 @@ import {
 
 import LoginForm from "./components/login-form";
 
-const AuthPage = () => {
+const AuthPage = async () => {
+  const userLogged = await verifyUserLogged();
+  if (userLogged) {
+    redirect("/admin");
+  }
+
   return (
     <Card className="w-full sm:max-w-md">
       <CardHeader className="w-full">
