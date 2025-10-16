@@ -30,8 +30,11 @@ interface SortableRootListProps<T extends BasicItemToSortable> {
   children: React.ReactNode;
 }
 
-export const getSortingIsDisabledQueryStateParams = () =>
-  ["sortingIsDisabled", parseAsBoolean.withDefault(true)] as const;
+export const getSortingIsDisabledQueryStateParams = (initialState?: boolean) =>
+  [
+    "sortingIsDisabled",
+    parseAsBoolean.withDefault(initialState ?? true),
+  ] as const;
 
 export default function SortableRootList<T extends BasicItemToSortable>({
   items,
