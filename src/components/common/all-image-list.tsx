@@ -1,6 +1,5 @@
 "use client";
 
-import { Expand } from "lucide-react";
 import Image from "next/image";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
@@ -9,7 +8,7 @@ import { ImageDTO } from "@/app/data/image/image-dto";
 import { useAllImages } from "@/hooks/queries/use-all-images";
 import { cn } from "@/lib/utils";
 
-import { Button } from "../ui/button";
+import ExpandItemButton from "./expand-item-button";
 
 interface AllImageListProps {
   initialData?: Array<ImageDTO>;
@@ -42,14 +41,11 @@ const AllImageList = ({ initialData, actionOnClick }: AllImageListProps) => {
                 className="object-cover"
               />
             </button>
-            <Button
+            <ExpandItemButton
               onClick={() =>
                 setStates({ imageId: image.id, openDetailImage: true })
               }
-              className="absolute top-0 right-0 z-20"
-            >
-              <Expand />
-            </Button>
+            />
           </div>
         ))}
       </div>
