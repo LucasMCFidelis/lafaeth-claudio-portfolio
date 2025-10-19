@@ -3,7 +3,7 @@ import { comicsTable, imagesTable } from "@/db/schema";
 import { mapToImageDTO } from "../image/map-to-image-dto";
 import { ComicDTO } from "./comic-dto";
 
-interface MapToComicDTOProps<WithImage extends boolean> {
+interface MapToComicDTOProps<WithImage extends boolean = boolean> {
   data: typeof comicsTable.$inferSelect & {
     image?: typeof imagesTable.$inferSelect | null;
   };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import getManyComics from "@/app/data/comics/get-many-comics";
+import ComicsList from "@/components/common/comics-list";
 import { Button } from "@/components/ui/button";
 
 import SortableComics from "../components/sortable-items/sortable-comics";
@@ -19,7 +20,13 @@ const ComicsAdminPage = async () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <SortableComics initialData={comics} />
+        <SortableComics
+          initialData={comics.filter((comic) => comic.visibleInComics)}
+        />
+        <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
+
+        <ComicsList displayButtonOpenModal initialData={comics} withImage={true}/>
+        </div>
       </div>
     </>
   );
