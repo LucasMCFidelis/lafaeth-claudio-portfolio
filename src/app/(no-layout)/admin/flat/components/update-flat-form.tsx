@@ -98,7 +98,7 @@ const UpdateFlatForm = ({
           onSubmit={formUpdateFlat.handleSubmit(onSubmit)}
           className="w-full h-full flex flex-col gap-6 mt-12"
         >
-          <div className="grid md:grid-cols-2 gap-4 flex-1 col-span-full w-full">
+          <div className="grid md:grid-cols-2 gap-4 flex-1 w-full">
             <FormField
               control={formUpdateFlat.control}
               name="frontImageId"
@@ -259,31 +259,33 @@ const UpdateFlatForm = ({
             />
           </div>
 
-          <Button
-            type="button"
-            onClick={() =>
-              setFormIsEditable((old) => {
-                const newValue = !old;
-                if (newValue === false) {
-                  formUpdateFlat.reset(formDefaultValues);
-                }
-                return newValue;
-              })
-            }
-            variant={formIsEditable ? "destructive" : "default"}
-            className={`${!formIsEditable && "col-span-full"}`}
-          >
-            {formIsEditable ? "Cancelar edição" : "Habilitar edição"}
-          </Button>
-          {formIsEditable && (
+          <div className="flex w-full gap-4 justify-between">
             <Button
-              type="submit"
-              className="w-full col-span-full"
-              disabled={updateFlatMutation.isPending}
+              type="button"
+              onClick={() =>
+                setFormIsEditable((old) => {
+                  const newValue = !old;
+                  if (newValue === false) {
+                    formUpdateFlat.reset(formDefaultValues);
+                  }
+                  return newValue;
+                })
+              }
+              variant={formIsEditable ? "destructive" : "default"}
+              className={`${!formIsEditable ? "flex-1" : "flex-1/2"}`}
             >
-              Atualizar Flat
+              {formIsEditable ? "Cancelar edição" : "Habilitar edição"}
             </Button>
-          )}
+            {formIsEditable && (
+              <Button
+                type="submit"
+                className="flex-1/2"
+                disabled={updateFlatMutation.isPending}
+              >
+                Atualizar Flat
+              </Button>
+            )}
+          </div>
         </form>
       </Form>
     </>

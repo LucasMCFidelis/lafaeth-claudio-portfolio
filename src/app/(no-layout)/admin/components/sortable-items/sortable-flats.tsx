@@ -37,24 +37,7 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
 
   return (
     <div className="space-y-4">
-      <h3 className={`${sortingIsDisabled && "hidden"} md:block`}>
-        Disposição na página
-      </h3>
-      <SortableRootList
-        items={sortableFlats}
-        getQueryKeyFunction={getFlatsVisibleQueryKey}
-        className={`max-w-full ${sortingIsDisabled && "hidden"} md:block`}
-      >
-        {sortableFlats.map((item) => (
-          <SortableItem
-            key={item.id}
-            item={item}
-            disabled={sortingIsDisabled}
-            className="w-full"
-          />
-        ))}
-      </SortableRootList>
-      <div className="w-full grid gap-4 md:grid-cols-2">
+      <div className="w-full grid gap-4">
         <Button
           onClick={() => {
             setSortingIsDisabled((prev) => !prev);
@@ -65,13 +48,8 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
             }
           }}
           variant={sortingIsDisabled ? "default" : "destructive"}
-          className={`w-full ${sortingIsDisabled && "md:col-span-full"}`}
         >
-          {sortingIsDisabled ? (
-            <>Habilitar edição de ordem</>
-          ) : (
-            <>Cancelar edição</>
-          )}
+          {sortingIsDisabled ? <>Habilitar Ordenação</> : <>Cancelar edição</>}
         </Button>
         {!sortingIsDisabled && (
           <Button
@@ -86,6 +64,20 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
           </Button>
         )}
       </div>
+      <SortableRootList
+        items={sortableFlats}
+        getQueryKeyFunction={getFlatsVisibleQueryKey}
+        className={`max-w-full ${sortingIsDisabled && "hidden"} md:block`}
+      >
+        {sortableFlats.map((item) => (
+          <SortableItem
+            key={item.id}
+            item={item}
+            disabled={sortingIsDisabled}
+            className="w-full"
+          />
+        ))}
+      </SortableRootList>
     </div>
   );
 };
