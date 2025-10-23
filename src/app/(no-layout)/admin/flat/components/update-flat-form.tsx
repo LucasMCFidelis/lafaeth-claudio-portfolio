@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import Image from "next/image";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 
@@ -29,8 +28,7 @@ import { getFlatQueryKey, useFlat } from "@/hooks/queries/use-flat";
 import { getFlatsVisibleQueryKey } from "@/hooks/queries/use-flats-visible";
 import { useImage } from "@/hooks/queries/use-image";
 
-import CadastreImageModal from "../../components/cadastre-image-modal";
-import { SelectImageDialog } from "../../components/select-image-dialog";
+import { FlatImageField } from "./flat-image-field";
 
 interface UpdateFlatFormProps {
   imagesToSelect?: Array<ImageDTO>;
@@ -65,11 +63,11 @@ const UpdateFlatForm = ({
     defaultValues: formDefaultValues,
   });
 
-  const { data: frontImage } = useImage(
+  const { data: frontImage, refetch: refetchFront } = useImage(
     formUpdateFlat.watch("frontImageId"),
     currentFlat.frontImage ? { initialData: currentFlat.frontImage } : undefined
   );
-  const { data: backImage } = useImage(
+  const { data: backImage, refetch: refetchBack } = useImage(
     formUpdateFlat.watch("backImageId"),
     currentFlat.backImage ? { initialData: currentFlat.backImage } : undefined
   );
@@ -103,103 +101,36 @@ const UpdateFlatForm = ({
               control={formUpdateFlat.control}
               name="frontImageId"
               render={() => (
-                <FormItem className="flex w-full h-72 md:h-full flex-col">
-                  <FormLabel>Imagem da Line</FormLabel>
-
-                  <div className="flex-1 relative mb-2">
-                    <Image
-                      src={frontImage?.imageUrl || ""}
-                      alt="Selected image"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-
-                  {formIsEditable && (
-                    <>
-                      <CadastreImageModal
-                        initialData={
-                          backImage && {
-                            artist: backImage.artist,
-                            screenwriter: backImage.screenwriter,
-                            colorist: backImage.colorist,
-                            horizontalPage: backImage.horizontalPage,
-                          }
-                        }
-                        saveImageId={(imageId) => {
-                          formUpdateFlat.setValue("frontImageId", imageId);
-                        }}
-                        disabled={!formIsEditable}
-                        textToTrigger="Alterar com nova Imagem"
-                      />
-
-                      <SelectImageDialog
-                        imagesToSelect={imagesToSelect}
-                        onSelect={(image) => {
-                          formUpdateFlat.setValue("frontImageId", image.id);
-                        }}
-                        trigger={
-                          <Button variant="outline" disabled={!formIsEditable}>
-                            Selecionar outra imagem para Line
-                          </Button>
-                        }
-                      />
-                    </>
-                  )}
-                  <FormMessage />
-                </FormItem>
+                <FlatImageField
+                  label="Imagem da Line"
+                  image={frontImage}
+                  relatedImage={backImage}
+                  disabled={!formIsEditable}
+                  onSelectImage={(id) => {
+                    formUpdateFlat.setValue("frontImageId", id);
+                    refetchFront();
+                  }}
+                  imagesToSelect={imagesToSelect}
+                  triggerTextToSelect="Selecionar outra imagem para Line"
+                />
               )}
             />
             <FormField
               control={formUpdateFlat.control}
               name="backImageId"
               render={() => (
-                <FormItem className="flex flex-col h-72 md:h-full">
-                  <FormLabel>Imagem do Flat</FormLabel>
-
-                  <div className="flex-1 relative mb-2">
-                    <Image
-                      src={backImage?.imageUrl || ""}
-                      alt="Selected image"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-
-                  {formIsEditable && (
-                    <>
-                      <CadastreImageModal
-                        initialData={
-                          frontImage && {
-                            artist: frontImage.artist,
-                            screenwriter: frontImage.screenwriter,
-                            colorist: frontImage.colorist,
-                            horizontalPage: frontImage.horizontalPage,
-                          }
-                        }
-                        saveImageId={(imageId) => {
-                          formUpdateFlat.setValue("backImageId", imageId);
-                        }}
-                        disabled={!formIsEditable}
-                        textToTrigger="Alterar com nova Imagem"
-                      />
-
-                      <SelectImageDialog
-                        imagesToSelect={imagesToSelect}
-                        onSelect={(image) => {
-                          formUpdateFlat.setValue("backImageId", image.id);
-                        }}
-                        trigger={
-                          <Button variant="outline" disabled={!formIsEditable}>
-                            Selecionar outra imagem para Flat
-                          </Button>
-                        }
-                      />
-                    </>
-                  )}
-
-                  <FormMessage />
-                </FormItem>
+                <FlatImageField
+                  label="Imagem do Flat"
+                  image={backImage}
+                  relatedImage={frontImage}
+                  disabled={!formIsEditable}
+                  onSelectImage={(id) => {
+                    formUpdateFlat.setValue("backImageId", id);
+                    refetchBack();
+                  }}
+                  imagesToSelect={imagesToSelect}
+                  triggerTextToSelect="Selecionar outra imagem para Flat"
+                />
               )}
             />
           </div>

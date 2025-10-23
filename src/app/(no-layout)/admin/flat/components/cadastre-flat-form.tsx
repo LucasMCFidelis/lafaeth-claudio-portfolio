@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -23,8 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { usePostFlat } from "@/hooks/mutations/use-post-flat";
 import { useImage } from "@/hooks/queries/use-image";
 
-import CadastreImageModal from "../../components/cadastre-image-modal";
-import { SelectImageDialog } from "../../components/select-image-dialog";
+import { FlatImageField } from "./flat-image-field";
 
 interface CadastreFlatFormProps {
   imagesToSelect?: Array<ImageDTO>;
@@ -43,8 +41,12 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
     },
   });
 
-  const { data: frontImage } = useImage(formCadastreFlat.watch("frontImageId"));
-  const { data: backImage } = useImage(formCadastreFlat.watch("backImageId"));
+  const { data: frontImage, refetch: refetchFront } = useImage(
+    formCadastreFlat.watch("frontImageId")
+  );
+  const { data: backImage, refetch: refetchBack } = useImage(
+    formCadastreFlat.watch("backImageId")
+  );
 
   function onSubmit(data: CadastreFlatDTO) {
     postFlatMutation.mutate(data, {
@@ -66,91 +68,32 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
               control={formCadastreFlat.control}
               name="frontImageId"
               render={() => (
-                <FormItem className="flex flex-col h-72">
-                  <FormLabel>Imagem da Line</FormLabel>
-                  <div className="flex-1 relative mb-2 bg-accent rounded-lg">
-                    {frontImage && (
-                      <Image
-                        src={frontImage.imageUrl}
-                        alt="Selected image"
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    )}
-                  </div>
-                  <div className="w-full grid gap-4">
-                    <CadastreImageModal
-                      initialData={
-                        backImage && {
-                          artist: backImage.artist,
-                          screenwriter: backImage.screenwriter,
-                          colorist: backImage.colorist,
-                          horizontalPage: backImage.horizontalPage,
-                        }
-                      }
-                      saveImageId={(imageId) => {
-                        formCadastreFlat.setValue("frontImageId", imageId);
-                      }}
-                      textToTrigger={
-                        frontImage ? "Cadastrar outra imagem" : undefined
-                      }
-                    />
-                    <SelectImageDialog
-                      imagesToSelect={imagesToSelect}
-                      onSelect={(image) => {
-                        formCadastreFlat.setValue("frontImageId", image.id);
-                      }}
-                    />
-                  </div>
-
-                  <FormMessage />
-                </FormItem>
+                <FlatImageField
+                  label="Imagem da Line"
+                  image={frontImage}
+                  relatedImage={backImage}
+                  onSelectImage={(id) => {
+                    formCadastreFlat.setValue("frontImageId", id);
+                    refetchFront();
+                  }}
+                  imagesToSelect={imagesToSelect}
+                />
               )}
             />
             <FormField
               control={formCadastreFlat.control}
               name="backImageId"
               render={() => (
-                <FormItem className="flex flex-col h-72">
-                  <FormLabel>Imagem do Flat</FormLabel>
-                  <div className="flex-1 relative mb-2 bg-accent rounded-lg">
-                    {backImage && (
-                      <Image
-                        src={backImage.imageUrl}
-                        alt="Selected image"
-                        fill
-                        className="object-cover rounded-lg"
-                      />
-                    )}
-                  </div>
-
-                  <div className="w-full grid gap-4">
-                    <CadastreImageModal
-                      initialData={
-                        frontImage && {
-                          artist: frontImage.artist,
-                          screenwriter: frontImage.screenwriter,
-                          colorist: frontImage.colorist,
-                          horizontalPage: frontImage.horizontalPage,
-                        }
-                      }
-                      saveImageId={(imageId) => {
-                        formCadastreFlat.setValue("backImageId", imageId);
-                      }}
-                      textToTrigger={
-                        frontImage ? "Cadastrar outra imagem" : undefined
-                      }
-                    />
-                    <SelectImageDialog
-                      imagesToSelect={imagesToSelect}
-                      onSelect={(image) => {
-                        formCadastreFlat.setValue("backImageId", image.id);
-                      }}
-                    />
-                  </div>
-
-                  <FormMessage />
-                </FormItem>
+                <FlatImageField
+                  label="Imagem do Flat"
+                  image={backImage}
+                  relatedImage={frontImage}
+                  onSelectImage={(id) => {
+                    formCadastreFlat.setValue("backImageId", id);
+                    refetchBack();
+                  }}
+                  imagesToSelect={imagesToSelect}
+                />
               )}
             />
           </div>
