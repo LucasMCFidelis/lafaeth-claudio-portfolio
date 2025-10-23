@@ -17,11 +17,23 @@ export const postComic = async (data: CadastreComicDTO): Promise<ComicDTO> => {
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
-  const comic = await getOneComic({
-    where: { field: "imageId", value: dataValidated.imageId },
-  });
+  let comic;
+  try {
+    comic = await getOneComic({
+      where: { field: "imageId", value: dataValidated.imageId },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "Comic not found") {
+      comic = null;
+    } else {
+      console.error("Unexpected error fetching comic:", error);
+      throw error;
+    }
+  }
   if (comic) {
-    throw new Error("Duplicate imageId: a comic with this image already exists");
+    throw new Error(
+      "Duplicate imageId: a comic with this image already exists"
+    );
   }
 
   const [newComic] = await db
