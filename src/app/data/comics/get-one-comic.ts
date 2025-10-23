@@ -5,18 +5,17 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { comicsTable } from "@/db/schema";
 
+import { WhereCondition } from "../where-condition";
 import { ComicDTO } from "./comic-dto";
 import mapToComicDTO from "./map-to-comic";
 
 export interface GetOneComicProps {
-  comicId: string;
+  where: WhereCondition<typeof comicsTable>;
 }
 
-const getOneComic = async ({
-  comicId,
-}: GetOneComicProps): Promise<ComicDTO> => {
+const getOneComic = async ({ where }: GetOneComicProps): Promise<ComicDTO> => {
   const comic = await db.query.comicsTable.findFirst({
-    where: eq(comicsTable.id, comicId),
+    where: eq(comicsTable[where.field], where.value),
     with: { image: true },
   });
 

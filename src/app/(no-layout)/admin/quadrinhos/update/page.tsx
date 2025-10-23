@@ -1,5 +1,5 @@
 import { getAllImages } from "@/actions/get-all-images";
-import getOneComic from "@/app/data/comics/get-one-comic";
+import getOneComicById from "@/app/data/comics/get-one-comic-by-id";
 
 const UpdateComicPage = async ({
   searchParams,
@@ -10,7 +10,7 @@ const UpdateComicPage = async ({
 
   const [allImages, comic] = await Promise.all([
     getAllImages(),
-    getOneComic({ comicId }),
+    getOneComicById({ comicId }),
   ]);
 
   return (
@@ -20,4 +20,4 @@ const UpdateComicPage = async ({
   );
 };
 
-export default UpdateComicPage 
+export default UpdateComicPage;

@@ -118,9 +118,11 @@ export const flatRelations = relations(flatTable, ({ one }) => ({
 
 export const comicsTable = pgTable("comic", {
   id: uuid("id").primaryKey().defaultRandom(),
-  imageId: uuid("image_id").references(() => imagesTable.id, {
-    onDelete: "set null",
-  }),
+  imageId: uuid("image_id")
+    .unique()
+    .references(() => imagesTable.id, {
+      onDelete: "set null",
+    }),
   productionYear: integer("production_year")
     .notNull()
     .default(new Date().getFullYear()),
@@ -144,7 +146,7 @@ export const colorizationTable = pgTable("colorization", {
   productionYear: integer("production_year")
     .notNull()
     .default(new Date().getFullYear()),
-    observations: text("observations"),
+  observations: text("observations"),
   visibleInColorization: boolean("visible_in_colorization")
     .notNull()
     .default(false),
