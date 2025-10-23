@@ -13,7 +13,11 @@ export const useImage = (
 ) => {
   return useQuery({
     queryKey: getImageQueryKey(imageId),
-    queryFn: async() => await getImage({ imageId }),
+    queryFn: async () => {
+      if (!imageId) return null;
+      return await getImage({ imageId });
+    },
+    enabled: !!imageId,
     initialData: params?.initialData,
   });
 };
