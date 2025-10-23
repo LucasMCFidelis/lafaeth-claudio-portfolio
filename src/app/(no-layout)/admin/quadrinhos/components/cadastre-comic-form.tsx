@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 
@@ -20,6 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { usePostComic } from "@/hooks/mutations/use-post-comic";
+import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
 import { useImage } from "@/hooks/queries/use-image";
 
 import CadastreImageModal from "../../components/cadastre-image-modal";
@@ -34,10 +37,21 @@ const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
     resolver: zodResolver(cadastreComicSchema),
   });
 
+  const queryClient = useQueryClient();
+  const postComicMutation = usePostComic();
   const { data: image } = useImage(formCadastreComic.watch("imageId"));
 
   function onSubmit(data: CadastreComicDTO) {
-    console.log(data);
+    postComicMutation.mutate(data, {
+      onSuccess: (newComic) => {
+        formCadastreComic.reset();
+        if (newComic.visibleInComics) {
+          queryClient.invalidateQueries({
+            queryKey: getComicsVisibleQueryKey(),
+          });
+        }
+      },
+    });
   }
 
   return (
@@ -51,7 +65,7 @@ const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
             control={formCadastreComic.control}
             name="imageId"
             render={() => (
-              <FormItem className="flex flex-1 h-full flex-col">
+              <FormItem className="flex flex-1 md:h-full flex-col">
                 <FormLabel>Imagem da Line</FormLabel>
                 <div className="relative h-full mb-2 bg-accent rounded-lg">
                   {image && (
@@ -142,7 +156,11 @@ const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={postComicMutation.isPending}
+            >
               Cadastrar Quadrinho
             </Button>
           </div>
