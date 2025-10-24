@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
@@ -11,7 +10,6 @@ import {
   UpdateFlatDTO,
   updateFlatSchema,
 } from "@/app/data/schemas/update-flat-schema";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -27,7 +25,9 @@ import { useUpdateFlat } from "@/hooks/mutations/use-update-flat";
 import { getFlatQueryKey, useFlat } from "@/hooks/queries/use-flat";
 import { getFlatsVisibleQueryKey } from "@/hooks/queries/use-flats-visible";
 import { useImage } from "@/hooks/queries/use-image";
+import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
+import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateFlatFormProps {
@@ -42,10 +42,7 @@ const UpdateFlatForm = ({
   const { data: currentFlat } = useFlat(initialData.id, { initialData });
   if (!currentFlat) throw new Error(`Flat ${initialData.id} not found`);
 
-  const [formIsEditable, setFormIsEditable] = useQueryState(
-    "formIsEditable",
-    parseAsBoolean.withDefault(false)
-  );
+  const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const updateFlatMutation = useUpdateFlat(currentFlat.id);
   const queryClient = useQueryClient();
 
@@ -190,33 +187,11 @@ const UpdateFlatForm = ({
             />
           </div>
 
-          <div className="flex w-full gap-4 justify-between">
-            <Button
-              type="button"
-              onClick={() =>
-                setFormIsEditable((old) => {
-                  const newValue = !old;
-                  if (newValue === false) {
-                    formUpdateFlat.reset(formDefaultValues);
-                  }
-                  return newValue;
-                })
-              }
-              variant={formIsEditable ? "destructive" : "default"}
-              className={`${!formIsEditable ? "flex-1" : "flex-1/2"}`}
-            >
-              {formIsEditable ? "Cancelar edição" : "Habilitar edição"}
-            </Button>
-            {formIsEditable && (
-              <Button
-                type="submit"
-                className="flex-1/2"
-                disabled={updateFlatMutation.isPending}
-              >
-                Atualizar Flat
-              </Button>
-            )}
-          </div>
+          <ActionsUpdateForm
+            textSaveUpdateAction="Atualizar Flat"
+            disableSaveUpdateAction={updateFlatMutation.isPending}
+            resetForm={() => formUpdateFlat.reset(formDefaultValues)}
+          />
         </form>
       </Form>
     </>

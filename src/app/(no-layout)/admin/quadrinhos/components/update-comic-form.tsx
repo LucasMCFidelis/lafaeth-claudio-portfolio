@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
@@ -11,7 +10,6 @@ import {
   UpdateComicDTO,
   updateComicSchema,
 } from "@/app/data/schemas/update-comic-schema";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -26,7 +24,9 @@ import { useUpdateComic } from "@/hooks/mutations/use-update-comic";
 import { useComic } from "@/hooks/queries/use-comic";
 import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
 import { useImage } from "@/hooks/queries/use-image";
+import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
+import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateComicFormProps {
@@ -43,10 +43,7 @@ const UpdateComicForm = ({
   const updateComicMutation = useUpdateComic(currentComic.id);
   const queryClient = useQueryClient();
 
-  const [formIsEditable, setFormIsEditable] = useQueryState(
-    "formIsEditable",
-    parseAsBoolean.withDefault(false)
-  );
+  const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const formDefaultValues: UpdateComicDTO = {
     id: initialData.id,
     imageId: initialData.imageId ?? "",
@@ -160,33 +157,11 @@ const UpdateComicForm = ({
                 </FormItem>
               )}
             />
-            <div className="flex w-full gap-4 justify-between">
-              <Button
-                type="button"
-                onClick={() =>
-                  setFormIsEditable((old) => {
-                    const newValue = !old;
-                    if (newValue === false) {
-                      formUpdateComic.reset(formDefaultValues);
-                    }
-                    return newValue;
-                  })
-                }
-                variant={formIsEditable ? "destructive" : "default"}
-                className={`${!formIsEditable ? "flex-1" : "flex-1/2"}`}
-              >
-                {formIsEditable ? "Cancelar edição" : "Habilitar edição"}
-              </Button>
-              {formIsEditable && (
-                <Button
-                  type="submit"
-                  className="flex-1/2"
-                  disabled={updateComicMutation.isPending}
-                >
-                  Atualizar Flat
-                </Button>
-              )}
-            </div>
+            <ActionsUpdateForm
+              textSaveUpdateAction="Atualizar Quadrinho"
+              disableSaveUpdateAction={updateComicMutation.isPending}
+              resetForm={() => formUpdateComic.reset(formDefaultValues)}
+            />
           </div>
         </form>
       </Form>

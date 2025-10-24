@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
-import { parseAsBoolean, useQueryState } from "nuqs";
 import { useForm } from "react-hook-form";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -11,7 +10,6 @@ import {
   UpdateImageDTO,
   updateImageSchema,
 } from "@/app/data/schemas/update-image-schema";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -25,6 +23,9 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateImage } from "@/hooks/mutations/use-update-image";
 import { getHomeImagesQueryKey } from "@/hooks/queries/use-home-images";
+import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
+
+import ActionsUpdateForm from "./actions-update-forms";
 
 interface UpdateImageFormProps {
   initialData: ImageDTO;
@@ -47,10 +48,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
     defaultValues: formDefaultValues,
   });
 
-  const [formIsEditable, setFormIsEditable] = useQueryState(
-    "formIsEditable",
-    parseAsBoolean.withDefault(false)
-  );
+  const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const queryClient = useQueryClient();
   const updateImageMutation = useUpdateImage(formDefaultValues.id);
 
@@ -229,28 +227,12 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
               )}
             />
           </div>
-
-          <Button
-            type="button"
-            onClick={() =>
-              setFormIsEditable((old) => {
-                const newValue = !old;
-                if (newValue === false) {
-                  formUpdateImage.reset(formDefaultValues);
-                }
-                return newValue;
-              })
-            }
-            variant={formIsEditable ? "destructive" : "default"}
-            className={`${!formIsEditable && "col-span-full"}`}
-          >
-            {formIsEditable ? "Cancelar edição" : "Habilitar edição"}
-          </Button>
-          {formIsEditable && (
-            <Button type="submit" disabled={updateImageMutation.isPending}>
-              Atualizar
-            </Button>
-          )}
+          <ActionsUpdateForm
+            textSaveUpdateAction="Atualizar Imagem"
+            disableSaveUpdateAction={updateImageMutation.isPending}
+            resetForm={() => formUpdateImage.reset(formDefaultValues)}
+            className="col-span-full"
+          />
         </form>
       </Form>
     </div>
