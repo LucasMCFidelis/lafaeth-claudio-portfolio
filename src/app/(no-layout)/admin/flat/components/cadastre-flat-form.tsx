@@ -22,7 +22,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { usePostFlat } from "@/hooks/mutations/use-post-flat";
 import { useImage } from "@/hooks/queries/use-image";
 
-import { FlatImageField } from "./flat-image-field";
+import { ImageFormField } from "../../components/image-form-field";
 
 interface CadastreFlatFormProps {
   imagesToSelect?: Array<ImageDTO>;
@@ -68,7 +68,7 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
               control={formCadastreFlat.control}
               name="frontImageId"
               render={() => (
-                <FlatImageField
+                <ImageFormField
                   label="Imagem da Line"
                   image={frontImage}
                   relatedImage={backImage}
@@ -84,7 +84,7 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
               control={formCadastreFlat.control}
               name="backImageId"
               render={() => (
-                <FlatImageField
+                <ImageFormField
                   label="Imagem do Flat"
                   image={backImage}
                   relatedImage={frontImage}

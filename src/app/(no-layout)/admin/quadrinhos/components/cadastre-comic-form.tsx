@@ -2,7 +2,6 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
-import Image from "next/image";
 import { useForm } from "react-hook-form";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -25,8 +24,7 @@ import { usePostComic } from "@/hooks/mutations/use-post-comic";
 import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
 import { useImage } from "@/hooks/queries/use-image";
 
-import CadastreImageModal from "../../components/cadastre-image-modal";
-import { SelectImageDialog } from "../../components/select-image-dialog";
+import { ImageFormField } from "../../components/image-form-field";
 
 interface CadastreComicFormProps {
   imagesToSelect?: Array<ImageDTO>;
@@ -65,35 +63,15 @@ const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
             control={formCadastreComic.control}
             name="imageId"
             render={() => (
-              <FormItem className="flex flex-1 md:h-full flex-col">
-                <FormLabel>Imagem da Line</FormLabel>
-                <div className="relative h-full mb-2 bg-accent rounded-lg">
-                  {image && (
-                    <Image
-                      src={image.imageUrl}
-                      alt="Selected image"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  )}
-                </div>
-                <div className="w-full grid gap-4">
-                  <CadastreImageModal
-                    saveImageId={(imageId) => {
-                      formCadastreComic.setValue("imageId", imageId);
-                    }}
-                    textToTrigger={image ? "Cadastrar outra imagem" : undefined}
-                  />
-                  <SelectImageDialog
-                    imagesToSelect={imagesToSelect}
-                    onSelect={(image) => {
-                      formCadastreComic.setValue("imageId", image.id);
-                    }}
-                  />
-                </div>
-
-                <FormMessage />
-              </FormItem>
+              <ImageFormField
+                label="Imagem do quadrinho"
+                image={image}
+                onSelectImage={(imageId) => {
+                  formCadastreComic.setValue("imageId", imageId);
+                }}
+                imagesToSelect={imagesToSelect}
+                className="flex-1 md:h-full"
+              />
             )}
           />
 

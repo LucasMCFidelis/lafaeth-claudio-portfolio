@@ -28,7 +28,7 @@ import { getFlatQueryKey, useFlat } from "@/hooks/queries/use-flat";
 import { getFlatsVisibleQueryKey } from "@/hooks/queries/use-flats-visible";
 import { useImage } from "@/hooks/queries/use-image";
 
-import { FlatImageField } from "./flat-image-field";
+import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateFlatFormProps {
   imagesToSelect?: Array<ImageDTO>;
@@ -101,7 +101,7 @@ const UpdateFlatForm = ({
               control={formUpdateFlat.control}
               name="frontImageId"
               render={() => (
-                <FlatImageField
+                <ImageFormField
                   label="Imagem da Line"
                   image={frontImage}
                   relatedImage={backImage}
@@ -119,7 +119,7 @@ const UpdateFlatForm = ({
               control={formUpdateFlat.control}
               name="backImageId"
               render={() => (
-                <FlatImageField
+                <ImageFormField
                   label="Imagem do Flat"
                   image={backImage}
                   relatedImage={frontImage}

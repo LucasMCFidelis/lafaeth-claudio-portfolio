@@ -3,11 +3,12 @@ import Image from "next/image";
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
 import { FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { cn } from "@/lib/utils";
 
-import CadastreImageModal from "../../components/cadastre-image-modal";
-import { SelectImageDialog } from "../../components/select-image-dialog";
+import CadastreImageModal from "./cadastre-image-modal";
+import { SelectImageDialog } from "./select-image-dialog";
 
-interface FlatImageFieldProps {
+interface ImageFormFieldProps {
   label: string;
   image?: ImageDTO | null;
   relatedImage?: ImageDTO | null;
@@ -15,9 +16,10 @@ interface FlatImageFieldProps {
   disabled?: boolean;
   imagesToSelect?: Array<ImageDTO>;
   triggerTextToSelect?: string;
+  className?: string;
 }
 
-export function FlatImageField({
+export function ImageFormField({
   label,
   image,
   relatedImage,
@@ -25,9 +27,10 @@ export function FlatImageField({
   disabled,
   imagesToSelect,
   triggerTextToSelect,
-}: FlatImageFieldProps) {
+  className,
+}: ImageFormFieldProps) {
   return (
-    <FormItem className="flex flex-col h-72">
+    <FormItem className={cn("flex flex-col h-72", className)}>
       <FormLabel>{label}</FormLabel>
 
       <div className="flex-1 relative mb-2 bg-accent rounded-lg">
