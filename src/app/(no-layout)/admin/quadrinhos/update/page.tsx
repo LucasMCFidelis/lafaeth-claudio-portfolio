@@ -1,6 +1,8 @@
 import { getAllImages } from "@/actions/get-all-images";
 import getOneComicById from "@/app/data/comics/get-one-comic-by-id";
 
+import UpdateComicForm from "../components/update-comic-form";
+
 const UpdateComicPage = async ({
   searchParams,
 }: {
@@ -13,11 +15,7 @@ const UpdateComicPage = async ({
     getOneComicById({ comicId }),
   ]);
 
-  return (
-    <div className="mt-12">
-      <p>{comic.id}</p>
-    </div>
-  );
+  return <UpdateComicForm initialData={comic} imagesToSelect={allImages} />;
 };
 
 export default UpdateComicPage;
