@@ -137,6 +137,11 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
           >
             Cadastrar Flat
           </Button>
+          {postFlatMutation.isError && (
+            <p className="text-destructive text-sm text-center col-span-full">
+              {postFlatMutation.error.message}
+            </p>
+          )}
         </form>
       </Form>
     </>

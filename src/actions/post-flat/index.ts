@@ -2,6 +2,7 @@
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import mapToFlatDTO from "@/app/data/flat/map-to-flat-dto";
+import getOneImageById from "@/app/data/image/get-one-image-by-id";
 import {
   CadastreFlatDTO,
   cadastreFlatSchema,
@@ -15,6 +16,15 @@ export const postFlat = async (data: CadastreFlatDTO): Promise<FlatDTO> => {
 
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
+
+  const [frontImage, backImage] = await Promise.all([
+    getOneImageById({ imageId: dataValidated.frontImageId }),
+    getOneImageById({ imageId: dataValidated.backImageId }),
+  ]);
+
+  if (frontImage.horizontalPage != backImage.horizontalPage) {
+    throw new Error("Conflict in orientations pages")
+  }
 
   const [newFlat] = await db
     .insert(flatTable)
