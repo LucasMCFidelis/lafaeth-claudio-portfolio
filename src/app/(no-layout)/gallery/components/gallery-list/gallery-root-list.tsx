@@ -85,10 +85,13 @@ const GalleryRootList = <T extends ImageDTO>({
                 typeof item.productionYear === "number" && (
                   <p>Ano: {item.productionYear}</p>
                 )}
-
               {"productionSizePages" in item &&
                 typeof item.productionSizePages === "number" && (
                   <p>Tamanho: {item.productionSizePages} páginas</p>
+                )}
+              {"observations" in item &&
+                typeof item.observations === "string" && (
+                  <p>{item.observations}</p>
                 )}
             </div>
           </div>

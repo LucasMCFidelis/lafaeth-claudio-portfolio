@@ -3,11 +3,11 @@ import { colorizationTable, imagesTable } from "@/db/schema";
 import { mapToImageDTO } from "../image/map-to-image-dto";
 import { ColorDTO } from "./colors-dto";
 
-interface MapToColorDTOProps<WithImage extends boolean = boolean> {
+interface MapToColorDTOProps<WithImage extends boolean> {
   data: typeof colorizationTable.$inferSelect & {
     image?: typeof imagesTable.$inferSelect | null;
   };
-  withImage?: WithImage;
+  withImage: WithImage;
 }
 
 const mapToColorDTO = <WithImage extends boolean>({
