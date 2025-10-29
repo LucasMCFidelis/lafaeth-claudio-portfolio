@@ -1,6 +1,5 @@
 "use client";
 
-
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { WhereCondition } from "@/app/data/where-condition";
@@ -32,32 +31,39 @@ const FlatList = ({
   });
   return (
     <>
-      {flats &&
-        flats.map((flat) => {
-          const screenwriter =
-            flat.backImage?.screenwriter || flat.frontImage?.screenwriter;
-          const artist = flat.backImage?.artist || flat.frontImage?.artist;
-          return (
-            <FlatItem
-              key={flat.id}
-              title={flat.title}
-              artist={artist || ""}
-              screenwriter={screenwriter || ""}
-              horizontalPage={flat.horizontalPage}
-              visibleInFlat={flat.visibleInFlat}
-              frontImageUrl={flat.frontImage?.imageUrl}
-              backImageUrl={flat.backImage?.imageUrl}
-              maxSizeItemsMd={maxSizeItemsMd}
-            >
-              {displayButtonOpenModal && (
-                <ExpandItemButton
-                  typeLink
-                  href={`/admin/flat/update?flatId=${flat.id}`}
-                />
-              )}
-            </FlatItem>
-          );
-        })}
+      {flats && flats.length > 0 ? (
+        <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
+          {flats.map((flat) => {
+            const screenwriter =
+              flat.backImage?.screenwriter || flat.frontImage?.screenwriter;
+            const artist = flat.backImage?.artist || flat.frontImage?.artist;
+            return (
+              <FlatItem
+                key={flat.id}
+                title={flat.title}
+                artist={artist || ""}
+                screenwriter={screenwriter || ""}
+                horizontalPage={flat.horizontalPage}
+                visibleInFlat={flat.visibleInFlat}
+                frontImageUrl={flat.frontImage?.imageUrl}
+                backImageUrl={flat.backImage?.imageUrl}
+                maxSizeItemsMd={maxSizeItemsMd}
+              >
+                {displayButtonOpenModal && (
+                  <ExpandItemButton
+                    typeLink
+                    href={`/admin/flat/update?flatId=${flat.id}`}
+                  />
+                )}
+              </FlatItem>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="col-span-full text-center">
+          Nenhum Flat para ser exibido no momento
+        </p>
+      )}
     </>
   );
 };

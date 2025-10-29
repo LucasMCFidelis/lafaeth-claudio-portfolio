@@ -35,6 +35,8 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
     };
   });
 
+ if(!flats || flats.length === 0) return
+
   return (
     <div className="space-y-4">
       <div className="w-full grid gap-4">

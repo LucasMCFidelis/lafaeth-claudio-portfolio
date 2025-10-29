@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
+import CadastreImageModal from "@/app/(no-layout)/admin/components/cadastre-image-modal";
 import DetailImageModal from "@/app/(no-layout)/admin/components/detail-image-modal";
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { useAllImages } from "@/hooks/queries/use-all-images";
@@ -25,34 +26,41 @@ const AllImageList = ({ initialData, actionOnClick }: AllImageListProps) => {
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-2">
-        {images?.map((image) => (
-          <div
-            key={image.id}
-            className="relative aspect-square overflow-hidden rounded-lg border hover:ring-2 hover:ring-primary"
-          >
-            <button
-              onClick={() => actionOnClick?.(image)}
-              className={cn("relative aspect-square h-full")}
+        {images && images.length > 0 ? (
+          images.map((image) => (
+            <div
+              key={image.id}
+              className="relative aspect-square overflow-hidden rounded-lg border hover:ring-2 hover:ring-primary"
             >
-              <Image
-                src={image.imageUrl}
-                alt={image.title}
-                fill
-                className="object-cover"
+              <button
+                onClick={() => actionOnClick?.(image)}
+                className={cn("relative aspect-square h-full")}
+              >
+                <Image
+                  src={image.imageUrl}
+                  alt={image.title}
+                  fill
+                  className="object-cover"
+                />
+              </button>
+              <ExpandItemButton
+                onClick={() =>
+                  setStates({ imageId: image.id, openDetailImage: true })
+                }
               />
-            </button>
-            <ExpandItemButton
-              onClick={() =>
-                setStates({ imageId: image.id, openDetailImage: true })
-              }
-            />
-          </div>
-        ))}
+            </div>
+          ))
+        ) : (
+          <p className="col-span-full text-center">
+            Nenhuma imagem cadastrada até o momento
+          </p>
+        )}
       </div>
       <DetailImageModal
         imageId={imageSelected || ""}
         initialData={images?.find((img) => img.id === imageSelected)}
       />
+      <CadastreImageModal />
     </>
   );
 };

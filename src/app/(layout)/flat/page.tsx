@@ -16,13 +16,11 @@ const FlatPage = async () => {
     field: "visibleInFlat",
     value: true,
   };
-  const flats = await getFlats({where});
+  const flats = await getFlats({ where });
 
   return (
     <div className="px-5 flex-1 flex flex-col">
-      <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
-        <FlatList initialData={flats} where={where} />
-      </div>
+      <FlatList initialData={flats} where={where} />
     </div>
   );
 };

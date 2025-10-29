@@ -32,6 +32,8 @@ const SortableImagesHome = ({ initialData }: SortableImagesHomeProps) => {
     ...getSortingIsDisabledQueryStateParams()
   );
 
+  if (!imagesHome || imagesHome.length === 0) return <CadastreImageModal />;
+
   return (
     <>
       <SortableRootList

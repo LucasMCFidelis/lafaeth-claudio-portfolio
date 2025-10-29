@@ -29,14 +29,12 @@ const FlatsPage = async () => {
 
       <div className="flex-1 max-w-full grid md:grid-cols-[20%_1fr] gap-6 mt-12">
         <SortableFlats initialData={flats} />
-        <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
-          <FlatList
-            initialData={allFlats}
-            maxSizeItemsMd={true}
-            displayButtonOpenModal={true}
-            orderBy={orderBy}
-          />
-        </div>
+        <FlatList
+          initialData={allFlats}
+          maxSizeItemsMd={true}
+          displayButtonOpenModal={true}
+          orderBy={orderBy}
+        />
       </div>
     </>
   );

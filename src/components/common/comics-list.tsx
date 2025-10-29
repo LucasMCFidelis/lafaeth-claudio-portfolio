@@ -32,25 +32,31 @@ const ComicsList = ({
 
   return (
     <>
-      {comics
-        .filter((comic) => comic.image)
-        .map((comic) => (
-          <ComicItem
-            key={comic.id}
-            title={comic.image!.title}
-            imageId={comic.image!.id}
-            imageUrl={comic.image!.imageUrl}
-            visibleInComics={comic.visibleInComics}
-            disableLink={displayButtonOpenModal}
-          >
-            {displayButtonOpenModal && (
-              <ExpandItemButton
-                typeLink
-                href={`/admin/quadrinhos/update?comicId=${comic.id}`}
-              />
-            )}
-          </ComicItem>
-        ))}
+      {comics.length > 0 ? (
+        comics
+          .filter((comic) => comic.image)
+          .map((comic) => (
+            <ComicItem
+              key={comic.id}
+              title={comic.image!.title}
+              imageId={comic.image!.id}
+              imageUrl={comic.image!.imageUrl}
+              visibleInComics={comic.visibleInComics}
+              disableLink={displayButtonOpenModal}
+            >
+              {displayButtonOpenModal && (
+                <ExpandItemButton
+                  typeLink
+                  href={`/admin/quadrinhos/update?comicId=${comic.id}`}
+                />
+              )}
+            </ComicItem>
+          ))
+      ) : (
+        <p className="col-span-full text-center">
+          Nenhum Quadrinho para ser exibido no momento
+        </p>
+      )}
     </>
   );
 };

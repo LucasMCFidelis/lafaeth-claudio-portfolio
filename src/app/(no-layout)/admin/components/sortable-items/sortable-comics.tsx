@@ -50,6 +50,8 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
     }
   };
 
+  if(!comics || comics.length === 0) return
+
   return (
     <>
       <Button
