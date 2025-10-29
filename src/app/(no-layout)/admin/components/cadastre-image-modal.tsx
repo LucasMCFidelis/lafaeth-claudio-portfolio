@@ -5,6 +5,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import {
@@ -83,7 +84,13 @@ const CadastreImageModal = ({
   }, [initialData, formCadastreImage]);
 
   async function onSubmit(data: CadastreImageDTO) {
-    const newImage = await postHomeImageMutation.mutateAsync(data);
+    const newImage = await postHomeImageMutation.mutateAsync(data, {
+      onSuccess: () => toast.success("Imagem cadastrada com sucesso"),
+      onError: (error) =>
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao cadastrar imagem"
+        ),
+    });
     setCadastreImageModalIsOpen(false);
     if (saveImageId) {
       saveImageId(newImage.id);

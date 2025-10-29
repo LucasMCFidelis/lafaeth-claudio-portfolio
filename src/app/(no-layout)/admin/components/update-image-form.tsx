@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import {
@@ -58,7 +59,12 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
         if (data.visibleInHome !== formDefaultValues.visibleInHome) {
           queryClient.invalidateQueries({ queryKey: getHomeImagesQueryKey() });
         }
+        toast.success("Imagem atualizada com sucesso");
       },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao atualizar imagem"
+        ),
     });
     setFormIsEditable(false);
   }
