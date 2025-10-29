@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import { toast } from "sonner";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,18 @@ const SortableImagesHome = ({ initialData }: SortableImagesHomeProps) => {
             className="w-full"
             disabled={updateHomeImagesOrderMutation.isPending}
             onClick={async () => {
-              await updateHomeImagesOrderMutation.mutateAsync(imagesHome);
+              await updateHomeImagesOrderMutation.mutateAsync(imagesHome, {
+                onSuccess: () =>
+                  toast.success(
+                    "Ordem das images de inicio atualizada com sucesso"
+                  ),
+                onError: (error) =>
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : "Erro ao atualizar ordem das images de inicio"
+                  ),
+              });
               setSortingIsDisabled(true);
             }}
           >

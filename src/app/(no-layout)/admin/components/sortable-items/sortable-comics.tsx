@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import { toast } from "sonner";
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import { Button } from "@/components/ui/button";
@@ -50,7 +51,7 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
     }
   };
 
-  if(!comics || comics.length === 0) return
+  if (!comics || comics.length === 0) return;
 
   return (
     <>
@@ -98,7 +99,19 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
               disabled={updateComicsOrderMutation.isPending}
               onClick={async () => {
                 await updateComicsOrderMutation.mutateAsync(
-                  comics as unknown as ComicDTO[]
+                  comics as unknown as ComicDTO[],
+                  {
+                    onSuccess: () =>
+                      toast.success(
+                        "Ordem dos quadrinho atualizada com sucesso"
+                      ),
+                    onError: (error) =>
+                      toast.error(
+                        error instanceof Error
+                          ? error.message
+                          : "Erro ao atualizar ordem dos quadrinho"
+                      ),
+                  }
                 );
                 setSortingIsDisabled(true);
               }}

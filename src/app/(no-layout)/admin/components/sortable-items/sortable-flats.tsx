@@ -2,6 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
+import { toast } from "sonner";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { Button } from "@/components/ui/button";
@@ -35,7 +36,7 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
     };
   });
 
- if(!flats || flats.length === 0) return
+  if (!flats || flats.length === 0) return;
 
   return (
     <div className="space-y-4">
@@ -58,7 +59,16 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
             className="w-full"
             disabled={updateFlatsOrderMutation.isPending}
             onClick={async () => {
-              await updateFlatsOrderMutation.mutateAsync(flats);
+              await updateFlatsOrderMutation.mutateAsync(flats, {
+                onSuccess: () =>
+                  toast.success("Ordem dos flats atualizado com sucesso"),
+                onError: (error) =>
+                  toast.error(
+                    error instanceof Error
+                      ? error.message
+                      : "Erro ao atualizar ordem dos flats"
+                  ),
+              });
               setSortingIsDisabled(true);
             }}
           >
