@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import {
@@ -48,7 +49,12 @@ const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
             queryKey: getComicsVisibleQueryKey(),
           });
         }
+        toast.success("Quadrinho cadastrado com sucesso");
       },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao cadastrar quadrinho"
+        ),
     });
   }
 

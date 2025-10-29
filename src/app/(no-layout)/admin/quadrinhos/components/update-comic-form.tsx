@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -66,7 +67,12 @@ const UpdateComicForm = ({
             queryKey: getComicsVisibleQueryKey(),
           });
         }
+        toast.success("Quadrinho atualizado com sucesso");
       },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao atualizar quadrinho"
+        ),
     });
     setFormIsEditable(false);
   }
