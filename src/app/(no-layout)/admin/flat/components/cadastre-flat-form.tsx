@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import {
@@ -52,7 +53,12 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
     postFlatMutation.mutate(data, {
       onSuccess: () => {
         formCadastreFlat.reset();
+        toast.success("Flat cadastrado com sucesso");
       },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao cadastrar flat"
+        ),
     });
   }
 

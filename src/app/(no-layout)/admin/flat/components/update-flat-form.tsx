@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { ImageDTO } from "@/app/data/image/image-dto";
@@ -81,7 +82,12 @@ const UpdateFlatForm = ({
           getFlatQueryKey(data.id),
           flatUpdated
         );
+        toast.success("Flat atualizado com sucesso");
       },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error ? error.message : "Erro ao atualizar flat"
+        ),
     });
     setFormIsEditable(false);
   }
