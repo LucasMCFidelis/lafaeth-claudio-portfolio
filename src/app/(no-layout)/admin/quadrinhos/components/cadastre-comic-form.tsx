@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   CadastreComicDTO,
   cadastreComicSchema,
@@ -27,11 +26,7 @@ import { useImage } from "@/hooks/queries/use-image";
 
 import { ImageFormField } from "../../components/image-form-field";
 
-interface CadastreComicFormProps {
-  imagesToSelect?: Array<ImageDTO>;
-}
-
-const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
+const CadastreComicForm = () => {
   const formCadastreComic = useForm<CadastreComicDTO>({
     resolver: zodResolver(cadastreComicSchema),
   });
@@ -75,7 +70,6 @@ const CadastreComicForm = ({ imagesToSelect }: CadastreComicFormProps) => {
                 onSelectImage={(imageId) => {
                   formCadastreComic.setValue("imageId", imageId);
                 }}
-                imagesToSelect={imagesToSelect}
                 className="flex-1 md:h-full"
               />
             )}

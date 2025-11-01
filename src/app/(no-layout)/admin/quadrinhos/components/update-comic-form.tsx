@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
-import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   UpdateComicDTO,
   updateComicSchema,
@@ -31,14 +30,10 @@ import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateComicFormProps {
-  imagesToSelect?: Array<ImageDTO>;
   initialData: ComicDTO;
 }
 
-const UpdateComicForm = ({
-  imagesToSelect,
-  initialData,
-}: UpdateComicFormProps) => {
+const UpdateComicForm = ({ initialData }: UpdateComicFormProps) => {
   const { data: currentComic } = useComic(initialData.id, { initialData });
   if (!currentComic) throw new Error(`Comic ${initialData.id} not found`);
   const updateComicMutation = useUpdateComic(currentComic.id);
@@ -95,7 +90,6 @@ const UpdateComicForm = ({
                 onSelectImage={(imageId) => {
                   formUpdateComic.setValue("imageId", imageId);
                 }}
-                imagesToSelect={imagesToSelect}
                 className="flex-1 md:h-full"
               />
             )}

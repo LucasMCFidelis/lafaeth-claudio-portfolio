@@ -6,7 +6,6 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
-import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   UpdateFlatDTO,
   updateFlatSchema,
@@ -32,14 +31,10 @@ import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateFlatFormProps {
-  imagesToSelect?: Array<ImageDTO>;
   initialData: FlatDTO<true>;
 }
 
-const UpdateFlatForm = ({
-  imagesToSelect,
-  initialData,
-}: UpdateFlatFormProps) => {
+const UpdateFlatForm = ({ initialData }: UpdateFlatFormProps) => {
   const { data: currentFlat } = useFlat(initialData.id, { initialData });
   if (!currentFlat) throw new Error(`Flat ${initialData.id} not found`);
 
@@ -113,7 +108,6 @@ const UpdateFlatForm = ({
                     formUpdateFlat.setValue("frontImageId", id);
                     refetchFront();
                   }}
-                  imagesToSelect={imagesToSelect}
                   triggerTextToSelect="Selecionar outra imagem para Line"
                 />
               )}
@@ -131,7 +125,6 @@ const UpdateFlatForm = ({
                     formUpdateFlat.setValue("backImageId", id);
                     refetchBack();
                   }}
-                  imagesToSelect={imagesToSelect}
                   triggerTextToSelect="Selecionar outra imagem para Flat"
                 />
               )}

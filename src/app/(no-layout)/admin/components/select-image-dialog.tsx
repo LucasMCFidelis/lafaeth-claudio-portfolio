@@ -17,13 +17,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 interface SelectImageDialogProps {
   trigger?: React.ReactNode;
   onSelect: (image: ImageDTO) => void;
-  imagesToSelect?: Array<ImageDTO>;
 }
 
 export function SelectImageDialog({
   trigger,
   onSelect,
-  imagesToSelect
 }: SelectImageDialogProps) {
   const [open, setOpen] = useState(false);
 
@@ -42,7 +40,9 @@ export function SelectImageDialog({
           <DialogTitle>Selecione uma imagem</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[70vh]">
-          <AllImageList actionOnClick={handleSelect} initialData={imagesToSelect}/>
+          <AllImageList
+            actionOnClick={handleSelect}
+          />
         </ScrollArea>
       </DialogContent>
     </Dialog>

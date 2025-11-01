@@ -14,7 +14,7 @@ interface ImageFormFieldProps {
   relatedImage?: ImageDTO | null;
   onSelectImage: (id: string) => void;
   disabled?: boolean;
-  imagesToSelect?: Array<ImageDTO>;
+
   triggerTextToSelect?: string;
   className?: string;
 }
@@ -25,7 +25,6 @@ export function ImageFormField({
   relatedImage,
   onSelectImage,
   disabled,
-  imagesToSelect,
   triggerTextToSelect,
   className,
 }: ImageFormFieldProps) {
@@ -60,7 +59,6 @@ export function ImageFormField({
             disabled={disabled}
           />
           <SelectImageDialog
-            imagesToSelect={imagesToSelect}
             onSelect={(img) => onSelectImage(img.id)}
             {...(triggerTextToSelect && {
               trigger: (

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   CadastreFlatDTO,
   cadastreFlatSchema,
@@ -25,11 +24,7 @@ import { useImage } from "@/hooks/queries/use-image";
 
 import { ImageFormField } from "../../components/image-form-field";
 
-interface CadastreFlatFormProps {
-  imagesToSelect?: Array<ImageDTO>;
-}
-
-const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
+const CadastreFlatForm = () => {
   const postFlatMutation = usePostFlat();
   const formCadastreFlat = useForm<CadastreFlatDTO>({
     resolver: zodResolver(cadastreFlatSchema),
@@ -82,7 +77,6 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
                     formCadastreFlat.setValue("frontImageId", id);
                     refetchFront();
                   }}
-                  imagesToSelect={imagesToSelect}
                 />
               )}
             />
@@ -98,7 +92,6 @@ const CadastreFlatForm = ({ imagesToSelect }: CadastreFlatFormProps) => {
                     formCadastreFlat.setValue("backImageId", id);
                     refetchBack();
                   }}
-                  imagesToSelect={imagesToSelect}
                 />
               )}
             />
