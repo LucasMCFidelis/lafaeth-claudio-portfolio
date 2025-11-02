@@ -38,7 +38,7 @@ export function ImageFormField({
             src={image.imageUrl}
             alt="Selected image"
             fill
-            className="object-cover rounded-lg"
+            className="object-contain object-top rounded-lg"
           />
         )}
       </div>
