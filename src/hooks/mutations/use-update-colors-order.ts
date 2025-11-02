@@ -8,7 +8,7 @@ import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import { getColorsVisibleQueryKey } from "../queries/use-colors-visible";
 
 export const getUpdateColorsOrderQueryKey = () =>
-  ["update-comics-order"] as const;
+  ["update-colors-order"] as const;
 
 export const useUpdateColorsOrder = () => {
   const queryClient = useQueryClient();

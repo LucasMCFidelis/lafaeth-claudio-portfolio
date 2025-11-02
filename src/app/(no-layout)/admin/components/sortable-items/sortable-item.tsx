@@ -39,7 +39,7 @@ const SortableItem = <T extends BasicItemToSortable>({
         src={item.imageUrl}
         alt={item.imageUrl}
         fill
-        className="object-cover"
+        className="object-contain object-top"
       />
     </button>
   );

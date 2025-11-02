@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { toast } from "sonner";
 
-import { ComicDTO } from "@/app/data/comics/comic-dto";
+import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,46 +12,47 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useUpdateComicsOrder } from "@/hooks/mutations/use-update-comics-order";
+import { useUpdateColorsOrder } from "@/hooks/mutations/use-update-colors-order";
 import {
-  getComicsVisibleQueryKey,
-  useComicsVisible,
-} from "@/hooks/queries/use-comics-visible";
+  getColorsVisibleQueryKey,
+  useColorsVisible,
+} from "@/hooks/queries/use-colors-visible";
 
 import SortableItem from "./sortable-item";
 import SortableRootList, {
   getSortingIsDisabledQueryStateParams,
 } from "./sortable-root-list";
 
-interface SortableComicsProps {
-  initialData?: Array<ComicDTO>;
+interface SortableColorsProps {
+  initialData?: Array<ColorDTO>;
 }
 
-const SortableComics = ({ initialData }: SortableComicsProps) => {
-  const { data: comics = [] } = useComicsVisible(
+const SortableColors = ({ initialData }: SortableColorsProps) => {
+  const { data: colors = [] } = useColorsVisible(
     initialData && { initialData }
   );
-  const updateComicsOrderMutation = useUpdateComicsOrder();
+  const updateColorsOrderMutation = useUpdateColorsOrder();
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
     ...getSortingIsDisabledQueryStateParams()
   );
   const queryClient = useQueryClient();
-  const sortableComics = comics.map((comic) => ({
-    id: comic.id,
-    title: comic.image?.title || "",
-    imageUrl: comic.image?.imageUrl || "",
+  const sortableColors = colors.map((color) => ({
+    id: color.id,
+    title: color.image?.title || "",
+    imageUrl: color.image?.imageUrl || "",
+    horizontalPage: color.image?.horizontalPage ?? false,
   }));
 
   const toggleSortingState = () => {
     setSortingIsDisabled((prev) => !prev);
     if (!sortingIsDisabled) {
       queryClient.invalidateQueries({
-        queryKey: getComicsVisibleQueryKey(),
+        queryKey: getColorsVisibleQueryKey(),
       });
     }
   };
 
-  if (!comics || comics.length === 0) return;
+  if (!colors || colors.length === 0) return;
 
   return (
     <>
@@ -70,18 +71,22 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
             <DialogTitle>Disposição na página</DialogTitle>
           </DialogHeader>
           <SortableRootList
-            items={sortableComics}
-            getQueryKeyFunction={getComicsVisibleQueryKey}
+            items={sortableColors}
+            getQueryKeyFunction={getColorsVisibleQueryKey}
             className={`max-w-full ${sortingIsDisabled && "hidden"} `}
           >
             <div className="w-full flex-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-              {sortableComics.map((item) => (
-                <SortableItem
+              {sortableColors.map((item) => (
+                <div
                   key={item.id}
-                  item={item}
-                  disabled={sortingIsDisabled}
-                  className="w-full h-full aspect-auto"
-                />
+                  className={`min-h-56 ${item.horizontalPage ? "md:col-span-2" : ""}`}
+                >
+                  <SortableItem
+                    item={item}
+                    disabled={sortingIsDisabled}
+                    className="w-full h-full aspect-auto"
+                  />
+                </div>
               ))}
             </div>
           </SortableRootList>
@@ -96,20 +101,20 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
 
             <Button
               className="w-1/2"
-              disabled={updateComicsOrderMutation.isPending}
+              disabled={updateColorsOrderMutation.isPending}
               onClick={async () => {
-                await updateComicsOrderMutation.mutateAsync(
-                  comics as unknown as ComicDTO[],
+                await updateColorsOrderMutation.mutateAsync(
+                  colors as unknown as Array<ColorDTO>,
                   {
                     onSuccess: () =>
                       toast.success(
-                        "Ordem dos quadrinho atualizada com sucesso"
+                        "Ordem das colorizações atualizada com sucesso"
                       ),
                     onError: (error) =>
                       toast.error(
                         error instanceof Error
                           ? error.message
-                          : "Erro ao atualizar ordem dos quadrinho"
+                          : "Erro ao atualizar ordem das colorizações"
                       ),
                   }
                 );
@@ -125,4 +130,4 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
   );
 };
 
-export default SortableComics;
+export default SortableColors;
