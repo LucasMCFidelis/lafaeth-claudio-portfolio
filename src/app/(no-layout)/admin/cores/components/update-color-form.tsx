@@ -5,11 +5,11 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import {
-  CadastreColorDTO,
-  cadastreColorSchema,
-} from "@/app/data/schemas/cadastre-color-schema";
-import { Button } from "@/components/ui/button";
+  UpdateColorDTO,
+  updateColorSchema,
+} from "@/app/data/schemas/update-color-schema";
 import {
   Form,
   FormControl,
@@ -21,56 +21,80 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { usePostColor } from "@/hooks/mutations/use-post-color";
-import { getColorsVisibleQueryKey } from "@/hooks/queries/use-colors-visible";
+import { useUpdateColor } from "@/hooks/mutations/use-update-color";
+import { useColor } from "@/hooks/queries/use-color";
+import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
 import { useImage } from "@/hooks/queries/use-image";
+import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
+import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
-const CadastreColorForm = () => {
-  const formCadastreColor = useForm<CadastreColorDTO>({
-    resolver: zodResolver(cadastreColorSchema),
+interface UpdateColorFormProps {
+  initialData: ColorDTO;
+}
+
+const UpdateColorForm = ({ initialData }: UpdateColorFormProps) => {
+  const { data: currentColor } = useColor(initialData.id, { initialData });
+  if (!currentColor)
+    throw new Error(`Colorization ${initialData.id} not found`);
+  const updateColorMutation = useUpdateColor(currentColor.id);
+  const queryClient = useQueryClient();
+
+  const [formIsEditable, setFormIsEditable] = useFormIsEditable();
+  const formDefaultValues: UpdateColorDTO = {
+    id: initialData.id,
+    imageId: initialData.imageId ?? "",
+    observations: initialData.observations ?? "",
+    productionYear: initialData.productionYear,
+    visibleInColorization: initialData.visibleInColors ?? false,
+  };
+
+  const formUpdateColor = useForm<UpdateColorDTO>({
+    resolver: zodResolver(updateColorSchema),
+    defaultValues: formDefaultValues,
   });
 
-  const queryClient = useQueryClient();
-  const postColorMutation = usePostColor();
-  const { data: image } = useImage(formCadastreColor.watch("imageId"));
+  const { data: image } = useImage(formUpdateColor.watch("imageId"));
 
-  function onSubmit(data: CadastreColorDTO) {
-    postColorMutation.mutate(data, {
+  function onSubmit(data: UpdateColorDTO) {
+    updateColorMutation.mutate(data, {
       onSuccess: (newColor) => {
-        formCadastreColor.reset();
-        if (newColor.visibleInColors) {
+        if (
+          newColor.visibleInColors != formDefaultValues.visibleInColorization
+        ) {
           queryClient.invalidateQueries({
-            queryKey: getColorsVisibleQueryKey(),
+            queryKey: getComicsVisibleQueryKey(),
           });
         }
-        toast.success("Colorização cadastrada com sucesso");
+        toast.success("Colorização atualizada com sucesso");
       },
       onError: (error) =>
         toast.error(
           error instanceof Error
             ? error.message
-            : "Erro ao cadastrar colorização"
+            : "Erro ao atualizar colorização"
         ),
     });
+    setFormIsEditable(false);
   }
 
   return (
-    <Form {...formCadastreColor}>
+    <Form {...formUpdateColor}>
       <form
-        onSubmit={formCadastreColor.handleSubmit(onSubmit)}
+        onSubmit={formUpdateColor.handleSubmit(onSubmit)}
         className="w-full h-full flex flex-wrap gap-4 mt-12"
       >
         <FormField
-          control={formCadastreColor.control}
+          control={formUpdateColor.control}
           name="imageId"
           render={() => (
             <ImageFormField
               label="Imagem da colorização"
               image={image}
+              disabled={!formIsEditable || updateColorMutation.isPending}
               onSelectImage={(imageId) => {
-                formCadastreColor.setValue("imageId", imageId);
+                formUpdateColor.setValue("imageId", imageId);
               }}
               className="flex-1 md:h-full"
             />
@@ -78,7 +102,7 @@ const CadastreColorForm = () => {
         />
         <div className="space-y-4 w-full md:w-1/2 md:max-w-sm">
           <FormField
-            control={formCadastreColor.control}
+            control={formUpdateColor.control}
             name="productionYear"
             render={({ field }) => (
               <FormItem>
@@ -88,6 +112,7 @@ const CadastreColorForm = () => {
                     placeholder="Insira o ano de publicação"
                     {...field}
                     type="number"
+                    disabled={!formIsEditable || updateColorMutation.isPending}
                     value={field.value ?? ""}
                     onChange={(e) =>
                       field.onChange(e.target.valueAsNumber || undefined)
@@ -99,7 +124,7 @@ const CadastreColorForm = () => {
             )}
           />
           <FormField
-            control={formCadastreColor.control}
+            control={formUpdateColor.control}
             name="observations"
             render={({ field }) => (
               <FormItem>
@@ -107,6 +132,7 @@ const CadastreColorForm = () => {
                 <FormControl>
                   <Textarea
                     placeholder="Insira alguma observação"
+                    disabled={!formIsEditable || updateColorMutation.isPending}
                     className="md:min-h-24"
                     {...field}
                   />
@@ -116,7 +142,7 @@ const CadastreColorForm = () => {
             )}
           />
           <FormField
-            control={formCadastreColor.control}
+            control={formUpdateColor.control}
             name="visibleInColorization"
             render={({ field }) => (
               <FormItem className="flex items-center">
@@ -124,6 +150,7 @@ const CadastreColorForm = () => {
                   <Switch
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={!formIsEditable || updateColorMutation.isPending}
                   />
                 </FormControl>
                 <FormLabel>Exibir na página de colorizações</FormLabel>
@@ -132,17 +159,15 @@ const CadastreColorForm = () => {
             )}
           />
 
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={postColorMutation.isPending}
-          >
-            Cadastrar Colorização
-          </Button>
+          <ActionsUpdateForm
+            textSaveUpdateAction="Atualizar Quadrinho"
+            disableSaveUpdateAction={updateColorMutation.isPending}
+            resetForm={() => formUpdateColor.reset(formDefaultValues)}
+          />
         </div>
       </form>
     </Form>
   );
 };
 
-export default CadastreColorForm;
+export default UpdateColorForm;
