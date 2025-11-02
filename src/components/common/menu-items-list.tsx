@@ -6,10 +6,10 @@ import { memo } from "react";
 const menuItemsList: Array<{ label: string; href: string }> = [
   { label: "Início", href: "/" },
   { label: "Flat", href: "/flat" },
-  // { label: "Cores", href: "/cores" },
+  { label: "Cores", href: "/cores" },
   { label: "Quadrinhos", href: "/quadrinhos" },
-  // { label: "Ilustrações", href: "/ilustracoes" },
-  // { label: "Portfólio", href: "/portfolio" },
+  { label: "Ilustrações", href: "/ilustracoes" },
+  { label: "Portfólio", href: "/portfolio" },
 ];
 
 function MenuItemsListComponent() {

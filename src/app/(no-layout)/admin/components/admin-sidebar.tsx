@@ -41,6 +41,11 @@ const items = [
     url: "/admin/quadrinhos",
     icon: Image,
   },
+  {
+    title: "Cores",
+    url: "/admin/cores",
+    icon: Image,
+  },
 ];
 
 const AdminSidebar = async () => {
