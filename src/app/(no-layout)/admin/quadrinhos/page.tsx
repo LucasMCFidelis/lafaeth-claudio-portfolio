@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import getManyComics from "@/app/data/comics/get-many-comics";
 import ComicsList from "@/components/common/comics-list";
@@ -12,7 +13,7 @@ const ComicsAdminPage = async () => {
   });
 
   return (
-    <>
+    <Suspense>
       <Link href={"/admin/quadrinhos/cadastre"}>
         <Button className="absolute top-0 right-0 -translate-x-4 translate-y-4">
           Adicionar Quadrinho
@@ -24,11 +25,14 @@ const ComicsAdminPage = async () => {
           initialData={comics.filter((comic) => comic.visibleInComics)}
         />
         <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-
-        <ComicsList displayButtonOpenModal initialData={comics} withImage={true}/>
+          <ComicsList
+            displayButtonOpenModal
+            initialData={comics}
+            withImage={true}
+          />
         </div>
       </div>
-    </>
+    </Suspense>
   );
 };
 

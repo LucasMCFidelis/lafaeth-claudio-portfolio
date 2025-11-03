@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { getFlatsVisible } from "@/actions/get-flats-visible";
 import { getFlats } from "@/actions/get-many-flats";
@@ -20,7 +21,7 @@ const FlatsPage = async () => {
   ]);
 
   return (
-    <>
+    <Suspense>
       <Link href={"/admin/flat/cadastre"}>
         <Button className="absolute top-0 right-0 -translate-x-4 translate-y-4">
           Adicionar Flat
@@ -36,7 +37,7 @@ const FlatsPage = async () => {
           orderBy={orderBy}
         />
       </div>
-    </>
+    </Suspense>
   );
 };
 

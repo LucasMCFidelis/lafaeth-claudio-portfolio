@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
 import getManyColors from "@/app/data/colorization/get-many-colors";
 import ColorsList from "@/components/common/colors-list";
@@ -20,9 +21,11 @@ const ColorsAdminPage = async () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <SortableColors
-          initialData={colors.filter((color) => color.visibleInColors)}
-        />
+        <Suspense fallback={<>...</>}>
+          <SortableColors
+            initialData={colors.filter((color) => color.visibleInColors)}
+          />
+        </Suspense>
         <ColorsList
           displayButtonOpenModal
           initialData={colors}

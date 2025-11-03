@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import getOneColorById from "@/app/data/colorization/get-one-color-by-id";
 
 import UpdateColorForm from "../components/update-color-form";
@@ -10,7 +12,11 @@ const UpdateColorPage = async ({
   const { colorId } = await searchParams;
   const colorInitialData = await getOneColorById({ colorId });
 
-  return <UpdateColorForm initialData={colorInitialData} />;
+  return (
+    <Suspense fallback={<p>Carregando formulário</p>}>
+      <UpdateColorForm initialData={colorInitialData} />;
+    </Suspense>
+  );
 };
 
 export default UpdateColorPage;
