@@ -30,6 +30,9 @@ import { ImageFormField } from "../../components/image-form-field";
 const CadastreColorForm = () => {
   const formCadastreColor = useForm<CadastreColorDTO>({
     resolver: zodResolver(cadastreColorSchema),
+    defaultValues: {
+      observations: "",
+    },
   });
 
   const queryClient = useQueryClient();

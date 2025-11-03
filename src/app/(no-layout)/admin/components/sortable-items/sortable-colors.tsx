@@ -79,7 +79,7 @@ const SortableColors = ({ initialData }: SortableColorsProps) => {
               {sortableColors.map((item) => (
                 <div
                   key={item.id}
-                  className={`min-h-56 ${item.horizontalPage ? "md:col-span-2" : ""}`}
+                  className={`min-h-56 border-2 shadow-md rounded-xl ${item.horizontalPage ? "md:col-span-2" : ""}`}
                 >
                   <SortableItem
                     item={item}
