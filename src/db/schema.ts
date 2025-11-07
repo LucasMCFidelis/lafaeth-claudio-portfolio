@@ -162,3 +162,29 @@ export const colorizationRelations = relations(
     }),
   })
 );
+
+export const illustrationsTable = pgTable("illustrations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  imageId: uuid("image_id").references(() => imagesTable.id, {
+    onDelete: "set null",
+  }),
+  horizontalIllustration: boolean("horizontal_illustration")
+    .notNull()
+    .default(false),
+  redirectUrl: text("redirect_url"),
+  description: text("description"),
+  visibleInIllustrations: boolean("visible_in_illustrations")
+    .notNull()
+    .default(false),
+  index: integer("index"),
+});
+
+export const illustrationsRelations = relations(
+  illustrationsTable,
+  ({ one }) => ({
+    image: one(imagesTable, {
+      fields: [illustrationsTable.imageId],
+      references: [imagesTable.id],
+    }),
+  })
+);

@@ -8,7 +8,7 @@ const menuItemsList: Array<{ label: string; href: string }> = [
   { label: "Flat", href: "/flat" },
   { label: "Cores", href: "/cores" },
   { label: "Quadrinhos", href: "/quadrinhos" },
-  // { label: "Ilustrações", href: "/ilustracoes" },
+  { label: "Ilustrações", href: "/ilustracoes" },
   // { label: "Portfólio", href: "/portfolio" },
 ];
 
