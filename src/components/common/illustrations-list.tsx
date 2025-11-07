@@ -44,7 +44,7 @@ const IllustrationsList = ({
               {displayButtonOpenModal && (
                 <ExpandItemButton
                   typeLink
-                  href={`/admin/cores/update?colorId=${illustration.id}`}
+                  href={`/admin/ilustracoes/update?illustrationId=${illustration.id}`}
                 />
               )}
             </IllustrationItem>
