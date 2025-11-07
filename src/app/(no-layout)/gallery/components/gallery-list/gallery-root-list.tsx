@@ -5,21 +5,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 
-import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
 import getPreferenceTheme from "@/helpers/get-theme-preference";
 
 import ExpandFullSizeButton from "../expand-full-size-button";
+import { GalleryBasicType } from "./gallery-basic-type";
 
-interface GalleryRootListProps<T extends ImageDTO> {
-  itemsList: Array<T>;
+interface GalleryRootListProps {
+  itemsList: Array<GalleryBasicType>;
   hrefBackToClose?: string;
 }
 
-const GalleryRootList = <T extends ImageDTO>({
+const GalleryRootList = ({
   itemsList,
   hrefBackToClose = "/",
-}: GalleryRootListProps<T>) => {
+}: GalleryRootListProps) => {
   const isDarkTheme = getPreferenceTheme();
   const [{ id, "full-screen": isFullscreen }, setValues] = useQueryStates({
     id: parseAsString,
@@ -58,7 +58,7 @@ const GalleryRootList = <T extends ImageDTO>({
       </div>
       <div className="flex flex-col flex-1 p-5 w-full sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10">
         <div className="flex-1 relative">
-          {item && (
+          {item.imageUrl && (
             <Image
               src={item.imageUrl}
               alt={"teste"}
@@ -81,18 +81,14 @@ const GalleryRootList = <T extends ImageDTO>({
               {item.screenwriter && <p>Roteiro: {item.screenwriter}</p>}
               {item.colorist && <p>Cor: {item.colorist}</p>}
 
-              {"productionYear" in item &&
-                typeof item.productionYear === "number" && (
-                  <p>Ano: {item.productionYear}</p>
-                )}
-              {"productionSizePages" in item &&
-                typeof item.productionSizePages === "number" && (
-                  <p>Tamanho: {item.productionSizePages} páginas</p>
-                )}
-              {"observations" in item &&
-                typeof item.observations === "string" && (
-                  <p>{item.observations}</p>
-                )}
+              {item.productionYear && <p>Ano: {item.productionYear}</p>}
+              {item.productionSizePages && (
+                <p>Tamanho: {item.productionSizePages} páginas</p>
+              )}
+              {item.observations && <p>{item.observations}</p>}
+              {item.redirectUrl && (
+                <Link href={item.redirectUrl}>{item.redirectUrl}</Link>
+              )}
             </div>
           </div>
 

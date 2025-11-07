@@ -1,5 +1,6 @@
 import getManyComics from "@/app/data/comics/get-many-comics";
 
+import { GalleryBasicType } from "../components/gallery-list/gallery-basic-type";
 import GalleryRootList from "../components/gallery-list/gallery-root-list";
 
 export default async function GalleryComicsPage() {
@@ -8,7 +9,7 @@ export default async function GalleryComicsPage() {
     withImage: true,
   });
 
-  const itemsList = comics
+  const itemsList: Array<GalleryBasicType> = comics
     .filter((comic) => comic.image !== null)
     .map((comic) => {
       return {
@@ -20,5 +21,7 @@ export default async function GalleryComicsPage() {
 
   if (itemsList.length === 0) return <p>Lista de itens vazia</p>;
 
-  return <GalleryRootList itemsList={itemsList} hrefBackToClose="/quadrinhos" />;
+  return (
+    <GalleryRootList itemsList={itemsList} hrefBackToClose="/quadrinhos" />
+  );
 }
