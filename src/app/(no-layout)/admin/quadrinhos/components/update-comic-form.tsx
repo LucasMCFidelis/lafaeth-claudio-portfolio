@@ -18,12 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useDeleteComic } from "@/hooks/mutations/use-delete-comic";
 import { useUpdateComic } from "@/hooks/mutations/use-update-comic";
 import { useComic } from "@/hooks/queries/use-comics";
 import { useImage } from "@/hooks/queries/use-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "../../components/actions-update-forms";
+import DeleteItemButton from "../../components/delete-item-button";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateComicFormProps {
@@ -33,6 +35,7 @@ interface UpdateComicFormProps {
 const UpdateComicForm = ({ comicId }: UpdateComicFormProps) => {
   const { data: currentComic } = useComic(comicId);
   const updateComicMutation = useUpdateComic(currentComic.id);
+  const deleteComicMutation = useDeleteComic();
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const formDefaultValues: UpdateComicDTO = {
@@ -151,6 +154,12 @@ const UpdateComicForm = ({ comicId }: UpdateComicFormProps) => {
               textSaveUpdateAction="Atualizar Quadrinho"
               disableSaveUpdateAction={updateComicMutation.isPending}
               resetForm={() => formUpdateComic.reset(formDefaultValues)}
+            />
+            <DeleteItemButton
+              itemName="este quadrinho"
+              onDelete={() => deleteComicMutation.mutateAsync(currentComic.id)}
+              redirectTo="/admin/quadrinhos"
+              disabled={updateComicMutation.isPending}
             />
           </div>
         </form>

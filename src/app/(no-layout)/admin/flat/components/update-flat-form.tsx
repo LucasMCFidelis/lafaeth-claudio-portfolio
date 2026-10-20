@@ -19,12 +19,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useDeleteFlat } from "@/hooks/mutations/use-delete-flat";
 import { useUpdateFlat } from "@/hooks/mutations/use-update-flat";
 import { useFlat } from "@/hooks/queries/use-flats";
 import { useImage } from "@/hooks/queries/use-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "../../components/actions-update-forms";
+import DeleteItemButton from "../../components/delete-item-button";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateFlatFormProps {
@@ -36,6 +38,7 @@ const UpdateFlatForm = ({ flatId }: UpdateFlatFormProps) => {
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const updateFlatMutation = useUpdateFlat(currentFlat.id);
+  const deleteFlatMutation = useDeleteFlat();
 
   const formDefaultValues = {
     id: currentFlat.id,
@@ -176,6 +179,13 @@ const UpdateFlatForm = ({ flatId }: UpdateFlatFormProps) => {
             textSaveUpdateAction="Atualizar Flat"
             disableSaveUpdateAction={updateFlatMutation.isPending}
             resetForm={() => formUpdateFlat.reset(formDefaultValues)}
+          />
+
+          <DeleteItemButton
+            itemName="este flat"
+            onDelete={() => deleteFlatMutation.mutateAsync(currentFlat.id)}
+            redirectTo="/admin/flat"
+            disabled={updateFlatMutation.isPending}
           />
         </form>
       </Form>

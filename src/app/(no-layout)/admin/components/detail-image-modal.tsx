@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useImage } from "@/hooks/queries/use-images";
 
+import DeleteImageButton from "./delete-image-button";
 import UpdateImageForm from "./update-image-form";
 
 interface DetailImageModalProps {
@@ -38,7 +39,19 @@ const DetailImageModal = ({ imageId, initialData }: DetailImageModalProps) => {
           <DialogHeader>
             <DialogTitle>Detalhes da imagem</DialogTitle>
           </DialogHeader>
-          {image && <UpdateImageForm initialData={image} />}
+          {image && (
+            <>
+              <UpdateImageForm initialData={image} />
+              <div className="w-full max-w-sm self-end px-5">
+                <DeleteImageButton
+                  imageId={image.id}
+                  onDeleted={() =>
+                    setDetailStates({ imageId: null, openDetailImage: false })
+                  }
+                />
+              </div>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>

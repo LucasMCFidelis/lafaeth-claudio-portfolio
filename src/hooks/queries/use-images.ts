@@ -24,3 +24,6 @@ export const useImage = (
     enabled: !!imageId,
     initialData: options?.initialData,
   });
+
+/** Admin: where each image is used, keyed by image id. */
+export const useImagesUsage = () => useQuery(imagesQueries.usage());
