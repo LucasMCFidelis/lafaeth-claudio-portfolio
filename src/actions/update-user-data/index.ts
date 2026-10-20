@@ -10,8 +10,6 @@ import { db } from "@/db";
 import { userTable } from "@/db/schema";
 
 export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
-  console.log( "aaaa");
-  
   const dataValidated = updateUserSchema.parse(dataUpdate);
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getComics } from "@/actions/get-comics";
+import { displayOrder } from "@/app/data/order-by-condition";
 
 export const getComicsVisibleQueryKey = () => ["comics-visible"] as const;
 
@@ -14,6 +15,7 @@ export const useComicsVisible = (params?: {
     queryFn: async () =>
       getComics({
         where: { field: "visibleInComics", value: true },
+        orderBy: displayOrder,
         withImage: true,
       }),
     initialData: params?.initialData,

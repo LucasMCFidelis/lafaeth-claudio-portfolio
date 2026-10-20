@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import getManyIllustrations from "@/app/data/illustrations/get-many-illustration";
+import { displayOrder } from "@/app/data/order-by-condition";
 import IllustrationsList from "@/components/common/illustrations-list";
 import { Button } from "@/components/ui/button";
 
@@ -14,6 +15,7 @@ const IllustrationsAdminPage = async () => {
     }),
     getManyIllustrations({
       where: { field: "visibleInIllustrations", value: true },
+      orderBy: displayOrder,
       withImage: true,
     }),
   ]);

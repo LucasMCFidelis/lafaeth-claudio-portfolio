@@ -1,7 +1,8 @@
 "use server";
 
+import { eq } from "drizzle-orm";
+
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
-import getOneColor from "@/app/data/colorization/get-one-color";
 import mapToColorDTO from "@/app/data/colorization/map-to-color";
 import {
   CadastreColorDTO,
@@ -17,20 +18,11 @@ export const postColor = async (data: CadastreColorDTO): Promise<ColorDTO> => {
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
-  let color;
-  try {
-    color = await getOneColor({
-      where: { field: "imageId", value: dataValidated.imageId },
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === "Color not found") {
-      color = null;
-    } else {
-      console.error("Unexpected error fetching colorization:", error);
-      throw error;
-    }
-  }
-  if (color) {
+  const existingColor = await db.query.colorizationTable.findFirst({
+    columns: { id: true },
+    where: eq(colorizationTable.imageId, dataValidated.imageId),
+  });
+  if (existingColor) {
     throw new Error(
       "Duplicate imageId: a colorization with this image already exists"
     );

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import getManyComics from "@/app/data/comics/get-many-comics";
+import { displayOrder } from "@/app/data/order-by-condition";
 import ComicsList from "@/components/common/comics-list";
 import { Button } from "@/components/ui/button";
 
@@ -9,6 +10,7 @@ import SortableComics from "../components/sortable-items/sortable-comics";
 
 const ComicsAdminPage = async () => {
   const comics = await getManyComics({
+    orderBy: displayOrder,
     withImage: true,
   });
 

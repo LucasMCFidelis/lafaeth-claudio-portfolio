@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 
 import getManyImages from "../data/image/get-many-images";
+import { displayOrder } from "../data/order-by-condition";
 import getUserData from "../data/user/get-user-data";
 
 export const metadata: Metadata = {
@@ -24,6 +25,7 @@ export default async function Home() {
   const user = await getUserData();
   const imagesHome = await getManyImages({
     where: { field: "visibleInHome", value: true },
+    orderBy: displayOrder,
   });
 
   return (
