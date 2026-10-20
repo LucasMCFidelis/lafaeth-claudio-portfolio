@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getFlats, GetFlatsProps } from "@/actions/get-many-flats";
+import { getFlats, GetFlatsProps } from "@/actions/get-flats";
 
 interface Props extends GetFlatsProps {
   params?: {

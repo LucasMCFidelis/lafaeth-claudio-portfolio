@@ -2,23 +2,17 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getIllustrations } from "@/actions/get-illustrations";
-import { displayOrder } from "@/app/data/order-by-condition";
+import { getVisibleIllustrations } from "@/actions/get-visible-illustrations";
 
 export const getIllustrationsVisibleQueryKey = () =>
   ["illustrations-visible"] as const;
 
 export const useIllustrationsVisible = (params?: {
-  initialData: Awaited<ReturnType<typeof getIllustrations>>;
+  initialData: Awaited<ReturnType<typeof getVisibleIllustrations>>;
 }) => {
   return useQuery({
     queryKey: getIllustrationsVisibleQueryKey(),
-    queryFn: async () =>
-      getIllustrations({
-        where: { field: "visibleInIllustrations", value: true },
-        orderBy: displayOrder,
-        withImage: true,
-      }),
+    queryFn: getVisibleIllustrations,
     initialData: params?.initialData,
   });
 };

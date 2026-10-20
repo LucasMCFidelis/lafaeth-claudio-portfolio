@@ -1,12 +1,7 @@
 import { Metadata } from "next";
 
-import getManyIllustrations, {
-  GetManyIllustrationsProps,
-} from "@/app/data/illustrations/get-many-illustration";
-import { OrderByCondition } from "@/app/data/order-by-condition";
-import { WhereCondition } from "@/app/data/where-condition";
+import { getVisibleIllustrations } from "@/actions/get-visible-illustrations";
 import IllustrationsList from "@/components/common/illustrations-list";
-import { illustrationsTable } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Cores",
@@ -15,29 +10,11 @@ export const metadata: Metadata = {
 };
 
 const IllustrationsPage = async () => {
-  const where: WhereCondition<typeof illustrationsTable> = {
-    field: "visibleInIllustrations",
-    value: true,
-  };
-  const orderBy: OrderByCondition<typeof illustrationsTable> = {
-    field: "index",
-    type: "asc",
-  };
-  const clauseGetColors: GetManyIllustrationsProps<true> = {
-    where,
-    orderBy,
-    withImage: true,
-  };
-  const illustrationsVisible = await getManyIllustrations<
-    typeof clauseGetColors.withImage
-  >({ ...clauseGetColors });
+  const illustrationsVisible = await getVisibleIllustrations();
 
   return (
     <div className="px-5 flex-1 flex flex-col">
-      <IllustrationsList
-        initialData={illustrationsVisible}
-        {...clauseGetColors}
-      />
+      <IllustrationsList variant="visible" initialData={illustrationsVisible} />
     </div>
   );
 };

@@ -1,12 +1,7 @@
 import { Metadata } from "next";
 
-import getManyColors, {
-  GetManyColorsProps,
-} from "@/app/data/colorization/get-many-colors";
-import { OrderByCondition } from "@/app/data/order-by-condition";
-import { WhereCondition } from "@/app/data/where-condition";
+import { getVisibleColors } from "@/actions/get-visible-colors";
 import ColorsList from "@/components/common/colors-list";
-import { colorizationTable } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Cores",
@@ -15,26 +10,11 @@ export const metadata: Metadata = {
 };
 
 const ColorsPage = async () => {
-  const where: WhereCondition<typeof colorizationTable> = {
-    field: "visibleInColorization",
-    value: true,
-  };
-  const orderBy: OrderByCondition<typeof colorizationTable> = {
-    field: "index",
-    type: "asc",
-  };
-  const clauseGetColors: GetManyColorsProps<true> = {
-    where,
-    orderBy,
-    withImage: true,
-  };
-  const colorizationVisible = await getManyColors<
-    typeof clauseGetColors.withImage
-  >({ ...clauseGetColors });
+  const colorizationVisible = await getVisibleColors();
 
   return (
     <div className="px-5 flex-1 flex flex-col">
-      <ColorsList initialData={colorizationVisible} {...clauseGetColors} />
+      <ColorsList variant="visible" initialData={colorizationVisible} />
     </div>
   );
 };
