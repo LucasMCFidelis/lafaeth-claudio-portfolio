@@ -3,8 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { getFlats, GetFlatsProps } from "@/actions/get-many-flats";
-import { WhereCondition } from "@/app/data/where-condition";
-import { flatTable } from "@/db/schema";
 
 interface Props extends GetFlatsProps {
   params?: {
@@ -12,12 +10,12 @@ interface Props extends GetFlatsProps {
   };
 }
 
-export const getAllFlatsQueryKey = (where?: WhereCondition<typeof flatTable>) =>
-  ["many-flats", where] as const;
+export const getAllFlatsQueryKey = ({ where, orderBy }: GetFlatsProps) =>
+  ["many-flats", where, orderBy] as const;
 
 export const useManyFlats = ({ where, orderBy, params }: Props) => {
   return useQuery({
-    queryKey: getAllFlatsQueryKey(),
+    queryKey: getAllFlatsQueryKey({ where, orderBy }),
     queryFn: () => getFlats({ where, orderBy }),
     initialData: params?.initialData,
   });
