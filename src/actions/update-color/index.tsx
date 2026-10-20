@@ -4,7 +4,6 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
-import getOneColorById from "@/app/data/colorization/get-one-color-by-id";
 import mapToColorDTO from "@/app/data/colorization/map-to-color";
 import {
   UpdateColorDTO,
@@ -23,8 +22,6 @@ export const updateColor = async (
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
-  getOneColorById({ colorId });
-
   const [colorUpdated] = await db
     .update(colorizationTable)
     .set({
@@ -35,6 +32,8 @@ export const updateColor = async (
     })
     .where(eq(colorizationTable.id, colorId))
     .returning();
+
+  if (!colorUpdated) throw new Error("Color not found");
 
   revalidatePath(`/admin/cores/update`);
 
