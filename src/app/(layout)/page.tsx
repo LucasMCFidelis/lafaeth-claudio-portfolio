@@ -32,9 +32,9 @@ export default async function Home() {
 
   return (
     <PageTransition>
+      {user?.bannerImage && <HomeBanner image={user.bannerImage} />}
       <div className="w-full max-w-screen flex flex-col gap-5 md:gap-10 items-center px-5 mx-auto my-5">
-        {user?.bannerImage && <HomeBanner image={user.bannerImage} />}
-      <Card className="w-full max-w-6xl">
+        <Card className="w-full max-w-6xl">
           {user ? (
             <CardContent className="flex flex-col-reverse items-center sm:flex-row-reverse">
               <>

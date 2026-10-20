@@ -12,6 +12,9 @@ const nextConfig: NextConfig = {
     // 31 days to update (a new upload gets a new id and shows right away).
     minimumCacheTTL: 2678400,
     formats: ["image/avif", "image/webp"],
+    // 75 is the default; 90 is used by the home banner, which is shown at
+    // full screen width and shows compression artifacts at 75.
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: "https",

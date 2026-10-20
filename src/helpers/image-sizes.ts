@@ -17,3 +17,10 @@ export const imageLoadingProps = (priority?: boolean) =>
   priority
     ? ({ loading: "eager", fetchPriority: "high" } as const)
     : ({ loading: "lazy", fetchPriority: "auto" } as const);
+
+/**
+ * Minimum width (px) of the original home banner image. The banner spans the
+ * whole screen; a smaller file gets upscaled and looks blurry on large
+ * monitors (1920px and up, more on high density screens).
+ */
+export const BANNER_MIN_WIDTH = 2560;

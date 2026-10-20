@@ -20,8 +20,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateToInput } from "@/helpers/format-date-to-input";
+import { BANNER_MIN_WIDTH } from "@/helpers/image-sizes";
 import { useUpdateUserData } from "@/hooks/mutations/use-update-user-data";
 import { useImage } from "@/hooks/queries/use-images";
+import { useOriginalImageSize } from "@/hooks/use-original-image-size";
 
 import { ImageFormField } from "../../components/image-form-field";
 
@@ -69,6 +71,11 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
         ? (initialData.bannerImage ?? undefined)
         : undefined,
   });
+  // Size of the original file, to warn when it would look blurry full width.
+  const bannerSize = useOriginalImageSize(
+    bannerImageId ? bannerImage?.imageUrl : null
+  );
+  const bannerTooSmall = !!bannerSize && bannerSize.width < BANNER_MIN_WIDTH;
 
   return (
     <Form {...form}>
@@ -153,6 +160,14 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
                   bannerImageId ? "Trocar banner" : "Escolher banner"
                 }
               />
+              {bannerTooSmall && (
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                  Esta imagem tem {bannerSize.width} × {bannerSize.height} px.
+                  O banner ocupa a largura toda da tela e vai aparecer
+                  embaçado em monitores grandes. Use uma imagem com pelo menos{" "}
+                  {BANNER_MIN_WIDTH} px de largura.
+                </p>
+              )}
               {bannerImageId && (
                 <Button
                   type="button"

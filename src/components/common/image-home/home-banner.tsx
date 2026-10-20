@@ -9,14 +9,19 @@ interface HomeBannerProps {
   className?: string;
 }
 
-/** Wide artwork at the top of the home page, chosen in the admin profile. */
+/**
+ * Wide artwork at the top of the home page, chosen in the admin profile.
+ * It spans the whole screen, so the original needs to be at least
+ * BANNER_MIN_WIDTH px wide (src/helpers/image-sizes.ts) to look sharp; the
+ * admin profile warns when it is smaller.
+ */
 const HomeBanner = ({ image, className }: HomeBannerProps) => {
   return (
     <div
       style={staggerStyle(0)}
       className={cn(
-        "relative w-full max-w-6xl overflow-hidden rounded-xl bg-muted shadow-md",
-        "aspect-[4/3] sm:aspect-[21/9] lg:aspect-[3/1]",
+        "relative w-full overflow-hidden bg-muted shadow-md",
+        "aspect-[4/3] sm:aspect-[21/9] lg:aspect-[4/1]",
         staggerClassName,
         className
       )}
@@ -25,7 +30,9 @@ const HomeBanner = ({ image, className }: HomeBannerProps) => {
         src={image.imageUrl}
         alt={image.title}
         fill
-        sizes="(max-width: 1152px) 100vw, 1152px"
+        // Full screen width: ask for the largest version the original has.
+        sizes="100vw"
+        quality={90}
         // The banner is the largest element above the fold (LCP).
         loading="eager"
         fetchPriority="high"
