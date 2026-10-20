@@ -71,7 +71,7 @@ const FlatGrid = ({
     <>
       {flats.length > 0 ? (
         <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
-          {flats.map((flat) => {
+          {flats.map((flat, index) => {
             const screenwriter =
               flat.backImage?.screenwriter || flat.frontImage?.screenwriter;
             const artist = flat.backImage?.artist || flat.frontImage?.artist;
@@ -86,6 +86,7 @@ const FlatGrid = ({
                 frontImageUrl={flat.frontImage?.imageUrl}
                 backImageUrl={flat.backImage?.imageUrl}
                 maxSizeItemsMd={maxSizeItemsMd}
+                priority={index === 0}
               >
                 {displayButtonOpenModal && (
                   <ExpandItemButton

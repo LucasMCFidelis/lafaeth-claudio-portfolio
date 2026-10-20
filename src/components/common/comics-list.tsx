@@ -3,6 +3,7 @@
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { comicsTable } from "@/db/schema";
+import { PRIORITY_ITEMS } from "@/helpers/image-sizes";
 import { useComicsList, useVisibleComics } from "@/hooks/queries/use-comics";
 
 import ComicItem from "./comic-item";
@@ -57,7 +58,7 @@ const ComicsGrid = ({ comics, displayButtonOpenModal }: ComicsGridProps) => {
       {comics.length > 0 ? (
         comics
           .filter((comic) => comic.image)
-          .map((comic) => (
+          .map((comic, index) => (
             <ComicItem
               key={comic.id}
               title={comic.image!.title}
@@ -65,6 +66,7 @@ const ComicsGrid = ({ comics, displayButtonOpenModal }: ComicsGridProps) => {
               imageUrl={comic.image!.imageUrl}
               visibleInComics={comic.visibleInComics}
               disableLink={displayButtonOpenModal}
+              priority={index < PRIORITY_ITEMS}
             >
               {displayButtonOpenModal && (
                 <ExpandItemButton

@@ -141,6 +141,7 @@ const CadastreImageModal = ({
                   <ImageHome
                     src={matchUrlDrive(valueImageUrl)}
                     alt="Imagem que será salva"
+                    sizes="(max-width: 640px) 88px, (max-width: 768px) 128px, 192px"
                   />
                 </ContainerImageHome>
               )}

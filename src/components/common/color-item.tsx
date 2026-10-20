@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import {
+  gridImageSizes,
+  imageLoadingProps,
+  wideGridImageSizes,
+} from "@/helpers/image-sizes";
+
+import ArtworkCaption from "./artwork-caption";
+
 interface ColorItemProps {
   imageId: string;
   imageUrl: string;
@@ -8,6 +16,8 @@ interface ColorItemProps {
   visibleInColors?: boolean;
   horizontalPage: boolean;
   disableLink?: boolean;
+  /** Loads the image right away (first row of the grid). */
+  priority?: boolean;
   children: React.ReactNode;
 }
 
@@ -18,6 +28,7 @@ const ColorItem = ({
   visibleInColors,
   horizontalPage,
   disableLink,
+  priority,
   children,
 }: ColorItemProps) => {
   const content = (
@@ -26,10 +37,15 @@ const ColorItem = ({
         horizontalPage ? "aspect-[29.5/21]" : "aspect-[21/29.5]"
       }`}
     >
-      <Image src={imageUrl} alt={title} fill className="object-contain" />
-      <div className="absolute inset-0 z-20 bg-primary/70 text-primary-foreground flex justify-center items-center opacity-0 hover:opacity-100 transition-opacity duration-1000 ease-in-out font-semibold">
-        <p className="first-letter:uppercase">{title}</p>
-      </div>
+      <Image
+        src={imageUrl}
+        alt={title}
+        fill
+        sizes={horizontalPage ? wideGridImageSizes : gridImageSizes}
+        {...imageLoadingProps(priority)}
+        className="object-contain"
+      />
+      <ArtworkCaption title={title} />
       {children}
     </div>
   );

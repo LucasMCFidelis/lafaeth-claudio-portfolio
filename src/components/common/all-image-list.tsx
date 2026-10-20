@@ -42,6 +42,7 @@ const AllImageList = ({ actionOnClick }: AllImageListProps) => {
                   src={image.imageUrl}
                   alt={image.title}
                   fill
+                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                   className="object-cover"
                 />
               </button>

@@ -72,6 +72,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
           src={valueImageUrl}
           alt={"teste"}
           fill
+          sizes="(max-width: 768px) 100vw, 65vw"
           className="object-contain"
         />
       </div>

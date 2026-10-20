@@ -1,12 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { gridImageSizes, imageLoadingProps } from "@/helpers/image-sizes";
+
+import ArtworkCaption from "./artwork-caption";
+
 interface ComicItemProps {
   imageId: string;
   imageUrl: string;
   title: string;
   visibleInComics?: boolean;
   disableLink?: boolean;
+  /** Loads the image right away (first row of the grid). */
+  priority?: boolean;
   children: React.ReactNode;
 }
 
@@ -16,6 +22,7 @@ const ComicItem = ({
   title,
   visibleInComics,
   disableLink,
+  priority,
   children,
 }: ComicItemProps) => {
   const content = (
@@ -26,13 +33,13 @@ const ComicItem = ({
     >
       <Image
         src={imageUrl}
-        alt={title || "Comic"}
+        alt={title || "Quadrinho"}
         fill
+        sizes={gridImageSizes}
+        {...imageLoadingProps(priority)}
         className="object-cover"
       />
-      <div className="absolute inset-0 z-20 bg-primary/70 text-primary-foreground flex justify-center items-center opacity-0 hover:opacity-100 transition-opacity duration-1000 ease-in-out font-semibold">
-        <p className="first-letter:uppercase">{title}</p>
-      </div>
+      <ArtworkCaption title={title} />
       {children}
     </div>
   );

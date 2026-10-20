@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { imageLoadingProps, PRIORITY_ITEMS } from "@/helpers/image-sizes";
 
 import getHomeImagesCached from "../data/image/get-home-images";
 import getUserData from "../data/user/get-user-data";
@@ -52,9 +53,13 @@ export default async function Home() {
         )}
       </Card>
       <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {imagesHome.map((image) => (
+        {imagesHome.map((image, index) => (
           <ContainerImageHome key={image.id} imageId={image.id}>
-            <ImageHome src={image.imageUrl} alt={image.title} />
+            <ImageHome
+              src={image.imageUrl}
+              alt={image.title}
+              {...imageLoadingProps(index < PRIORITY_ITEMS)}
+            />
           </ContainerImageHome>
         ))}
       </div>
