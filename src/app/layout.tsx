@@ -2,6 +2,7 @@ import "./globals.css";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
@@ -34,9 +35,6 @@ export default function RootLayout({
   return (
     // The theme script changes the class before hydration.
     <html lang="pt" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col justify-start`}
       >
@@ -46,6 +44,11 @@ export default function RootLayout({
             <Toaster />
           </NuqsAdapter>
         </ReactQueryProvider>
+        {/* beforeInteractive puts it in the initial HTML, ahead of React. A
+            plain <script> element warns when React renders it on the client. */}
+        <Script id="theme" strategy="beforeInteractive">
+          {themeScript}
+        </Script>
       </body>
     </html>
   );
