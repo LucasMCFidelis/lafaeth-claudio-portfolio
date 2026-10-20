@@ -1,13 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import {
   gridImageSizes,
   imageLoadingProps,
+  PRIORITY_ITEMS,
   wideGridImageSizes,
 } from "@/helpers/image-sizes";
+import { staggerClassName, staggerStyle } from "@/helpers/stagger";
+import { cn } from "@/lib/utils";
 
 import ArtworkCaption from "./artwork-caption";
+import ArtworkTransition from "./artwork-transition";
+import FadeImage from "./fade-image";
 
 interface IllustrationItemProps {
   imageId: string;
@@ -16,8 +20,8 @@ interface IllustrationItemProps {
   horizontalIllustration: boolean;
   visibleInIllustrations?: boolean;
   disableLink?: boolean;
-  /** Loads the image right away (first row of the grid). */
-  priority?: boolean;
+  /** Position in the grid: drives the entrance delay and eager loading. */
+  index?: number;
   children: React.ReactNode;
 }
 
@@ -28,32 +32,40 @@ const IllustrationItem = ({
   visibleInIllustrations,
   horizontalIllustration,
   disableLink,
-  priority,
+  index = 0,
   children,
 }: IllustrationItemProps) => {
-  const content = (
+  const card = (
     <div
-      className={`relative ${!visibleInIllustrations && "opacity-50"} ${
+      style={staggerStyle(index)}
+      className={cn(
+        "group relative overflow-hidden",
+        staggerClassName,
+        !visibleInIllustrations && "opacity-50",
         horizontalIllustration ? "aspect-[29.5/21]" : "aspect-[21/29.5]"
-      }`}
+      )}
     >
-      <Image
+      <FadeImage
         src={imageUrl}
         alt={title}
         fill
         sizes={horizontalIllustration ? wideGridImageSizes : gridImageSizes}
-        {...imageLoadingProps(priority)}
-        className="object-contain"
+        {...imageLoadingProps(index < PRIORITY_ITEMS)}
+        className="object-contain group-hover:scale-[1.02]"
       />
       <ArtworkCaption title={title} />
       {children}
     </div>
   );
 
-  if (disableLink) return content;
+  if (disableLink) return card;
   if (!imageId) throw new Error("imageId is required with link enabled");
 
-  return <Link href={`/gallery/ilustracoes?id=${imageId}`}>{content}</Link>;
+  return (
+    <Link href={`/gallery/ilustracoes?id=${imageId}`}>
+      <ArtworkTransition imageId={imageId}>{card}</ArtworkTransition>
+    </Link>
+  );
 };
 
 export default IllustrationItem;

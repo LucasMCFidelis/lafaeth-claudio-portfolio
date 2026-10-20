@@ -3,7 +3,6 @@
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { colorizationTable } from "@/db/schema";
-import { PRIORITY_ITEMS } from "@/helpers/image-sizes";
 import { useColorsList, useVisibleColors } from "@/hooks/queries/use-colors";
 
 import ColorItem from "./color-item";
@@ -73,7 +72,7 @@ const ColorsGrid = ({ colors, displayButtonOpenModal }: ColorsGridProps) => {
               visibleInColors={color.visibleInColors}
               horizontalPage={color.image!.horizontalPage}
               disableLink={displayButtonOpenModal}
-              priority={index < PRIORITY_ITEMS}
+              index={index}
             >
               {displayButtonOpenModal && (
                 <ExpandItemButton

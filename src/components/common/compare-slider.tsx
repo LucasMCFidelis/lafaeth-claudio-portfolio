@@ -13,6 +13,7 @@ interface CompareSliderProps {
   /** Accessible name of the divider, e.g. "Comparar line e flat". */
   label: string;
   className?: string;
+  style?: React.CSSProperties;
   /** Extra content drawn above both layers (credits, admin buttons). */
   children?: React.ReactNode;
 }
@@ -30,6 +31,7 @@ const CompareSlider = ({
   overlay,
   label,
   className,
+  style,
   children,
 }: CompareSliderProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -78,6 +80,7 @@ const CompareSlider = ({
   return (
     <div
       ref={containerRef}
+      style={style}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={stopDragging}
