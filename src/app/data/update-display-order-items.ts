@@ -29,15 +29,14 @@ const updateDisplayOrderItems = async <
 
   await db.transaction(async (tx) => {
     for (const [i, item] of items.entries()) {
-      const itemInDb = await tx
-        .select()
-        .from(table)
+      const updated = await tx
+        .update(table)
+        .set({ index: i })
         .where(eq(id, item.id))
-        .limit(1);
-      if (!itemInDb)
+        .returning({ id });
+      // Throwing rolls back the whole transaction.
+      if (updated.length === 0)
         throw new Error(`Item ${item.id} not found in table ${table._.name}`);
-
-      await tx.update(table).set({ index: i }).where(eq(id, item.id));
     }
   });
 };
