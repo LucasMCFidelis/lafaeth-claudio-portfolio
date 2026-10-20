@@ -82,10 +82,11 @@ Regras:
 
 - Nunca commitar direto em `main` nem em `develop`: criar a branch de apoio a partir da `develop` (ou da `main`, no caso de `hotfix`).
 - Uma branch por assunto. Misturar tarefas diferentes na mesma branch dificulta revisar e desfazer.
-- Merge na `develop` por pull request, com **`--base develop`** (o padrão do GitHub neste repositório é a `main`) e merge commit (`--no-ff`) para preservar o histórico da branch.
+- **Todo trabalho entra por pull request, nunca por merge local.** `feature/*` e `bugfix/*` abrem PR com **`--base develop`** (o padrão do GitHub neste repositório é a `main`). `release/*` e `hotfix/*` abrem um PR para a `main` e outro para a `develop`. O merge é feito no GitHub, com merge commit, para preservar o histórico da branch.
 - O tipo do commit (`feat:`, `fix:`, `chore:`...) segue o conventional commits, independente do prefixo da branch. Ex.: `feature/upgrade-next-16` pode ter commits `chore:` e `fix:`.
 - Antes de abrir o PR, a branch deve passar em `npm run typecheck` e `npm run lint`.
-- O agente não faz push, não faz merge em `main`/`develop` e não cria tags sem o pedido explícito do dono do projeto.
+- Para abrir um PR: `git push -u origin <branch>` e `gh pr create --base develop --title "<tipo>: <resumo>" --body "<descrição>"`. O título segue o conventional commits, em inglês. A descrição traz o que mudou, o porquê e como testar.
+- O agente só faz push da branch de apoio e abre o PR quando o dono do projeto pedir. Nunca faz merge de PR, nunca faz push em `main`/`develop` e nunca cria tags.
 
 ## Estado atual
 
