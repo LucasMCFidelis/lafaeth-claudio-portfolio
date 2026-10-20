@@ -3,22 +3,19 @@ import { Suspense } from "react";
 
 import getManyIllustrations from "@/app/data/illustrations/get-many-illustration";
 import { displayOrder } from "@/app/data/order-by-condition";
+import requireAdmin from "@/app/data/user/require-admin";
 import IllustrationsList from "@/components/common/illustrations-list";
 import { Button } from "@/components/ui/button";
 
 import SortableIllustrations from "../components/sortable-items/sortable-illustrations";
 
 const IllustrationsAdminPage = async () => {
-  const [allIllustrations, visibleIllustrations] = await Promise.all([
-    getManyIllustrations({
-      withImage: true,
-    }),
-    getManyIllustrations({
-      where: { field: "visibleInIllustrations", value: true },
-      orderBy: displayOrder,
-      withImage: true,
-    }),
-  ]);
+  await requireAdmin();
+
+  const illustrations = await getManyIllustrations({
+    orderBy: displayOrder,
+    withImage: true,
+  });
 
   return (
     <>
@@ -30,12 +27,17 @@ const IllustrationsAdminPage = async () => {
 
       <div className="px-5 flex-1 flex flex-col mt-12">
         <Suspense fallback={<>...</>}>
-          <SortableIllustrations initialData={visibleIllustrations} />
+          <SortableIllustrations
+            initialData={illustrations.filter(
+              (illustration) => illustration.visibleInIllustrations
+            )}
+          />
         </Suspense>
         <IllustrationsList
+          variant="all"
+          orderBy={displayOrder}
           displayButtonOpenModal
-          initialData={allIllustrations}
-          withImage={true}
+          initialData={illustrations}
         />
       </div>
     </>

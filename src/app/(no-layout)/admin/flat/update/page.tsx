@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { getFlat } from "@/actions/get-flat";
+import requireAdmin from "@/app/data/user/require-admin";
 
 import UpdateFlatForm from "../components/update-flat-form";
 
@@ -9,6 +10,8 @@ const UpdateFlatPage = async ({
 }: {
   searchParams: Promise<{ flatId: string }>;
 }) => {
+  await requireAdmin();
+
   const { flatId } = await searchParams;
 
   const flat = await getFlat({ flatId });

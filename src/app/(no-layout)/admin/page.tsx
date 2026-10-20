@@ -1,15 +1,10 @@
-import { redirect } from "next/navigation";
-
 import { getHomeImages } from "@/actions/get-home-images";
+import requireAdmin from "@/app/data/user/require-admin";
 
-import verifyUserLogged from "../../data/user/verify-user";
 import SortableImagesHome from "./components/sortable-items/sortable-images-home";
 
 const AdminHomePage = async () => {
-  const userLogged = await verifyUserLogged();
-  if (!userLogged) {
-    redirect("/admin/auth");
-  }
+  await requireAdmin();
 
   const imagesHome = await getHomeImages();
 
