@@ -22,13 +22,21 @@ export const metadata: Metadata = {
   description: "Portfolio de Design, Ilustrador e Quadrinista",
 };
 
+// Applies the saved (or system) theme before the first paint, so dark mode
+// does not flash light while React loads. Same rule as getPreferenceTheme().
+const themeScript = `try{var s=localStorage.getItem("darkTheme");var d=s!==null?s==="true":matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.classList.toggle("dark",d)}catch(e){}`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt">
+    // The theme script changes the class before hydration.
+    <html lang="pt" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col justify-start`}
       >
