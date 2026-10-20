@@ -16,9 +16,10 @@
       "Read(./.env.*.local)",
       "Read(./.env.production)",
       "Read(./.env.development)",
+      "Read(./.playwright-mcp/profile/**)",
       "Bash(npx drizzle-kit generate:*)",
       "Bash(npx drizzle-kit migrate:*)"
     ]
   },
-  "enabledMcpjsonServers": ["next-devtools"]
+  "enabledMcpjsonServers": ["next-devtools", "playwright", "playwright-external"]
 }
