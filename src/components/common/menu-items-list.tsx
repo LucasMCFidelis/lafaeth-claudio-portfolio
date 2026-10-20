@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { memo } from "react";
+
+import { cn } from "@/lib/utils";
 
 const menuItemsList: Array<{ label: string; href: string }> = [
   { label: "Início", href: "/" },
@@ -13,13 +16,26 @@ const menuItemsList: Array<{ label: string; href: string }> = [
 ];
 
 function MenuItemsListComponent() {
+  const pathname = usePathname();
+
   return (
     <>
-      {menuItemsList.map((item) => (
-        <Link key={item.href} className="px-4" href={item.href}>
-          {item.label}
-        </Link>
-      ))}
+      {menuItemsList.map((item) => {
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            aria-current={isActive ? "page" : undefined}
+            className={cn(
+              "px-4 transition-colors hover:text-foreground",
+              isActive ? "text-foreground" : "text-muted-foreground"
+            )}
+          >
+            {item.label}
+          </Link>
+        );
+      })}
     </>
   );
 }

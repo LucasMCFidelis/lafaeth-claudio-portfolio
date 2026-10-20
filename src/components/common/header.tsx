@@ -15,14 +15,18 @@ const Header = () => {
         className="w-full p-5 flex justify-between items-center"
         style={{ viewTransitionName: "site-header" }}
       >
-        <Link href={"/"} className="px-0 font-extrabold text-2xl md:text-3xl">
+        <Link href={"/"} className="px-0 font-heading font-bold tracking-wider text-2xl md:text-3xl">
           Lafaeth Claudio
         </Link>
-        <nav className="gap-4 hidden lg:flex font-semibold items-baseline">
+        <nav className="gap-4 hidden lg:flex font-nav items-center">
           <MenuItemsList />
           <Suspense fallback={null}>
             <ShowWhenLogged>
-              <Link key={"/admin"} className="px-4" href={"/admin"}>
+              <Link
+                key={"/admin"}
+                className="px-4 text-muted-foreground transition-colors hover:text-foreground"
+                href={"/admin"}
+              >
                 Administração
               </Link>
             </ShowWhenLogged>

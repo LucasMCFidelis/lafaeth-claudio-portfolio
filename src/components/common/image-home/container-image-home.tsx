@@ -29,7 +29,7 @@ const ContainerImageHome = ({
       {...rest}
       style={index === undefined ? style : { ...staggerStyle(index), ...style }}
       className={cn(
-        "group relative aspect-square overflow-hidden rounded-xl bg-muted shadow-md",
+        "group relative aspect-square overflow-hidden rounded-xl bg-muted shadow-md dark:shadow-none dark:ring-1 dark:ring-white/5",
         index !== undefined && staggerClassName,
         className
       )}

@@ -20,7 +20,7 @@ const HomeBanner = ({ image, className }: HomeBannerProps) => {
     <div
       style={staggerStyle(0)}
       className={cn(
-        "relative w-full overflow-hidden bg-muted shadow-md",
+        "relative w-full overflow-hidden bg-muted shadow-md dark:shadow-none",
         "aspect-[4/3] sm:aspect-[21/9] lg:aspect-[4/1]",
         staggerClassName,
         className
