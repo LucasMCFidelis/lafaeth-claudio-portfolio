@@ -43,7 +43,7 @@ async function Footer() {
                   sizes="40px"
                   src={img}
                   alt={alt ?? ""}
-                  className="dark:invert"
+                  className="dark:invert dark:opacity-85"
                 />
               </Link>
             </Button>

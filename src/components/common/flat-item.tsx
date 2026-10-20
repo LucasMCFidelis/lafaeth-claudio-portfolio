@@ -82,11 +82,15 @@ const FlatItem = ({
         )
       }
     >
-      <div className="absolute inset-x-0 bottom-0 z-30 flex justify-between gap-2 text-[0.65rem] sm:text-xs text-primary-foreground pointer-events-none">
+      <div className="absolute inset-x-0 bottom-0 z-30 flex justify-between gap-2 text-[0.65rem] sm:text-xs text-primary-foreground dark:text-foreground pointer-events-none">
         {screenwriter && (
-          <p className="bg-primary/70 px-2 py-0.5">Roteiro: {screenwriter}</p>
+          <p className="bg-primary/70 dark:bg-background/75 px-2 py-0.5">
+            Roteiro: {screenwriter}
+          </p>
         )}
-        <p className="ml-auto bg-primary/70 px-2 py-0.5">Arte: {artist}</p>
+        <p className="ml-auto bg-primary/70 dark:bg-background/75 px-2 py-0.5">
+          Arte: {artist}
+        </p>
       </div>
       {children}
     </CompareSlider>

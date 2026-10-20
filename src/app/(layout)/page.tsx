@@ -34,16 +34,16 @@ export default async function Home() {
     <PageTransition>
       {user?.bannerImage && <HomeBanner image={user.bannerImage} />}
       <div className="w-full max-w-screen flex flex-col gap-5 md:gap-10 items-center px-5 mx-auto my-5">
-        <Card className="w-full max-w-6xl">
+        <Card className="w-full max-w-6xl dark:shadow-none">
           {user ? (
             <CardContent className="flex flex-col-reverse items-center sm:flex-row-reverse">
               <>
                 <CardHeader className="flex-1 w-full text-center">
-                  <CardTitle className="font-bold text-2xl md:text-3xl">
+                  <CardTitle className="font-heading font-medium leading-normal text-3xl md:text-4xl">
                     Sobre {user?.name}
                   </CardTitle>
                   {user?.description && (
-                    <CardDescription className="sm:text-md md:text-lg first-letter:uppercase">
+                    <CardDescription className="mx-auto max-w-prose text-foreground text-base md:text-lg tracking-wider leading-normal first-letter:uppercase">
                       {user?.age && `tenho ${user.age} anos, `}
                       {user.description}
                     </CardDescription>

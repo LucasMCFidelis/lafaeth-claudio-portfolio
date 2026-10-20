@@ -20,9 +20,9 @@ const SheetMenu = () => {
       <SheetTrigger>
         <Menu />
       </SheetTrigger>
-      <SheetContent className="font-semibold">
+      <SheetContent className="font-nav">
         <SheetHeader>
-          <SheetTitle className="font-bold">Menu</SheetTitle>
+          <SheetTitle className="font-heading font-medium">Menu</SheetTitle>
         </SheetHeader>
         <div className="gap-2 flex flex-col items-start">
           <MenuItemsList />

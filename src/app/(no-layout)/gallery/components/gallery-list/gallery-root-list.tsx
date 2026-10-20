@@ -3,14 +3,12 @@
 import { ArrowBigLeft, ArrowBigRight, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
+import { parseAsString, useQueryStates } from "nuqs";
 import { useEffect, useRef } from "react";
 
 import ArtworkTransition from "@/components/common/artwork-transition";
 import FadeImage from "@/components/common/fade-image";
 import { Button } from "@/components/ui/button";
-import getPreferenceTheme from "@/helpers/get-theme-preference";
-import { cn } from "@/lib/utils";
 
 import ExpandFullSizeButton from "../expand-full-size-button";
 import { GalleryBasicType } from "./gallery-basic-type";
@@ -28,11 +26,7 @@ const GalleryRootList = ({
   hrefBackToClose = "/",
 }: GalleryRootListProps) => {
   const router = useRouter();
-  const isDarkTheme = getPreferenceTheme();
-  const [{ id, "full-screen": isFullscreen }, setValues] = useQueryStates({
-    id: parseAsString,
-    "full-screen": parseAsBoolean,
-  });
+  const [{ id }, setValues] = useQueryStates({ id: parseAsString });
   const swipeStartX = useRef<number | null>(null);
 
   // Without a valid ?id= (old link, removed item) start at the first image.
@@ -122,14 +116,9 @@ const GalleryRootList = ({
             )}
           </div>
         </ArtworkTransition>
-        <div
-          className={cn(
-            "font-sans flex flex-col justify-between sm:mt-10 min-w-0 wrap-anywhere",
-            isFullscreen && !isDarkTheme && "text-white"
-          )}
-        >
+        <div className="flex flex-col justify-between sm:mt-10 min-w-0 wrap-anywhere">
           <div className="flex-1">
-            <h2 className="font-extrabold text-xl md:text-3xl first-letter:uppercase">
+            <h2 className="font-medium text-xl md:text-3xl first-letter:uppercase">
               {item.title}
             </h2>
             <div className="text-xs lg:text-sm">

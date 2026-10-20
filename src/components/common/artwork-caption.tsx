@@ -13,7 +13,7 @@ const ArtworkCaption = ({ title, className }: ArtworkCaptionProps) => {
   return (
     <div
       className={cn(
-        "absolute inset-0 z-20 flex items-center justify-center bg-primary/70 px-3 text-center font-semibold text-primary-foreground opacity-0 transition-opacity duration-300 ease-out hover:opacity-100",
+        "absolute inset-0 z-20 flex items-center justify-center bg-primary/70 px-3 text-center font-heading font-medium text-primary-foreground backdrop-blur-sm dark:bg-background/75 dark:text-foreground opacity-0 transition-opacity duration-300 ease-out hover:opacity-100",
         "touch:inset-x-0 touch:top-auto touch:bottom-0 touch:py-1.5 touch:text-sm touch:opacity-100",
         className
       )}
