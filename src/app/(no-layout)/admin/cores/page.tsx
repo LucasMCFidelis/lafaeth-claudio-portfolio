@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import getManyColors from "@/app/data/colorization/get-many-colors";
+import { displayOrder } from "@/app/data/order-by-condition";
 import ColorsList from "@/components/common/colors-list";
 import { Button } from "@/components/ui/button";
 
@@ -9,6 +10,7 @@ import SortableColors from "../components/sortable-items/sortable-colors";
 
 const ColorsAdminPage = async () => {
   const colors = await getManyColors({
+    orderBy: displayOrder,
     withImage: true,
   });
 

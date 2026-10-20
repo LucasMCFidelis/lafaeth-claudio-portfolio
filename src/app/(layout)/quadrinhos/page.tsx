@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import getManyComics from "@/app/data/comics/get-many-comics";
+import { displayOrder } from "@/app/data/order-by-condition";
 import { WhereCondition } from "@/app/data/where-condition";
 import ComicsList from "@/components/common/comics-list";
 import { comicsTable } from "@/db/schema";
@@ -16,12 +17,21 @@ const ComicsPage = async () => {
     field: "visibleInComics",
     value: true,
   };
-  const comics = await getManyComics({ where, withImage: true });
+  const comics = await getManyComics({
+    where,
+    orderBy: displayOrder,
+    withImage: true,
+  });
 
   return (
     <div className="px-5 flex-1 flex flex-col">
       <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-        <ComicsList initialData={comics} where={where} withImage={true} />
+        <ComicsList
+          initialData={comics}
+          where={where}
+          orderBy={displayOrder}
+          withImage={true}
+        />
       </div>
     </div>
   );

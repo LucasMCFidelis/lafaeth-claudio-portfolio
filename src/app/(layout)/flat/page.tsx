@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import { getFlats } from "@/actions/get-many-flats";
+import { displayOrder } from "@/app/data/order-by-condition";
 import { WhereCondition } from "@/app/data/where-condition";
 import FlatList from "@/components/common/flat-list";
 import { flatTable } from "@/db/schema";
@@ -16,11 +17,11 @@ const FlatPage = async () => {
     field: "visibleInFlat",
     value: true,
   };
-  const flats = await getFlats({ where });
+  const flats = await getFlats({ where, orderBy: displayOrder });
 
   return (
     <div className="px-5 flex-1 flex flex-col">
-      <FlatList initialData={flats} where={where} />
+      <FlatList initialData={flats} where={where} orderBy={displayOrder} />
     </div>
   );
 };
