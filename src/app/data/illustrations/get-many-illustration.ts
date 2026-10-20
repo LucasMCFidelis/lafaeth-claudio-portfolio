@@ -1,9 +1,10 @@
-import { asc, desc, eq } from "drizzle-orm";
+import "server-only";
 
 import { db } from "@/db";
 import { illustrationsTable } from "@/db/schema";
 
 import { OrderByCondition } from "../order-by-condition";
+import { buildOrderBy, buildWhere } from "../query-builders";
 import { WhereCondition } from "../where-condition";
 import { IllustrationDTO } from "./illustration-dto";
 import mapToIllustrationDTO from "./map-to-illustration";
@@ -22,18 +23,13 @@ const getManyIllustrations = async <WithImage extends boolean>({
   Array<IllustrationDTO<WithImage>>
 > => {
   const illustrations = await db.query.illustrationsTable.findMany({
-    ...(where && { where: eq(illustrationsTable[where.field], where.value) }),
-    ...(orderBy && {
-      orderBy:
-        orderBy.type === "desc"
-          ? desc(illustrationsTable[orderBy.field])
-          : asc(illustrationsTable[orderBy.field]),
-    }),
+    where: buildWhere(illustrationsTable, where),
+    orderBy: buildOrderBy(illustrationsTable, orderBy),
     ...(withImage && { with: { image: true } }),
   });
 
-  return illustrations.map((color) =>
-    mapToIllustrationDTO({ data: color, withImage })
+  return illustrations.map((illustration) =>
+    mapToIllustrationDTO({ data: illustration, withImage })
   );
 };
 

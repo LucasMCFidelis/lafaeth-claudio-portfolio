@@ -1,9 +1,10 @@
-import { asc, desc, eq } from "drizzle-orm";
+import "server-only";
 
 import { db } from "@/db";
 import { colorizationTable } from "@/db/schema";
 
 import { OrderByCondition } from "../order-by-condition";
+import { buildOrderBy, buildWhere } from "../query-builders";
 import { WhereCondition } from "../where-condition";
 import { ColorDTO } from "./colors-dto";
 import mapToColorDTO from "./map-to-color";
@@ -20,13 +21,8 @@ const getManyColors = async <WithImage extends boolean>({
   withImage,
 }: GetManyColorsProps<WithImage>): Promise<Array<ColorDTO<WithImage>>> => {
   const colors = await db.query.colorizationTable.findMany({
-    ...(where && { where: eq(colorizationTable[where.field], where.value) }),
-    ...(orderBy && {
-      orderBy:
-        orderBy.type === "desc"
-          ? desc(colorizationTable[orderBy.field])
-          : asc(colorizationTable[orderBy.field]),
-    }),
+    where: buildWhere(colorizationTable, where),
+    orderBy: buildOrderBy(colorizationTable, orderBy),
     ...(withImage && { with: { image: true } }),
   });
 

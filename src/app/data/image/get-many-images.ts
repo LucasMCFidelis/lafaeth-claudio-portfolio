@@ -1,28 +1,29 @@
 import "server-only";
 
-import { eq, SQLWrapper } from "drizzle-orm";
-
 import { db } from "@/db";
 import { imagesTable } from "@/db/schema";
 
+import { OrderByCondition } from "../order-by-condition";
+import { buildOrderBy, buildWhere } from "../query-builders";
+import { WhereCondition } from "../where-condition";
 import { ImageDTO } from "./image-dto";
 import { mapToImageDTO } from "./map-to-image-dto";
 
 interface GetManyImagesProps {
-  where?: {
-    field: keyof typeof imagesTable.$inferSelect;
-    value: string | number | boolean | SQLWrapper;
-  };
+  where?: WhereCondition<typeof imagesTable>;
+  orderBy?: OrderByCondition<typeof imagesTable>;
 }
 
 const getManyImages = async ({
   where,
+  orderBy,
 }: GetManyImagesProps): Promise<Array<ImageDTO>> => {
-  const imagesHome = await db.query.imagesTable.findMany({
-    ...(where && { where: eq(imagesTable[where.field], where.value) }),
+  const images = await db.query.imagesTable.findMany({
+    where: buildWhere(imagesTable, where),
+    orderBy: buildOrderBy(imagesTable, orderBy),
   });
 
-  return imagesHome.map((image) => mapToImageDTO({ image }));
+  return images.map((image) => mapToImageDTO({ image }));
 };
 
 export default getManyImages;
