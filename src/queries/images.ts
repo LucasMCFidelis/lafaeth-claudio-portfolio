@@ -3,6 +3,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { getAllImages } from "@/actions/get-all-images";
 import { getHomeImages } from "@/actions/get-home-images";
 import { getImage } from "@/actions/get-image";
+import { getImagesUsageAction } from "@/actions/get-images-usage";
 
 import { cacheTags } from "./tags";
 
@@ -14,6 +15,7 @@ export const imagesQueries = {
     home: () => ["images", "home"] as const,
     list: () => ["images", "list"] as const,
     detail: (id: string) => ["images", "detail", id] as const,
+    usage: () => ["images", "usage"] as const,
   },
   /** Public: images shown on the home page, in display order. */
   home: () =>
@@ -32,6 +34,16 @@ export const imagesQueries = {
     queryOptions({
       queryKey: imagesQueries.keys.detail(id),
       queryFn: () => getImage({ imageId: id }),
+    }),
+  /**
+   * Admin: where each image is used. Always refetched when shown, since
+   * creating or deleting a colorization, comic, etc. changes it.
+   */
+  usage: () =>
+    queryOptions({
+      queryKey: imagesQueries.keys.usage(),
+      queryFn: () => getImagesUsageAction(),
+      staleTime: 0,
     }),
 };
 

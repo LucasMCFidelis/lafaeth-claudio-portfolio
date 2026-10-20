@@ -19,12 +19,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useDeleteColor } from "@/hooks/mutations/use-delete-color";
 import { useUpdateColor } from "@/hooks/mutations/use-update-color";
 import { useColor } from "@/hooks/queries/use-colors";
 import { useImage } from "@/hooks/queries/use-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "../../components/actions-update-forms";
+import DeleteItemButton from "../../components/delete-item-button";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateColorFormProps {
@@ -34,6 +36,7 @@ interface UpdateColorFormProps {
 const UpdateColorForm = ({ colorId }: UpdateColorFormProps) => {
   const { data: currentColor } = useColor(colorId);
   const updateColorMutation = useUpdateColor(currentColor.id);
+  const deleteColorMutation = useDeleteColor();
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const formDefaultValues: UpdateColorDTO = {
@@ -147,9 +150,16 @@ const UpdateColorForm = ({ colorId }: UpdateColorFormProps) => {
           />
 
           <ActionsUpdateForm
-            textSaveUpdateAction="Atualizar Quadrinho"
+            textSaveUpdateAction="Atualizar Colorização"
             disableSaveUpdateAction={updateColorMutation.isPending}
             resetForm={() => formUpdateColor.reset(formDefaultValues)}
+          />
+
+          <DeleteItemButton
+            itemName="esta colorização"
+            onDelete={() => deleteColorMutation.mutateAsync(currentColor.id)}
+            redirectTo="/admin/cores"
+            disabled={updateColorMutation.isPending}
           />
         </div>
       </form>

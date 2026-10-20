@@ -14,3 +14,6 @@ export const useVisibleIllustrations = () =>
 /** Admin: every illustration. */
 export const useIllustrationsList = (filters?: IllustrationsFilters) =>
   useSuspenseQuery(illustrationsQueries.list(filters));
+
+export const useIllustration = (illustrationId: string) =>
+  useSuspenseQuery(illustrationsQueries.detail(illustrationId));
