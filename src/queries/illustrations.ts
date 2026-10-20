@@ -1,5 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 
+import { getIllustration } from "@/actions/get-illustration";
 import { getIllustrations } from "@/actions/get-illustrations";
 import { getVisibleIllustrations } from "@/actions/get-visible-illustrations";
 import type { GetManyIllustrationsProps } from "@/app/data/illustrations/get-many-illustration";
@@ -19,6 +20,7 @@ export const illustrationsQueries = {
     visible: () => ["illustrations", "visible"] as const,
     list: (filters: IllustrationsFilters = {}) =>
       ["illustrations", "list", filters] as const,
+    detail: (id: string) => ["illustrations", "detail", id] as const,
   },
   visible: () =>
     queryOptions({
@@ -30,5 +32,10 @@ export const illustrationsQueries = {
     queryOptions({
       queryKey: illustrationsQueries.keys.list(filters),
       queryFn: () => getIllustrations({ ...filters, withImage: true }),
+    }),
+  detail: (id: string) =>
+    queryOptions({
+      queryKey: illustrationsQueries.keys.detail(id),
+      queryFn: () => getIllustration({ illustrationId: id }),
     }),
 };
