@@ -21,6 +21,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateToInput } from "@/helpers/format-date-to-input";
 import { useUpdateUserData } from "@/hooks/mutations/use-update-user-data";
+import { useImage } from "@/hooks/queries/use-images";
+
+import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateUserFormProps {
   initialData: UserDTO;
@@ -46,6 +49,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
         typeof initialData.whatsappNumber === "number"
           ? initialData.whatsappNumber
           : undefined,
+      bannerImageId: initialData.bannerImageId,
     },
   });
 
@@ -58,6 +62,13 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
   }
 
   const valueImageUrl = form.watch("image");
+  const bannerImageId = form.watch("bannerImageId");
+  const { data: bannerImage } = useImage(bannerImageId, {
+    initialData:
+      bannerImageId === initialData.bannerImageId
+        ? (initialData.bannerImage ?? undefined)
+        : undefined,
+  });
 
   return (
     <Form {...form}>
@@ -124,6 +135,37 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
               </FormControl>
               <FormMessage />
             </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bannerImageId"
+          render={() => (
+            <div className="lg:col-span-2 flex flex-col gap-2">
+              <ImageFormField
+                label="Banner da página inicial"
+                image={bannerImageId ? bannerImage : null}
+                onSelectImage={(id) =>
+                  form.setValue("bannerImageId", id, { shouldDirty: true })
+                }
+                triggerTextToSelect={
+                  bannerImageId ? "Trocar banner" : "Escolher banner"
+                }
+              />
+              {bannerImageId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="self-start"
+                  onClick={() =>
+                    form.setValue("bannerImageId", null, { shouldDirty: true })
+                  }
+                >
+                  Remover banner
+                </Button>
+              )}
+            </div>
           )}
         />
 

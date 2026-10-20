@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 
 import ContainerImageHome from "@/components/common/image-home/container-image-home";
+import HomeBanner from "@/components/common/image-home/home-banner";
 import ImageHome from "@/components/common/image-home/image-home";
 import PageTransition from "@/components/common/page-transition";
 import ProfileImage from "@/components/common/profile-image";
@@ -32,7 +33,8 @@ export default async function Home() {
   return (
     <PageTransition>
       <div className="w-full max-w-screen flex flex-col gap-5 md:gap-10 items-center px-5 mx-auto my-5">
-        <Card className="w-full max-w-6xl">
+        {user?.bannerImage && <HomeBanner image={user.bannerImage} />}
+      <Card className="w-full max-w-6xl">
           {user ? (
             <CardContent className="flex flex-col-reverse items-center sm:flex-row-reverse">
               <>
