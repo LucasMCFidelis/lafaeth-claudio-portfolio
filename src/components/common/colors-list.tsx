@@ -1,5 +1,6 @@
 "use client";
 
+import VisibilitySwitch from "@/app/(no-layout)/admin/components/visibility-switch";
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { colorizationTable } from "@/db/schema";
@@ -36,7 +37,10 @@ const VisibleColorsList = ({ displayButtonOpenModal }: ColorsListProps) => {
   );
 };
 
-const AllColorsList = ({ displayButtonOpenModal, ...props }: ColorsListProps) => {
+const AllColorsList = ({
+  displayButtonOpenModal,
+  ...props
+}: ColorsListProps) => {
   const { data: colors } = useColorsList({
     orderBy: props.variant === "all" ? props.orderBy : undefined,
   });
@@ -75,10 +79,17 @@ const ColorsGrid = ({ colors, displayButtonOpenModal }: ColorsGridProps) => {
               index={index}
             >
               {displayButtonOpenModal && (
-                <ExpandItemButton
-                  typeLink
-                  href={`/admin/cores/update?colorId=${color.id}`}
-                />
+                <>
+                  <VisibilitySwitch
+                    entity="color"
+                    id={color.id}
+                    visible={color.visibleInColors}
+                  />
+                  <ExpandItemButton
+                    typeLink
+                    href={`/admin/cores/update?colorId=${color.id}`}
+                  />
+                </>
               )}
             </ColorItem>
           </div>

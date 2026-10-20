@@ -1,5 +1,6 @@
 "use client";
 
+import VisibilitySwitch from "@/app/(no-layout)/admin/components/visibility-switch";
 import { IllustrationDTO } from "@/app/data/illustrations/illustration-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { illustrationsTable } from "@/db/schema";
@@ -85,10 +86,17 @@ const IllustrationsGrid = ({
               index={index}
             >
               {displayButtonOpenModal && (
-                <ExpandItemButton
-                  typeLink
-                  href={`/admin/ilustracoes/update?illustrationId=${illustration.id}`}
-                />
+                <>
+                  <VisibilitySwitch
+                    entity="illustration"
+                    id={illustration.id}
+                    visible={illustration.visibleInIllustrations}
+                  />
+                  <ExpandItemButton
+                    typeLink
+                    href={`/admin/ilustracoes/update?illustrationId=${illustration.id}`}
+                  />
+                </>
               )}
             </IllustrationItem>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import VisibilitySwitch from "@/app/(no-layout)/admin/components/visibility-switch";
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { flatTable } from "@/db/schema";
@@ -89,10 +90,17 @@ const FlatGrid = ({
                 index={index}
               >
                 {displayButtonOpenModal && (
-                  <ExpandItemButton
-                    typeLink
-                    href={`/admin/flat/update?flatId=${flat.id}`}
-                  />
+                  <>
+                    <VisibilitySwitch
+                      entity="flat"
+                      id={flat.id}
+                      visible={flat.visibleInFlat}
+                    />
+                    <ExpandItemButton
+                      typeLink
+                      href={`/admin/flat/update?flatId=${flat.id}`}
+                    />
+                  </>
                 )}
               </FlatItem>
             );

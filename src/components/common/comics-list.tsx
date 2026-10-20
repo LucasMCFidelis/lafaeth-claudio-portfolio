@@ -1,5 +1,6 @@
 "use client";
 
+import VisibilitySwitch from "@/app/(no-layout)/admin/components/visibility-switch";
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { comicsTable } from "@/db/schema";
@@ -33,7 +34,10 @@ const VisibleComicsList = ({ displayButtonOpenModal }: ComicsListProps) => {
   );
 };
 
-const AllComicsList = ({ displayButtonOpenModal, ...props }: ComicsListProps) => {
+const AllComicsList = ({
+  displayButtonOpenModal,
+  ...props
+}: ComicsListProps) => {
   const { data: comics } = useComicsList({
     orderBy: props.variant === "all" ? props.orderBy : undefined,
   });
@@ -68,10 +72,17 @@ const ComicsGrid = ({ comics, displayButtonOpenModal }: ComicsGridProps) => {
               index={index}
             >
               {displayButtonOpenModal && (
-                <ExpandItemButton
-                  typeLink
-                  href={`/admin/quadrinhos/update?comicId=${comic.id}`}
-                />
+                <>
+                  <VisibilitySwitch
+                    entity="comic"
+                    id={comic.id}
+                    visible={comic.visibleInComics}
+                  />
+                  <ExpandItemButton
+                    typeLink
+                    href={`/admin/quadrinhos/update?comicId=${comic.id}`}
+                  />
+                </>
               )}
             </ComicItem>
           ))

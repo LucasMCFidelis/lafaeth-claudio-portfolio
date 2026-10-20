@@ -47,7 +47,7 @@ const CompareSlider = ({
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     // Let links and buttons drawn over the slider (admin actions) get the click.
-    if ((e.target as HTMLElement).closest("a, button")) return;
+    if ((e.target as HTMLElement).closest("a, button, label, input")) return;
     // Keeps the drag when the finger leaves the image. Best effort: the
     // slider still works within its area if the capture is refused.
     try {
