@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getComics } from "@/actions/get-comics";
 import { GetManyComicsProps } from "@/app/data/comics/get-many-comics";
-import { WhereCondition } from "@/app/data/where-condition";
-import { comicsTable } from "@/db/schema";
 
 interface Props extends GetManyComicsProps {
   params?: {
@@ -13,13 +11,15 @@ interface Props extends GetManyComicsProps {
   };
 }
 
-export const getManyComicsQueryKey = (
-  where?: WhereCondition<typeof comicsTable>
-) => ["comics", where] as const;
+export const getManyComicsQueryKey = ({
+  where,
+  orderBy,
+  withImage,
+}: GetManyComicsProps) => ["many-comics", where, orderBy, withImage] as const;
 
 export const useManyComics = ({ params, where, orderBy, withImage }: Props) => {
   return useQuery({
-    queryKey: getManyComicsQueryKey(),
+    queryKey: getManyComicsQueryKey({ where, orderBy, withImage }),
     queryFn: () => getComics({ where, orderBy, withImage }),
     initialData: params?.initialData,
   });

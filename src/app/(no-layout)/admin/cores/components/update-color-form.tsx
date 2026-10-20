@@ -23,7 +23,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateColor } from "@/hooks/mutations/use-update-color";
 import { useColor } from "@/hooks/queries/use-color";
-import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
+import { getColorsVisibleQueryKey } from "@/hooks/queries/use-colors-visible";
 import { useImage } from "@/hooks/queries/use-image";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
@@ -64,7 +64,7 @@ const UpdateColorForm = ({ initialData }: UpdateColorFormProps) => {
           newColor.visibleInColors != formDefaultValues.visibleInColorization
         ) {
           queryClient.invalidateQueries({
-            queryKey: getComicsVisibleQueryKey(),
+            queryKey: getColorsVisibleQueryKey(),
           });
         }
         toast.success("Colorização atualizada com sucesso");

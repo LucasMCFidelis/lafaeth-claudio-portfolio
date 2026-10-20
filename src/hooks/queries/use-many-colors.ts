@@ -4,8 +4,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getColors } from "@/actions/get-colors";
 import { GetManyColorsProps } from "@/app/data/colorization/get-many-colors";
-import { WhereCondition } from "@/app/data/where-condition";
-import { comicsTable } from "@/db/schema";
 
 interface Props<WithImage extends boolean>
   extends GetManyColorsProps<WithImage> {
@@ -14,9 +12,12 @@ interface Props<WithImage extends boolean>
   };
 }
 
-export const getManyColorsQueryKey = (
-  where?: WhereCondition<typeof comicsTable>
-) => ["comics", where] as const;
+export const getManyColorsQueryKey = ({
+  where,
+  orderBy,
+  withImage,
+}: GetManyColorsProps<boolean>) =>
+  ["many-colors", where, orderBy, withImage] as const;
 
 export const useManyColors = <WithImage extends boolean>({
   params,
@@ -25,7 +26,7 @@ export const useManyColors = <WithImage extends boolean>({
   withImage,
 }: Props<WithImage>) => {
   return useQuery({
-    queryKey: getManyColorsQueryKey(),
+    queryKey: getManyColorsQueryKey({ where, orderBy, withImage }),
     queryFn: () => getColors({ where, orderBy, withImage }),
     initialData: params?.initialData,
   });
