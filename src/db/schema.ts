@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  AnyPgColumn,
   bigint,
   boolean,
   date,
@@ -23,12 +24,25 @@ export const userTable = pgTable("user", {
   whatsappMessage: text("whatsapp_message"),
   whatsappNumber: bigint("whatsapp_number", { mode: "number" }),
   lattes: text("lattes"),
+  // Wide image at the top of the home page. The explicit AnyPgColumn type
+  // breaks the circular inference with imagesTable, declared further down.
+  bannerImageId: uuid("banner_image_id").references(
+    (): AnyPgColumn => imagesTable.id,
+    { onDelete: "set null" }
+  ),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const userRelations = relations(userTable, ({ one }) => ({
+  bannerImage: one(imagesTable, {
+    fields: [userTable.bannerImageId],
+    references: [imagesTable.id],
+  }),
+}));
 
 export const sessionTable = pgTable("session", {
   id: text("id").primaryKey(),

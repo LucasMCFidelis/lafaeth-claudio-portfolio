@@ -1,3 +1,4 @@
+import { ImageDTO } from "../image/image-dto";
 import { UserMediasUrlsDTO } from "./user-medias-dto";
 
 export type UserDTO = {
@@ -10,4 +11,7 @@ export type UserDTO = {
   age: number | null;
   whatsappMessage: string | null;
   whatsappNumber: number | null;
+  bannerImageId: string | null;
+  /** Wide image at the top of the home page. */
+  bannerImage: ImageDTO | null;
 } & UserMediasUrlsDTO;

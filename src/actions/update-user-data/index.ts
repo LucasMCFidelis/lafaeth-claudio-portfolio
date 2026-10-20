@@ -33,6 +33,7 @@ export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
         ? dataValidated.whatsappMessage
         : null,
       whatsappNumber: dataValidated.whatsappNumber ?? null,
+      bannerImageId: dataValidated.bannerImageId,
     })
     .where(eq(userTable.id, user.id));
 

@@ -9,23 +9,26 @@ import { calculateAge } from "@/helpers/calculate-age";
 import { mountWhatsappUrl } from "@/helpers/mount-whatsapp-url";
 import { cacheTags } from "@/queries/tags";
 
+import { mapToImageDTO } from "../image/map-to-image-dto";
 import { UserDTO } from "./user-dto";
 
 /**
- * Cached profile of the site owner. Expired by updateTag(cacheTags.user) in
- * update-user-data. Uses "days" instead of "max" because `age` depends on
+ * Cached profile of the site owner, with the home banner. Expired by
+ * updateTag(cacheTags.user) in update-user-data, and by cacheTags.images when
+ * the banner image changes. Uses "days" instead of "max" because `age` depends on
  * the current date.
  */
 const getUserData = async (): Promise<UserDTO> => {
   "use cache";
   cacheLife("days");
-  cacheTag(cacheTags.user);
+  cacheTag(cacheTags.user, cacheTags.images);
 
   const userId = process.env.USER_ID;
   if (!userId) throw new Error("USER_ID not defined in env variables");
 
   const user = await db.query.userTable.findFirst({
     where: eq(userTable.id, userId),
+    with: { bannerImage: true },
   });
 
   if (!user) {
@@ -54,6 +57,10 @@ const getUserData = async (): Promise<UserDTO> => {
     whatsappMessage: user.whatsappMessage,
     whatsappNumber: user.whatsappNumber,
     lattes: user.lattes,
+    bannerImageId: user.bannerImageId,
+    bannerImage: user.bannerImage
+      ? mapToImageDTO({ image: user.bannerImage })
+      : null,
   };
 };
 

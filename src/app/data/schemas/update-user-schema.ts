@@ -36,4 +36,6 @@ export const updateUserSchema = z.object({
   }),
   whatsappMessage: z.string().optional(),
   lattes: z.string().optional(),
+  // null means no banner on the home page.
+  bannerImageId: z.union([z.uuid("Selecione uma imagem válida"), z.null()]),
 });
