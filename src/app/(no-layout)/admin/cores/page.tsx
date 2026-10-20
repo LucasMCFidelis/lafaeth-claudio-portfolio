@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Suspense } from "react";
 
 import getManyColors from "@/app/data/colorization/get-many-colors";
 import getVisibleColorsCached from "@/app/data/colorization/get-visible-colors";
 import { displayOrder } from "@/app/data/order-by-condition";
+import AnimatedSuspense from "@/components/common/animated-suspense";
 import ColorsList from "@/components/common/colors-list";
 import GridSkeleton from "@/components/common/grid-skeleton";
 import PrefetchBoundary from "@/components/common/prefetch-boundary";
@@ -23,7 +23,7 @@ const ColorsAdminPage = () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <Suspense fallback={<GridSkeleton />}>
+        <AnimatedSuspense fallback={<GridSkeleton />}>
           <AdminOnly>
             <PrefetchBoundary
               queries={[
@@ -46,7 +46,7 @@ const ColorsAdminPage = () => {
               />
             </PrefetchBoundary>
           </AdminOnly>
-        </Suspense>
+        </AnimatedSuspense>
       </div>
     </>
   );

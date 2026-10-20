@@ -1,9 +1,16 @@
-import Image from "next/image";
 import Link from "next/link";
 
-import { gridImageSizes, imageLoadingProps } from "@/helpers/image-sizes";
+import {
+  gridImageSizes,
+  imageLoadingProps,
+  PRIORITY_ITEMS,
+} from "@/helpers/image-sizes";
+import { staggerClassName, staggerStyle } from "@/helpers/stagger";
+import { cn } from "@/lib/utils";
 
 import ArtworkCaption from "./artwork-caption";
+import ArtworkTransition from "./artwork-transition";
+import FadeImage from "./fade-image";
 
 interface ComicItemProps {
   imageId: string;
@@ -11,8 +18,8 @@ interface ComicItemProps {
   title: string;
   visibleInComics?: boolean;
   disableLink?: boolean;
-  /** Loads the image right away (first row of the grid). */
-  priority?: boolean;
+  /** Position in the grid: drives the entrance delay and eager loading. */
+  index?: number;
   children: React.ReactNode;
 }
 
@@ -22,32 +29,39 @@ const ComicItem = ({
   title,
   visibleInComics,
   disableLink,
-  priority,
+  index = 0,
   children,
 }: ComicItemProps) => {
-  const content = (
+  const card = (
     <div
-      className={`relative aspect-[21/29.5]  ${
+      style={staggerStyle(index)}
+      className={cn(
+        "group relative aspect-[21/29.5] overflow-hidden",
+        staggerClassName,
         !visibleInComics && "opacity-50"
-      }`}
+      )}
     >
-      <Image
+      <FadeImage
         src={imageUrl}
         alt={title || "Quadrinho"}
         fill
         sizes={gridImageSizes}
-        {...imageLoadingProps(priority)}
-        className="object-cover"
+        {...imageLoadingProps(index < PRIORITY_ITEMS)}
+        className="object-cover group-hover:scale-[1.02]"
       />
       <ArtworkCaption title={title} />
       {children}
     </div>
   );
 
-  if (disableLink) return content;
+  if (disableLink) return card;
   if (!imageId) throw new Error("imageId is required with link enabled");
 
-  return <Link href={`/gallery/quadrinhos?id=${imageId}`}>{content}</Link>;
+  return (
+    <Link href={`/gallery/quadrinhos?id=${imageId}`}>
+      <ArtworkTransition imageId={imageId}>{card}</ArtworkTransition>
+    </Link>
+  );
 };
 
 export default ComicItem;

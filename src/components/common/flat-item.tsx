@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
-
 import { imageLoadingProps } from "@/helpers/image-sizes";
+import { staggerClassName, staggerStyle } from "@/helpers/stagger";
 import { cn } from "@/lib/utils";
 
 import CompareSlider from "./compare-slider";
+import FadeImage from "./fade-image";
 
 interface FlatItemProps {
   horizontalPage?: boolean;
@@ -19,8 +19,8 @@ interface FlatItemProps {
   backImageUrl?: string;
   /** Smaller maximum size, used in the admin list next to the sidebar. */
   maxSizeItemsMd?: boolean;
-  /** Loads the images right away (first item on the page). */
-  priority?: boolean;
+  /** Position in the list: drives the entrance delay; the first loads eagerly. */
+  index?: number;
   children?: React.ReactNode;
 }
 
@@ -33,7 +33,7 @@ const FlatItem = ({
   frontImageUrl,
   backImageUrl,
   maxSizeItemsMd,
-  priority,
+  index = 0,
   children,
 }: FlatItemProps) => {
   // Same widths the fixed sizes used to reach, now fluid below them.
@@ -56,27 +56,29 @@ const FlatItem = ({
     fill: true,
     sizes,
     draggable: false,
-    ...imageLoadingProps(priority),
+    ...imageLoadingProps(index === 0),
     className: "object-contain pointer-events-none",
   };
 
   return (
     <CompareSlider
       label={`Comparar line e flat de ${title}`}
+      style={staggerStyle(index)}
       className={cn(
         "w-full mx-auto",
+        staggerClassName,
         maxWidth,
         horizontalPage ? "aspect-[29.5/21]" : "aspect-[21/29.5]",
         !visibleInFlat && "opacity-50"
       )}
       base={
         backImageUrl && (
-          <Image src={backImageUrl} alt={`${title} - flat`} {...imageProps} />
+          <FadeImage src={backImageUrl} alt={`${title} - flat`} {...imageProps} />
         )
       }
       overlay={
         frontImageUrl && (
-          <Image src={frontImageUrl} alt={`${title} - line`} {...imageProps} />
+          <FadeImage src={frontImageUrl} alt={`${title} - line`} {...imageProps} />
         )
       }
     >

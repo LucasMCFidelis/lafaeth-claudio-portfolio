@@ -3,7 +3,6 @@
 import { IllustrationDTO } from "@/app/data/illustrations/illustration-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { illustrationsTable } from "@/db/schema";
-import { PRIORITY_ITEMS } from "@/helpers/image-sizes";
 import {
   useIllustrationsList,
   useVisibleIllustrations,
@@ -83,7 +82,7 @@ const IllustrationsGrid = ({
               visibleInIllustrations={illustration.visibleInIllustrations}
               horizontalIllustration={illustration.horizontalIllustration}
               disableLink={displayButtonOpenModal}
-              priority={index < PRIORITY_ITEMS}
+              index={index}
             >
               {displayButtonOpenModal && (
                 <ExpandItemButton

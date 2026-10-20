@@ -1,12 +1,13 @@
 "use client";
 
 import { ArrowBigLeft, ArrowBigRight, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 import { useEffect, useRef } from "react";
 
+import ArtworkTransition from "@/components/common/artwork-transition";
+import FadeImage from "@/components/common/fade-image";
 import { Button } from "@/components/ui/button";
 import getPreferenceTheme from "@/helpers/get-theme-preference";
 import { cn } from "@/lib/utils";
@@ -44,8 +45,10 @@ const GalleryRootList = ({
     const target = itemsList[newIndex];
     if (target) setValues({ id: target.id });
   };
-  const goPrev = () => goToItem(currentIndex > 0 ? currentIndex - 1 : lastIndex);
-  const goNext = () => goToItem(currentIndex < lastIndex ? currentIndex + 1 : 0);
+  const goPrev = () =>
+    goToItem(currentIndex > 0 ? currentIndex - 1 : lastIndex);
+  const goNext = () =>
+    goToItem(currentIndex < lastIndex ? currentIndex + 1 : 0);
 
   // Keep the latest handlers for the window listener without re-subscribing.
   const keyHandlers = useRef({ goPrev, goNext });
@@ -96,25 +99,29 @@ const GalleryRootList = ({
         </Button>
       </div>
       <div className="flex flex-col flex-1 p-5 w-full sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10">
-        <div
-          className="flex-1 relative min-h-[60svh] sm:min-h-0 touch-pan-y"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => (swipeStartX.current = null)}
-        >
-          {item.imageUrl && (
-            <Image
-              src={item.imageUrl}
-              alt={item.title}
-              fill
-              sizes="(max-width: 640px) 100vw, 75vw"
-              loading="eager"
-              fetchPriority="high"
-              draggable={false}
-              className="object-contain select-none"
-            />
-          )}
-        </div>
+        <ArtworkTransition imageId={item.id}>
+          <div
+            className="flex-1 relative min-h-[60svh] sm:min-h-0 touch-pan-y"
+            onPointerDown={onPointerDown}
+            onPointerUp={onPointerUp}
+            onPointerCancel={() => (swipeStartX.current = null)}
+          >
+            {item.imageUrl && (
+              <FadeImage
+                // A new key restarts the fade when moving to another image.
+                key={item.imageUrl}
+                src={item.imageUrl}
+                alt={item.title}
+                fill
+                sizes="(max-width: 640px) 100vw, 75vw"
+                loading="eager"
+                fetchPriority="high"
+                draggable={false}
+                className="object-contain select-none"
+              />
+            )}
+          </div>
+        </ArtworkTransition>
         <div
           className={cn(
             "font-sans flex flex-col justify-between sm:mt-10 min-w-0 wrap-anywhere",

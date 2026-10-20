@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Suspense } from "react";
 
 import getManyIllustrations from "@/app/data/illustrations/get-many-illustration";
 import getVisibleIllustrationsCached from "@/app/data/illustrations/get-visible-illustrations";
 import { displayOrder } from "@/app/data/order-by-condition";
+import AnimatedSuspense from "@/components/common/animated-suspense";
 import GridSkeleton from "@/components/common/grid-skeleton";
 import IllustrationsList from "@/components/common/illustrations-list";
 import PrefetchBoundary from "@/components/common/prefetch-boundary";
@@ -23,7 +23,7 @@ const IllustrationsAdminPage = () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <Suspense fallback={<GridSkeleton />}>
+        <AnimatedSuspense fallback={<GridSkeleton />}>
           <AdminOnly>
             <PrefetchBoundary
               queries={[
@@ -51,7 +51,7 @@ const IllustrationsAdminPage = () => {
               />
             </PrefetchBoundary>
           </AdminOnly>
-        </Suspense>
+        </AnimatedSuspense>
       </div>
     </>
   );

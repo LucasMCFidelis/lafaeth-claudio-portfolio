@@ -86,7 +86,7 @@ const FlatGrid = ({
                 frontImageUrl={flat.frontImage?.imageUrl}
                 backImageUrl={flat.backImage?.imageUrl}
                 maxSizeItemsMd={maxSizeItemsMd}
-                priority={index === 0}
+                index={index}
               >
                 {displayButtonOpenModal && (
                   <ExpandItemButton
