@@ -14,7 +14,7 @@ Portfólio do designer, ilustrador e quadrinista Lafaeth Claudio, com painel adm
 
 - **Área pública** (`src/app/(layout)`): `/` (sobre + imagens em destaque), `/cores`, `/flat`, `/quadrinhos`, `/ilustracoes`.
 - **Galeria** (`src/app/(no-layout)/gallery`): visualização das imagens em tela cheia.
-- **Admin** (`src/app/(no-layout)/admin`): login em `/admin/auth`; cadastro, edição e ordenação (drag and drop) de imagens, cores, flats e quadrinhos; edição do perfil.
+- **Admin** (`src/app/(no-layout)/admin`): login em `/admin/auth`; cadastro, edição, exclusão e ordenação (drag and drop) de imagens, cores, flats, quadrinhos e ilustrações; mostrar/ocultar direto no card; edição do perfil (inclui o banner da Home).
 
 ## Stack
 
@@ -72,6 +72,8 @@ Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente)
 - Toda Server Action de **leitura** que aceita filtros ou devolve itens ocultos também chama `verifyUserLogged()`. Leituras públicas têm filtro fixo.
 - Páginas do admin envolvem o conteúdo em `<AdminOnly>` (`src/app/(no-layout)/admin/components/admin-only.tsx`), que chama `requireAdmin()` e redireciona para `/admin/auth`.
 - **Toda Server Action que altera dados** chama `updateTag(cacheTags.<entidade>)` antes de retornar; ações sobre imagens usam `cacheTags.images` (todas as listas públicas também têm essa tag).
+- Exclusão: actions `delete-<entidade>` recebem o id (Zod `uuid`). `delete-image` não lança erro quando a imagem está em uso: devolve `{ deleted: false, usage }` para o admin confirmar (mensagens de erro de Server Action somem em produção). Hooks de exclusão não invalidam o detalhe do item excluído (`isDetailOf`), que quebraria ao refazer a busca.
+- Visibilidade: `update-visibility` (uma action para todas as entidades) + `useUpdateVisibility(entity)`, com atualização otimista; usado pelo `VisibilitySwitch` dos cards do admin.
 - Componentes cliente nunca importam `@/db` nem `src/app/data/*` com acesso ao banco; usam actions e DTOs.
 - Query keys vêm dos contratos em `src/queries/` e incluem os filtros usados (`where`, `orderBy`). A invalidação após mutation fica no hook da mutation, pela key raiz da entidade.
 - **Banco de dados:** mudanças no schema são aplicadas com `npx drizzle-kit push`, rodado pelo dono do projeto. Não usar `drizzle-kit generate`/`migrate` e não criar a pasta `drizzle/`.
