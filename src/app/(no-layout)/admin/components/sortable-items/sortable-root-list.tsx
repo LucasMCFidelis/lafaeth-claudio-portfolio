@@ -15,7 +15,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useQueryClient } from "@tanstack/react-query";
+import { type QueryKey, useQueryClient } from "@tanstack/react-query";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect } from "react";
 
@@ -25,7 +25,7 @@ import { BasicItemToSortable } from "./basic-item-to-sortable";
 
 interface SortableRootListProps<T extends BasicItemToSortable> {
   items: Array<T>;
-  getQueryKeyFunction: () => readonly [string];
+  getQueryKeyFunction: () => QueryKey;
   className?: string;
   children: React.ReactNode;
 }

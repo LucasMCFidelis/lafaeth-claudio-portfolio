@@ -1,11 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import {
   UpdateColorDTO,
   updateColorSchema,
@@ -22,32 +20,28 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateColor } from "@/hooks/mutations/use-update-color";
-import { useColor } from "@/hooks/queries/use-color";
-import { getColorsVisibleQueryKey } from "@/hooks/queries/use-colors-visible";
-import { useImage } from "@/hooks/queries/use-image";
+import { useColor } from "@/hooks/queries/use-colors";
+import { useImage } from "@/hooks/queries/use-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateColorFormProps {
-  initialData: ColorDTO;
+  colorId: string;
 }
 
-const UpdateColorForm = ({ initialData }: UpdateColorFormProps) => {
-  const { data: currentColor } = useColor(initialData.id, { initialData });
-  if (!currentColor)
-    throw new Error(`Colorization ${initialData.id} not found`);
+const UpdateColorForm = ({ colorId }: UpdateColorFormProps) => {
+  const { data: currentColor } = useColor(colorId);
   const updateColorMutation = useUpdateColor(currentColor.id);
-  const queryClient = useQueryClient();
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const formDefaultValues: UpdateColorDTO = {
-    id: initialData.id,
-    imageId: initialData.imageId ?? "",
-    observations: initialData.observations ?? "",
-    productionYear: initialData.productionYear,
-    visibleInColorization: initialData.visibleInColors ?? false,
+    id: currentColor.id,
+    imageId: currentColor.imageId ?? "",
+    observations: currentColor.observations ?? "",
+    productionYear: currentColor.productionYear,
+    visibleInColorization: currentColor.visibleInColors ?? false,
   };
 
   const formUpdateColor = useForm<UpdateColorDTO>({
@@ -59,14 +53,7 @@ const UpdateColorForm = ({ initialData }: UpdateColorFormProps) => {
 
   function onSubmit(data: UpdateColorDTO) {
     updateColorMutation.mutate(data, {
-      onSuccess: (newColor) => {
-        if (
-          newColor.visibleInColors != formDefaultValues.visibleInColorization
-        ) {
-          queryClient.invalidateQueries({
-            queryKey: getColorsVisibleQueryKey(),
-          });
-        }
+      onSuccess: () => {
         toast.success("Colorização atualizada com sucesso");
       },
       onError: (error) =>

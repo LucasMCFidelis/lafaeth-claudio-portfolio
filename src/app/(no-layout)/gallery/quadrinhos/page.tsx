@@ -1,15 +1,10 @@
-import getManyComics from "@/app/data/comics/get-many-comics";
-import { displayOrder } from "@/app/data/order-by-condition";
+import getVisibleComicsCached from "@/app/data/comics/get-visible-comics";
 
 import { GalleryBasicType } from "../components/gallery-list/gallery-basic-type";
 import GalleryRootList from "../components/gallery-list/gallery-root-list";
 
 export default async function GalleryComicsPage() {
-  const comics = await getManyComics({
-    where: { field: "visibleInComics", value: true },
-    orderBy: displayOrder,
-    withImage: true,
-  });
+  const comics = await getVisibleComicsCached();
 
   const itemsList: Array<GalleryBasicType> = comics
     .filter((comic) => comic.image !== null)

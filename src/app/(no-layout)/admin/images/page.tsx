@@ -1,17 +1,31 @@
 import { Suspense } from "react";
 
-import requireAdmin from "@/app/data/user/require-admin";
+import getManyImages from "@/app/data/image/get-many-images";
 import AllImageList from "@/components/common/all-image-list";
+import GridSkeleton from "@/components/common/grid-skeleton";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import { imagesQueries } from "@/queries/images";
 
-const ImagesPage = async () => {
-  await requireAdmin();
+import AdminOnly from "../components/admin-only";
 
+const ImagesPage = () => {
   return (
-    <Suspense>
-      <div className="mt-12">
-        <AllImageList />
-      </div>
-    </Suspense>
+    <div className="mt-12">
+      <Suspense fallback={<GridSkeleton />}>
+        <AdminOnly>
+          <PrefetchBoundary
+            queries={[
+              {
+                queryKey: imagesQueries.keys.list(),
+                fetcher: () => getManyImages({}),
+              },
+            ]}
+          >
+            <AllImageList />
+          </PrefetchBoundary>
+        </AdminOnly>
+      </Suspense>
+    </div>
   );
 };
 

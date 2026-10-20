@@ -13,21 +13,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUpdateIllustrationsOrder } from "@/hooks/mutations/use-update-illustrations-order";
-import { getIllustrationsVisibleQueryKey, useIllustrationsVisible } from "@/hooks/queries/use-illustrations-visible";
+import { useVisibleIllustrations } from "@/hooks/queries/use-illustrations";
+import { illustrationsQueries } from "@/queries/illustrations";
 
 import SortableItem from "./sortable-item";
 import SortableRootList, {
   getSortingIsDisabledQueryStateParams,
 } from "./sortable-root-list";
 
-interface SortableIllustrationsProps {
-  initialData?: Array<IllustrationDTO>;
-}
-
-const SortableIllustrations = ({ initialData }: SortableIllustrationsProps) => {
-  const { data: illustrations = [] } = useIllustrationsVisible(
-    initialData && { initialData }
-  );
+const SortableIllustrations = () => {
+  const { data: illustrations } = useVisibleIllustrations();
   const updateIllustrationOrderMutation = useUpdateIllustrationsOrder();
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
     ...getSortingIsDisabledQueryStateParams()
@@ -44,7 +39,7 @@ const SortableIllustrations = ({ initialData }: SortableIllustrationsProps) => {
     setSortingIsDisabled((prev) => !prev);
     if (!sortingIsDisabled) {
       queryClient.invalidateQueries({
-        queryKey: getIllustrationsVisibleQueryKey(),
+        queryKey: illustrationsQueries.keys.visible(),
       });
     }
   };
@@ -69,7 +64,7 @@ const SortableIllustrations = ({ initialData }: SortableIllustrationsProps) => {
           </DialogHeader>
           <SortableRootList
             items={sortableIllustrations}
-            getQueryKeyFunction={getIllustrationsVisibleQueryKey}
+            getQueryKeyFunction={illustrationsQueries.keys.visible}
             className={`max-w-full ${sortingIsDisabled && "hidden"} `}
           >
             <div className="w-full flex-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">

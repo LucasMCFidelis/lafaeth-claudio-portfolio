@@ -1,14 +1,9 @@
-import getManyColors from "@/app/data/colorization/get-many-colors";
-import { displayOrder } from "@/app/data/order-by-condition";
+import getVisibleColorsCached from "@/app/data/colorization/get-visible-colors";
 
 import GalleryRootList from "../components/gallery-list/gallery-root-list";
 
 export default async function GalleryColorsPage() {
-  const colors = await getManyColors({
-    where: { field: "visibleInColorization", value: true },
-    orderBy: displayOrder,
-    withImage: true,
-  });
+  const colors = await getVisibleColorsCached();
 
   const itemsList = colors
     .filter((color) => color.image !== null)

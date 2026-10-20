@@ -20,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { usePostFlat } from "@/hooks/mutations/use-post-flat";
-import { useImage } from "@/hooks/queries/use-image";
+import { useImage } from "@/hooks/queries/use-images";
 
 import { ImageFormField } from "../../components/image-form-field";
 

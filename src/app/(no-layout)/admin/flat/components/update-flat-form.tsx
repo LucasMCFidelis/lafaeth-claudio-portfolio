@@ -1,11 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { FlatDTO } from "@/app/data/flat/flat-dto";
 import {
   UpdateFlatDTO,
   updateFlatSchema,
@@ -22,33 +20,30 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateFlat } from "@/hooks/mutations/use-update-flat";
-import { getFlatQueryKey, useFlat } from "@/hooks/queries/use-flat";
-import { getFlatsVisibleQueryKey } from "@/hooks/queries/use-flats-visible";
-import { useImage } from "@/hooks/queries/use-image";
+import { useFlat } from "@/hooks/queries/use-flats";
+import { useImage } from "@/hooks/queries/use-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "../../components/actions-update-forms";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateFlatFormProps {
-  initialData: FlatDTO<true>;
+  flatId: string;
 }
 
-const UpdateFlatForm = ({ initialData }: UpdateFlatFormProps) => {
-  const { data: currentFlat } = useFlat(initialData.id, { initialData });
-  if (!currentFlat) throw new Error(`Flat ${initialData.id} not found`);
+const UpdateFlatForm = ({ flatId }: UpdateFlatFormProps) => {
+  const { data: currentFlat } = useFlat(flatId);
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const updateFlatMutation = useUpdateFlat(currentFlat.id);
-  const queryClient = useQueryClient();
 
   const formDefaultValues = {
-    id: initialData.id,
-    title: initialData.title ?? "",
-    description: initialData.description ?? "",
-    frontImageId: initialData.frontImageId ?? "",
-    backImageId: initialData.backImageId ?? "",
-    visibleInFlat: initialData.visibleInFlat ?? false,
+    id: currentFlat.id,
+    title: currentFlat.title ?? "",
+    description: currentFlat.description ?? "",
+    frontImageId: currentFlat.frontImageId ?? "",
+    backImageId: currentFlat.backImageId ?? "",
+    visibleInFlat: currentFlat.visibleInFlat ?? false,
   };
 
   const formUpdateFlat = useForm<UpdateFlatDTO>({
@@ -67,16 +62,7 @@ const UpdateFlatForm = ({ initialData }: UpdateFlatFormProps) => {
 
   function onSubmit(data: UpdateFlatDTO) {
     updateFlatMutation.mutate(data, {
-      onSuccess: (flatUpdated) => {
-        if (flatUpdated.visibleInFlat != formDefaultValues.visibleInFlat) {
-          queryClient.invalidateQueries({
-            queryKey: getFlatsVisibleQueryKey(),
-          });
-        }
-        queryClient.setQueryData<FlatDTO>(
-          getFlatQueryKey(data.id),
-          flatUpdated
-        );
+      onSuccess: () => {
         toast.success("Flat atualizado com sucesso");
       },
       onError: (error) =>

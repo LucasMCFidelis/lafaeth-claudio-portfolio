@@ -11,8 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import getManyImages from "../data/image/get-many-images";
-import { displayOrder } from "../data/order-by-condition";
+import getHomeImagesCached from "../data/image/get-home-images";
 import getUserData from "../data/user/get-user-data";
 
 export const metadata: Metadata = {
@@ -22,11 +21,11 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const user = await getUserData();
-  const imagesHome = await getManyImages({
-    where: { field: "visibleInHome", value: true },
-    orderBy: displayOrder,
-  });
+  // Both reads are cached ("use cache"), so this page is prerendered.
+  const [user, imagesHome] = await Promise.all([
+    getUserData(),
+    getHomeImagesCached(),
+  ]);
 
   return (
     <div className="w-full max-w-screen flex flex-col gap-5 md:gap-10 items-center px-5 mx-auto my-5">

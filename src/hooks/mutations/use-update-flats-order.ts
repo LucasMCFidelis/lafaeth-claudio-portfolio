@@ -4,18 +4,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { updateFlatsOrder } from "@/actions/update-flats-order";
 import { FlatDTO } from "@/app/data/flat/flat-dto";
+import { flatsQueries } from "@/queries/flats";
 
-import { getFlatsVisibleQueryKey } from "../queries/use-flats-visible";
-
-export const getUpdateFlatsOrderQueryKey = () =>
+export const getUpdateFlatsOrderMutationKey = () =>
   ["update-flats-order"] as const;
 
 export const useUpdateFlatsOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: getUpdateFlatsOrderQueryKey(),
+    mutationKey: getUpdateFlatsOrderMutationKey(),
     mutationFn: async (flats: Array<FlatDTO>) => await updateFlatsOrder(flats),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: getFlatsVisibleQueryKey() }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: flatsQueries.keys.all });
+    },
   });
 };

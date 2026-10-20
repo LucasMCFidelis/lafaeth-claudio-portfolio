@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { memo } from "react";
 
 import getUserMediaData from "@/app/data/user/get-user-medias-data";
 
 import { Button } from "../ui/button";
 
-async function FooterComponent() {
+async function Footer() {
   const mediasUrls = await getUserMediaData();
   const socialLinks: Array<{ href: string | null; img: string; alt?: string }> =
     [
@@ -48,5 +47,4 @@ async function FooterComponent() {
   );
 }
 
-const Footer = memo(FooterComponent);
 export default Footer;

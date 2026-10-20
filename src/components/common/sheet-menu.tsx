@@ -1,7 +1,6 @@
 import { Menu } from "lucide-react";
 import Link from "next/link";
-
-import verifyUserLogged from "@/app/data/user/verify-user";
+import { Suspense } from "react";
 
 import {
   Sheet,
@@ -13,10 +12,9 @@ import {
 } from "../ui/sheet";
 import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
+import ShowWhenLogged from "./show-when-logged";
 
-const SheetMenu = async () => {
-  const userLogged = await verifyUserLogged();
-
+const SheetMenu = () => {
   return (
     <Sheet>
       <SheetTrigger>
@@ -28,17 +26,21 @@ const SheetMenu = async () => {
         </SheetHeader>
         <div className="gap-2 flex flex-col items-start">
           <MenuItemsList />
-          {userLogged && (
-            <Link key={"/admin"} className="px-4" href={"/admin"}>
-              Administração
-            </Link>
-          )}
+          <Suspense fallback={null}>
+            <ShowWhenLogged>
+              <Link key={"/admin"} className="px-4" href={"/admin"}>
+                Administração
+              </Link>
+            </ShowWhenLogged>
+          </Suspense>
         </div>
-        {userLogged && (
-          <SheetFooter>
-            <LogoutButton typeComplexity="full" />
-          </SheetFooter>
-        )}
+        <Suspense fallback={null}>
+          <ShowWhenLogged>
+            <SheetFooter>
+              <LogoutButton typeComplexity="full" />
+            </SheetFooter>
+          </ShowWhenLogged>
+        </Suspense>
       </SheetContent>
     </Sheet>
   );

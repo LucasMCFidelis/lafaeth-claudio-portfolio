@@ -3,14 +3,12 @@
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { colorizationTable } from "@/db/schema";
-import { useColorsVisible } from "@/hooks/queries/use-colors-visible";
-import { useManyColors } from "@/hooks/queries/use-many-colors";
+import { useColorsList, useVisibleColors } from "@/hooks/queries/use-colors";
 
 import ColorItem from "./color-item";
 import ExpandItemButton from "./expand-item-button";
 
 type ColorsListProps = {
-  initialData: Array<ColorDTO<true>>;
   displayButtonOpenModal?: boolean;
 } & (
   | { variant: "visible" }
@@ -27,11 +25,8 @@ const ColorsList = (props: ColorsListProps) =>
     <AllColorsList {...props} />
   );
 
-const VisibleColorsList = ({
-  initialData,
-  displayButtonOpenModal,
-}: ColorsListProps) => {
-  const { data: colors = [] } = useColorsVisible({ initialData });
+const VisibleColorsList = ({ displayButtonOpenModal }: ColorsListProps) => {
+  const { data: colors } = useVisibleColors();
 
   return (
     <ColorsGrid
@@ -41,15 +36,9 @@ const VisibleColorsList = ({
   );
 };
 
-const AllColorsList = ({
-  initialData,
-  displayButtonOpenModal,
-  ...props
-}: ColorsListProps) => {
-  const { data: colors = [] } = useManyColors({
-    params: { initialData },
+const AllColorsList = ({ displayButtonOpenModal, ...props }: ColorsListProps) => {
+  const { data: colors } = useColorsList({
     orderBy: props.variant === "all" ? props.orderBy : undefined,
-    withImage: true,
   });
 
   return (

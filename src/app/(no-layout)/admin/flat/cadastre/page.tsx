@@ -1,15 +1,14 @@
 import { Suspense } from "react";
 
-import requireAdmin from "@/app/data/user/require-admin";
-
+import AdminOnly from "../../components/admin-only";
 import CadastreFlatForm from "../components/cadastre-flat-form";
 
-const CadastreFlatPage = async () => {
-  await requireAdmin();
-
+const CadastreFlatPage = () => {
   return (
     <Suspense fallback={<p>Carregando formulário</p>}>
-      <CadastreFlatForm />
+      <AdminOnly>
+        <CadastreFlatForm />
+      </AdminOnly>
     </Suspense>
   );
 };

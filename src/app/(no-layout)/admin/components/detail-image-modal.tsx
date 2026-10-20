@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useImage } from "@/hooks/queries/use-image";
+import { useImage } from "@/hooks/queries/use-images";
 
 import UpdateImageForm from "./update-image-form";
 

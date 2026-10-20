@@ -3,14 +3,12 @@
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { comicsTable } from "@/db/schema";
-import { useComicsVisible } from "@/hooks/queries/use-comics-visible";
-import { useManyComics } from "@/hooks/queries/use-many-comics";
+import { useComicsList, useVisibleComics } from "@/hooks/queries/use-comics";
 
 import ComicItem from "./comic-item";
 import ExpandItemButton from "./expand-item-button";
 
 type ComicsListProps = {
-  initialData: Array<ComicDTO>;
   displayButtonOpenModal?: boolean;
 } & (
   | { variant: "visible" }
@@ -24,11 +22,8 @@ const ComicsList = (props: ComicsListProps) =>
     <AllComicsList {...props} />
   );
 
-const VisibleComicsList = ({
-  initialData,
-  displayButtonOpenModal,
-}: ComicsListProps) => {
-  const { data: comics = [] } = useComicsVisible({ initialData });
+const VisibleComicsList = ({ displayButtonOpenModal }: ComicsListProps) => {
+  const { data: comics } = useVisibleComics();
 
   return (
     <ComicsGrid
@@ -38,15 +33,9 @@ const VisibleComicsList = ({
   );
 };
 
-const AllComicsList = ({
-  initialData,
-  displayButtonOpenModal,
-  ...props
-}: ComicsListProps) => {
-  const { data: comics = [] } = useManyComics({
-    params: { initialData },
+const AllComicsList = ({ displayButtonOpenModal, ...props }: ComicsListProps) => {
+  const { data: comics } = useComicsList({
     orderBy: props.variant === "all" ? props.orderBy : undefined,
-    withImage: true,
   });
 
   return (

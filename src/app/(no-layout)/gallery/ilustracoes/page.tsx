@@ -1,15 +1,10 @@
-import getManyIllustrations from "@/app/data/illustrations/get-many-illustration";
-import { displayOrder } from "@/app/data/order-by-condition";
+import getVisibleIllustrationsCached from "@/app/data/illustrations/get-visible-illustrations";
 
 import { GalleryBasicType } from "../components/gallery-list/gallery-basic-type";
 import GalleryRootList from "../components/gallery-list/gallery-root-list";
 
 export default async function GalleryIllustrationPage() {
-  const illustrations = await getManyIllustrations({
-    where: { field: "visibleInIllustrations", value: true },
-    orderBy: displayOrder,
-    withImage: true,
-  });
+  const illustrations = await getVisibleIllustrationsCached();
 
   const itemsList: Array<GalleryBasicType> = illustrations
     .filter((illustration) => illustration.image !== null)
