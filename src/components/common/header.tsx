@@ -10,7 +10,11 @@ import ToggleTheme from "./toggle-theme";
 const Header = () => {
   return (
     <>
-      <header className="w-full p-5 flex justify-between items-center">
+      {/* Named so it stays still during page transitions (globals.css). */}
+      <header
+        className="w-full p-5 flex justify-between items-center"
+        style={{ viewTransitionName: "site-header" }}
+      >
         <Link href={"/"} className="px-0 font-extrabold text-2xl md:text-3xl">
           Lafaeth Claudio
         </Link>

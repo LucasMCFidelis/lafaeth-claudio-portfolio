@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { Suspense } from "react";
 
 import getManyComics from "@/app/data/comics/get-many-comics";
 import getVisibleComicsCached from "@/app/data/comics/get-visible-comics";
 import { displayOrder } from "@/app/data/order-by-condition";
+import AnimatedSuspense from "@/components/common/animated-suspense";
 import ComicsList from "@/components/common/comics-list";
 import GridSkeleton from "@/components/common/grid-skeleton";
 import PrefetchBoundary from "@/components/common/prefetch-boundary";
@@ -23,7 +23,7 @@ const ComicsAdminPage = () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <Suspense fallback={<GridSkeleton />}>
+        <AnimatedSuspense fallback={<GridSkeleton />}>
           <AdminOnly>
             <PrefetchBoundary
               queries={[
@@ -48,7 +48,7 @@ const ComicsAdminPage = () => {
               </div>
             </PrefetchBoundary>
           </AdminOnly>
-        </Suspense>
+        </AnimatedSuspense>
       </div>
     </>
   );
