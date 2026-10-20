@@ -1,7 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import mapToColorDTO from "@/app/data/colorization/map-to-color";
@@ -12,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { colorizationTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const updateColor = async (
   colorId: string,
@@ -35,7 +36,7 @@ export const updateColor = async (
 
   if (!colorUpdated) throw new Error("Color not found");
 
-  revalidatePath(`/admin/cores/update`);
+  updateTag(cacheTags.colors);
 
   return mapToColorDTO({ data: colorUpdated, withImage: true });
 };

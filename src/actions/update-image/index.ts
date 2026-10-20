@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { mapToImageDTO } from "@/app/data/image/map-to-image-dto";
@@ -11,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { imagesTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const updateImage = async (
   imageId: string,
@@ -34,6 +36,8 @@ export const updateImage = async (
     .returning();
 
   if (!updatedImage) throw new Error("Image not found");
+
+  updateTag(cacheTags.images);
 
   return mapToImageDTO({ image: updatedImage });
 };

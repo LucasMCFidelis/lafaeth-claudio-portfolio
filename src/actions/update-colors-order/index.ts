@@ -1,9 +1,12 @@
 "use server";
 
+import { updateTag } from "next/cache";
+
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import updateDisplayOrderItems from "@/app/data/update-display-order-items";
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { colorizationTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const updateColorsOrder = async (colors: Array<ColorDTO>) => {
   const userIsLogged = await verifyUserLogged();
@@ -13,6 +16,8 @@ export const updateColorsOrder = async (colors: Array<ColorDTO>) => {
     items: colors,
     table: colorizationTable,
   });
+
+  updateTag(cacheTags.colors);
 
   return { success: true };
 };
