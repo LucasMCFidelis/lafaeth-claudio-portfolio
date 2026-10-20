@@ -39,6 +39,7 @@ const SortableItem = <T extends BasicItemToSortable>({
         src={item.imageUrl}
         alt={item.imageUrl}
         fill
+        sizes="(max-width: 768px) 100vw, 33vw"
         className="object-contain object-top"
       />
     </button>

@@ -38,6 +38,7 @@ export function ImageFormField({
             src={image.imageUrl}
             alt="Selected image"
             fill
+            sizes="(max-width: 768px) 100vw, 50vw"
             className="object-contain object-top rounded-lg"
           />
         )}

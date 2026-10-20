@@ -3,6 +3,7 @@
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { colorizationTable } from "@/db/schema";
+import { PRIORITY_ITEMS } from "@/helpers/image-sizes";
 import { useColorsList, useVisibleColors } from "@/hooks/queries/use-colors";
 
 import ColorItem from "./color-item";
@@ -59,7 +60,7 @@ const ColorsGrid = ({ colors, displayButtonOpenModal }: ColorsGridProps) => {
     <div className="w-full max-w-4xl xl:max-w-full mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3 grid-flow-dense">
       {colors
         .filter((color) => color.image)
-        .map((color) => (
+        .map((color, index) => (
           <div
             key={color.id}
             className={color.image!.horizontalPage ? "md:col-span-2" : ""}
@@ -72,6 +73,7 @@ const ColorsGrid = ({ colors, displayButtonOpenModal }: ColorsGridProps) => {
               visibleInColors={color.visibleInColors}
               horizontalPage={color.image!.horizontalPage}
               disableLink={displayButtonOpenModal}
+              priority={index < PRIORITY_ITEMS}
             >
               {displayButtonOpenModal && (
                 <ExpandItemButton

@@ -6,6 +6,12 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   images: {
+    // Google Drive sends no cache headers, so without this the optimizer
+    // fetched the originals again every few hours. There is no way to purge
+    // it: an image replaced in Drive under the same file id can take up to
+    // 31 days to update (a new upload gets a new id and shows right away).
+    minimumCacheTTL: 2678400,
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",

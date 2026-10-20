@@ -3,6 +3,7 @@
 import { IllustrationDTO } from "@/app/data/illustrations/illustration-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { illustrationsTable } from "@/db/schema";
+import { PRIORITY_ITEMS } from "@/helpers/image-sizes";
 import {
   useIllustrationsList,
   useVisibleIllustrations,
@@ -67,7 +68,7 @@ const IllustrationsGrid = ({
     <div className="w-full max-w-4xl xl:max-w-full mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-3 grid-flow-dense">
       {illustrations
         .filter((illustration) => illustration.image)
-        .map((illustration) => (
+        .map((illustration, index) => (
           <div
             key={illustration.id}
             className={
@@ -82,6 +83,7 @@ const IllustrationsGrid = ({
               visibleInIllustrations={illustration.visibleInIllustrations}
               horizontalIllustration={illustration.horizontalIllustration}
               disableLink={displayButtonOpenModal}
+              priority={index < PRIORITY_ITEMS}
             >
               {displayButtonOpenModal && (
                 <ExpandItemButton
