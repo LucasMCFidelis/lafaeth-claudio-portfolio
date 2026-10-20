@@ -1,6 +1,6 @@
 import "server-only";
 
-import { eq } from "drizzle-orm";
+import { and, inArray, sql } from "drizzle-orm";
 import { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
 
 import { db } from "@/db";
@@ -12,6 +12,10 @@ interface UpdateDisplayOrderItemsProps<
   items: Array<T>;
 }
 
+/**
+ * Saves the position of each item as its `index`, in a single statement.
+ * If any id does not exist (or is repeated), nothing is updated and it throws.
+ */
 const updateDisplayOrderItems = async <
   T extends { id: string; index: number | null }
 >({
@@ -27,18 +31,35 @@ const updateDisplayOrderItems = async <
     throw new Error(`Table ${table._.name} must have 'id' and 'index' columns`);
   }
 
-  await db.transaction(async (tx) => {
-    for (const [i, item] of items.entries()) {
-      const updated = await tx
-        .update(table)
-        .set({ index: i })
-        .where(eq(id, item.id))
-        .returning({ id });
-      // Throwing rolls back the whole transaction.
-      if (updated.length === 0)
-        throw new Error(`Item ${item.id} not found in table ${table._.name}`);
-    }
-  });
+  if (items.length === 0) return;
+
+  const ids = items.map((item) => item.id);
+  const newIndex = sql.join(
+    [
+      sql`CASE`,
+      ...items.map((item, i) => sql`WHEN ${id} = ${item.id} THEN ${i}::integer`),
+      sql`END`,
+    ],
+    sql` `
+  );
+
+  const updated = await db
+    .update(table)
+    .set({ index: newIndex })
+    .where(
+      and(
+        inArray(id, ids),
+        // Only update when every id exists, so a bad list changes nothing.
+        sql`(SELECT count(*) FROM ${table} WHERE ${inArray(id, ids)}) = ${ids.length}`
+      )
+    )
+    .returning({ id });
+
+  if (updated.length !== items.length) {
+    throw new Error(
+      `Some items were not found in table ${table._.name}; order not saved`
+    );
+  }
 };
 
 export default updateDisplayOrderItems;
