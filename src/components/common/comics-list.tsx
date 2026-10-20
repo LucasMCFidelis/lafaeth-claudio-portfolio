@@ -2,34 +2,67 @@
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
-import { WhereCondition } from "@/app/data/where-condition";
 import { comicsTable } from "@/db/schema";
+import { useComicsVisible } from "@/hooks/queries/use-comics-visible";
 import { useManyComics } from "@/hooks/queries/use-many-comics";
 
 import ComicItem from "./comic-item";
 import ExpandItemButton from "./expand-item-button";
 
-interface ComicsListProps {
+type ComicsListProps = {
   initialData: Array<ComicDTO>;
-  where?: WhereCondition<typeof comicsTable>;
-  orderBy?: OrderByCondition<typeof comicsTable>;
-  withImage?: boolean;
   displayButtonOpenModal?: boolean;
-}
-const ComicsList = ({
+} & (
+  | { variant: "visible" }
+  | { variant: "all"; orderBy?: OrderByCondition<typeof comicsTable> }
+);
+
+const ComicsList = (props: ComicsListProps) =>
+  props.variant === "visible" ? (
+    <VisibleComicsList {...props} />
+  ) : (
+    <AllComicsList {...props} />
+  );
+
+const VisibleComicsList = ({
   initialData,
-  where,
-  orderBy,
-  withImage,
   displayButtonOpenModal,
+}: ComicsListProps) => {
+  const { data: comics = [] } = useComicsVisible({ initialData });
+
+  return (
+    <ComicsGrid
+      comics={comics}
+      displayButtonOpenModal={displayButtonOpenModal}
+    />
+  );
+};
+
+const AllComicsList = ({
+  initialData,
+  displayButtonOpenModal,
+  ...props
 }: ComicsListProps) => {
   const { data: comics = [] } = useManyComics({
     params: { initialData },
-    where,
-    orderBy,
-    withImage,
+    orderBy: props.variant === "all" ? props.orderBy : undefined,
+    withImage: true,
   });
 
+  return (
+    <ComicsGrid
+      comics={comics}
+      displayButtonOpenModal={displayButtonOpenModal}
+    />
+  );
+};
+
+interface ComicsGridProps {
+  comics: Array<ComicDTO<boolean>>;
+  displayButtonOpenModal?: boolean;
+}
+
+const ComicsGrid = ({ comics, displayButtonOpenModal }: ComicsGridProps) => {
   return (
     <>
       {comics.length > 0 ? (

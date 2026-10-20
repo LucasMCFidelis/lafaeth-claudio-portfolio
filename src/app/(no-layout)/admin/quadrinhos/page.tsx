@@ -3,12 +3,15 @@ import { Suspense } from "react";
 
 import getManyComics from "@/app/data/comics/get-many-comics";
 import { displayOrder } from "@/app/data/order-by-condition";
+import requireAdmin from "@/app/data/user/require-admin";
 import ComicsList from "@/components/common/comics-list";
 import { Button } from "@/components/ui/button";
 
 import SortableComics from "../components/sortable-items/sortable-comics";
 
 const ComicsAdminPage = async () => {
+  await requireAdmin();
+
   const comics = await getManyComics({
     orderBy: displayOrder,
     withImage: true,
@@ -28,9 +31,10 @@ const ComicsAdminPage = async () => {
         />
         <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
           <ComicsList
+            variant="all"
+            orderBy={displayOrder}
             displayButtonOpenModal
             initialData={comics}
-            withImage={true}
           />
         </div>
       </div>

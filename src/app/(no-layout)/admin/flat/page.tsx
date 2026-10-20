@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { getFlatsVisible } from "@/actions/get-flats-visible";
-import { getFlats } from "@/actions/get-many-flats";
-import { OrderByCondition } from "@/app/data/order-by-condition";
+import getManyFlats from "@/app/data/flat/get-many-flats";
+import { displayOrder, OrderByCondition } from "@/app/data/order-by-condition";
+import requireAdmin from "@/app/data/user/require-admin";
 import FlatList from "@/components/common/flat-list";
 import { Button } from "@/components/ui/button";
 import { flatTable } from "@/db/schema";
@@ -11,13 +11,19 @@ import { flatTable } from "@/db/schema";
 import SortableFlats from "../components/sortable-items/sortable-flats";
 
 const FlatsPage = async () => {
+  await requireAdmin();
+
   const orderBy: OrderByCondition<typeof flatTable> = {
     field: "visibleInFlat",
     type: "desc",
   };
-  const [flats, allFlats] = await Promise.all([
-    getFlatsVisible(),
-    getFlats({ orderBy }),
+  const [visibleFlats, allFlats] = await Promise.all([
+    getManyFlats({
+      where: { field: "visibleInFlat", value: true },
+      orderBy: displayOrder,
+      withImages: true,
+    }),
+    getManyFlats({ orderBy, withImages: true }),
   ]);
 
   return (
@@ -29,12 +35,13 @@ const FlatsPage = async () => {
       </Link>
 
       <div className="flex-1 max-w-full grid md:grid-cols-[20%_1fr] gap-6 mt-12">
-        <SortableFlats initialData={flats} />
+        <SortableFlats initialData={visibleFlats} />
         <FlatList
+          variant="all"
+          orderBy={orderBy}
           initialData={allFlats}
           maxSizeItemsMd={true}
           displayButtonOpenModal={true}
-          orderBy={orderBy}
         />
       </div>
     </Suspense>

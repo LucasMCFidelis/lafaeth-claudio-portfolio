@@ -1,10 +1,7 @@
 import { Metadata } from "next";
 
-import getManyComics from "@/app/data/comics/get-many-comics";
-import { displayOrder } from "@/app/data/order-by-condition";
-import { WhereCondition } from "@/app/data/where-condition";
+import { getVisibleComics } from "@/actions/get-visible-comics";
 import ComicsList from "@/components/common/comics-list";
-import { comicsTable } from "@/db/schema";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Quadrinhos",
@@ -13,25 +10,12 @@ export const metadata: Metadata = {
 };
 
 const ComicsPage = async () => {
-  const where: WhereCondition<typeof comicsTable> = {
-    field: "visibleInComics",
-    value: true,
-  };
-  const comics = await getManyComics({
-    where,
-    orderBy: displayOrder,
-    withImage: true,
-  });
+  const comics = await getVisibleComics();
 
   return (
     <div className="px-5 flex-1 flex flex-col">
       <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-        <ComicsList
-          initialData={comics}
-          where={where}
-          orderBy={displayOrder}
-          withImage={true}
-        />
+        <ComicsList variant="visible" initialData={comics} />
       </div>
     </div>
   );

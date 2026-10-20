@@ -2,36 +2,79 @@
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
-import { WhereCondition } from "@/app/data/where-condition";
 import { flatTable } from "@/db/schema";
+import { useFlatsVisible } from "@/hooks/queries/use-flats-visible";
 import { useManyFlats } from "@/hooks/queries/use-many-flats";
 
 import ExpandItemButton from "./expand-item-button";
 import FlatItem from "./flat-item";
 
-interface FlatListProps {
+type FlatListProps = {
   initialData: Array<FlatDTO>;
   maxSizeItemsMd?: boolean;
   displayButtonOpenModal?: boolean;
-  where?: WhereCondition<typeof flatTable>;
-  orderBy?: OrderByCondition<typeof flatTable>;
-}
+} & (
+  | { variant: "visible" }
+  | { variant: "all"; orderBy?: OrderByCondition<typeof flatTable> }
+);
 
-const FlatList = ({
+const FlatList = (props: FlatListProps) =>
+  props.variant === "visible" ? (
+    <VisibleFlatList {...props} />
+  ) : (
+    <AllFlatList {...props} />
+  );
+
+const VisibleFlatList = ({
   initialData,
   maxSizeItemsMd,
   displayButtonOpenModal,
-  where,
-  orderBy,
 }: FlatListProps) => {
-  const { data: flats } = useManyFlats({
-    where,
-    orderBy,
+  const { data: flats = [] } = useFlatsVisible({ initialData });
+
+  return (
+    <FlatGrid
+      flats={flats}
+      maxSizeItemsMd={maxSizeItemsMd}
+      displayButtonOpenModal={displayButtonOpenModal}
+    />
+  );
+};
+
+const AllFlatList = ({
+  initialData,
+  maxSizeItemsMd,
+  displayButtonOpenModal,
+  ...props
+}: FlatListProps) => {
+  const { data: flats = [] } = useManyFlats({
+    orderBy: props.variant === "all" ? props.orderBy : undefined,
     params: { initialData },
   });
+
+  return (
+    <FlatGrid
+      flats={flats}
+      maxSizeItemsMd={maxSizeItemsMd}
+      displayButtonOpenModal={displayButtonOpenModal}
+    />
+  );
+};
+
+interface FlatGridProps {
+  flats: Array<FlatDTO>;
+  maxSizeItemsMd?: boolean;
+  displayButtonOpenModal?: boolean;
+}
+
+const FlatGrid = ({
+  flats,
+  maxSizeItemsMd,
+  displayButtonOpenModal,
+}: FlatGridProps) => {
   return (
     <>
-      {flats && flats.length > 0 ? (
+      {flats.length > 0 ? (
         <div className="flex-1 flex flex-col gap-5 sm:gap-10 items-center">
           {flats.map((flat) => {
             const screenwriter =

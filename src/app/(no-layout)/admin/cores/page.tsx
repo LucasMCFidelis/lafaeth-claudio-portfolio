@@ -3,12 +3,15 @@ import { Suspense } from "react";
 
 import getManyColors from "@/app/data/colorization/get-many-colors";
 import { displayOrder } from "@/app/data/order-by-condition";
+import requireAdmin from "@/app/data/user/require-admin";
 import ColorsList from "@/components/common/colors-list";
 import { Button } from "@/components/ui/button";
 
 import SortableColors from "../components/sortable-items/sortable-colors";
 
 const ColorsAdminPage = async () => {
+  await requireAdmin();
+
   const colors = await getManyColors({
     orderBy: displayOrder,
     withImage: true,
@@ -29,9 +32,10 @@ const ColorsAdminPage = async () => {
           />
         </Suspense>
         <ColorsList
+          variant="all"
+          orderBy={displayOrder}
           displayButtonOpenModal
           initialData={colors}
-          withImage={true}
         />
       </div>
     </>

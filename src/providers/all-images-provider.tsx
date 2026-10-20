@@ -12,6 +12,8 @@ interface AllImagesContextProps {
 interface AllImagesProviderProps {
   children: ReactNode;
   initialImages: Array<ImageDTO>;
+  /** False on pages without a session (the login page), where the fetch would fail. */
+  enabled?: boolean;
 }
 
 const AllImagesContext = createContext({} as AllImagesContextProps);
@@ -19,10 +21,12 @@ const AllImagesContext = createContext({} as AllImagesContextProps);
 export const AllImagesProvider = ({
   children,
   initialImages,
+  enabled = true,
 }: AllImagesProviderProps) => {
-  const { data: images } = useAllImages(
-    initialImages && { initialData: initialImages }
-  );
+  const { data: images } = useAllImages({
+    initialData: initialImages,
+    enabled,
+  });
 
   const imagesMemo = useMemo(
     () => images ?? initialImages ?? [],
