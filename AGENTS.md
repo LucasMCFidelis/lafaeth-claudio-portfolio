@@ -77,6 +77,11 @@ Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente)
 - **Banco de dados:** mudanças no schema são aplicadas com `npx drizzle-kit push`, rodado pelo dono do projeto. Não usar `drizzle-kit generate`/`migrate` e não criar a pasta `drizzle/`.
 - `src/components/ui/*` é código gerado pelo shadcn: editar só o mínimo necessário.
 - Imagens remotas vêm do Google Drive (`next.config.ts` → `images.remotePatterns`); usar `next/image`. Toda `<Image fill>` recebe `sizes` (padrões em `src/helpers/image-sizes.ts`) e só as imagens da primeira dobra usam `imageLoadingProps(true)` (`loading="eager"` + `fetchPriority="high"`).
+- Animações (sem biblioteca; CSS em `globals.css`, todas desligadas com `prefers-reduced-motion`):
+  - Imagens de conteúdo usam `FadeImage` (`src/components/common/fade-image.tsx`): shimmer enquanto carrega e fade-in.
+  - Cards de grade usam `staggerClassName` + `staggerStyle(index)` (`src/helpers/stagger.ts`) para entrar em sequência.
+  - Seções com dados usam `<AnimatedSuspense fallback={<GridSkeleton />}>` em vez de `<Suspense>`; páginas públicas ficam dentro de `<PageTransition>` (no `page.tsx`, não no layout).
+  - Miniatura e imagem da galeria compartilham `<ArtworkTransition imageId>`; o nome precisa ser único na página (não usar nas listas do admin).
 - Telas de toque não têm hover: o que aparece no hover precisa da variante `touch:` (`@media (hover: none)`, definida em `globals.css`).
 
 ## Convenções
