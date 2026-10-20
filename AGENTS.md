@@ -62,6 +62,31 @@ Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente)
 - Imports ordenados pelo `simple-import-sort` (`npm run lint -- --fix` corrige).
 - Commits em inglês no padrão conventional commits: `feat:`, `fix:`, `chore:`, `style:`, `docs:`, `refactor:`.
 
+## Fluxo de trabalho (git flow)
+
+O projeto segue o git flow, com duas branches permanentes:
+
+- `main`: código em produção. Só recebe merge de `release/*` e `hotfix/*`, sempre com tag de versão.
+- `develop`: integração do que está em desenvolvimento. É a base de todo trabalho novo.
+
+Branches de apoio, sempre em kebab-case e com o prefixo do tipo:
+
+| Prefixo | Sai de | Volta para | Uso |
+| --- | --- | --- | --- |
+| `feature/<nome>` | `develop` | `develop` | Funcionalidade nova, refatoração, estilo, dependências, docs |
+| `bugfix/<nome>` | `develop` | `develop` | Correção de bug ainda não publicado |
+| `release/<versão>` | `develop` | `main` e `develop` | Preparar uma publicação (ajustes finais e versão) |
+| `hotfix/<nome>` | `main` | `main` e `develop` | Correção urgente em produção |
+
+Regras:
+
+- Nunca commitar direto em `main` nem em `develop`: criar a branch de apoio a partir da `develop` (ou da `main`, no caso de `hotfix`).
+- Uma branch por assunto. Misturar tarefas diferentes na mesma branch dificulta revisar e desfazer.
+- Merge na `develop` por pull request, com **`--base develop`** (o padrão do GitHub neste repositório é a `main`) e merge commit (`--no-ff`) para preservar o histórico da branch.
+- O tipo do commit (`feat:`, `fix:`, `chore:`...) segue o conventional commits, independente do prefixo da branch. Ex.: `feature/upgrade-next-16` pode ter commits `chore:` e `fix:`.
+- Antes de abrir o PR, a branch deve passar em `npm run typecheck` e `npm run lint`.
+- O agente não faz push, não faz merge em `main`/`develop` e não cria tags sem o pedido explícito do dono do projeto.
+
 ## Estado atual
 
-- As páginas "Ilustrações" e "Portfólio" ainda não existem; os links estão comentados em `src/components/common/menu-items-list.tsx`.
+- Páginas em andamento ficam com o link comentado em `src/components/common/menu-items-list.tsx`. Confira esse arquivo na branch atual: o conteúdo muda entre `main` e `develop`.
