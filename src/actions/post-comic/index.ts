@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
 import mapToComicDTO from "@/app/data/comics/map-to-comic";
@@ -11,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { comicsTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const postComic = async (data: CadastreComicDTO): Promise<ComicDTO> => {
   const dataValidated = cadastreComicSchema.parse(data);
@@ -32,6 +34,8 @@ export const postComic = async (data: CadastreComicDTO): Promise<ComicDTO> => {
     .insert(comicsTable)
     .values(dataValidated)
     .returning();
+
+  updateTag(cacheTags.comics);
 
   return mapToComicDTO({ data: newComic, withImage: true });
 };

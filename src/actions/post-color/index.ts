@@ -1,6 +1,7 @@
 "use server";
 
 import { eq } from "drizzle-orm";
+import { updateTag } from "next/cache";
 
 import { ColorDTO } from "@/app/data/colorization/colors-dto";
 import mapToColorDTO from "@/app/data/colorization/map-to-color";
@@ -11,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { colorizationTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const postColor = async (data: CadastreColorDTO): Promise<ColorDTO> => {
   const dataValidated = cadastreColorSchema.parse(data);
@@ -32,6 +34,8 @@ export const postColor = async (data: CadastreColorDTO): Promise<ColorDTO> => {
     .insert(colorizationTable)
     .values(dataValidated)
     .returning();
+
+  updateTag(cacheTags.colors);
 
   return mapToColorDTO({ data: newColor, withImage: true });
 };

@@ -1,24 +1,42 @@
 import { Suspense } from "react";
 
 import getOneColorById from "@/app/data/colorization/get-one-color-by-id";
-import requireAdmin from "@/app/data/user/require-admin";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import { colorsQueries } from "@/queries/colors";
 
+import AdminOnly from "../../components/admin-only";
 import UpdateColorForm from "../components/update-color-form";
 
-const UpdateColorPage = async ({
-  searchParams,
-}: {
-  searchParams: Promise<{ colorId: string }>;
-}) => {
-  await requireAdmin();
+type SearchParams = Promise<{ colorId: string }>;
 
-  const { colorId } = await searchParams;
-  const colorInitialData = await getOneColorById({ colorId });
-
+const UpdateColorPage = ({ searchParams }: { searchParams: SearchParams }) => {
   return (
     <Suspense fallback={<p>Carregando formulário</p>}>
-      <UpdateColorForm initialData={colorInitialData} />;
+      <AdminOnly>
+        <UpdateColorContent searchParams={searchParams} />
+      </AdminOnly>
     </Suspense>
+  );
+};
+
+const UpdateColorContent = async ({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) => {
+  const { colorId } = await searchParams;
+
+  return (
+    <PrefetchBoundary
+      queries={[
+        {
+          queryKey: colorsQueries.keys.detail(colorId),
+          fetcher: () => getOneColorById({ colorId }),
+        },
+      ]}
+    >
+      <UpdateColorForm colorId={colorId} />
+    </PrefetchBoundary>
   );
 };
 

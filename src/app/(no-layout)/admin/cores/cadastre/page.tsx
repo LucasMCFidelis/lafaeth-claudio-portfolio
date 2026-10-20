@@ -1,15 +1,14 @@
 import { Suspense } from "react";
 
-import requireAdmin from "@/app/data/user/require-admin";
-
+import AdminOnly from "../../components/admin-only";
 import CadastreColorForm from "../components/cadastre-color-form";
 
-const CadastreColorPage = async () => {
-  await requireAdmin();
-
+const CadastreColorPage = () => {
   return (
     <Suspense fallback={<p>Carregando formulário</p>}>
-      <CadastreColorForm />;
+      <AdminOnly>
+        <CadastreColorForm />
+      </AdminOnly>
     </Suspense>
   );
 };

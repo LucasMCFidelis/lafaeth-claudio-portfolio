@@ -1,5 +1,7 @@
 "use server";
 
+import { updateTag } from "next/cache";
+
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { mapToImageDTO } from "@/app/data/image/map-to-image-dto";
 import {
@@ -9,6 +11,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { imagesTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const postImage = async (data: CadastreImageDTO): Promise<ImageDTO> => {
   const dataValidated = cadastreImageSchema.parse(data);
@@ -29,6 +32,8 @@ export const postImage = async (data: CadastreImageDTO): Promise<ImageDTO> => {
       horizontalPage: dataValidated.horizontalPage
     })
     .returning();
+
+  updateTag(cacheTags.images);
 
   return mapToImageDTO({ image: imageCreated });
 };

@@ -1,25 +1,42 @@
 import { Suspense } from "react";
 
 import { getFlat } from "@/actions/get-flat";
-import requireAdmin from "@/app/data/user/require-admin";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import { flatsQueries } from "@/queries/flats";
 
+import AdminOnly from "../../components/admin-only";
 import UpdateFlatForm from "../components/update-flat-form";
 
-const UpdateFlatPage = async ({
-  searchParams,
-}: {
-  searchParams: Promise<{ flatId: string }>;
-}) => {
-  await requireAdmin();
+type SearchParams = Promise<{ flatId: string }>;
 
-  const { flatId } = await searchParams;
-
-  const flat = await getFlat({ flatId });
-
+const UpdateFlatPage = ({ searchParams }: { searchParams: SearchParams }) => {
   return (
     <Suspense fallback={<p>Carregando formulário</p>}>
-      <UpdateFlatForm initialData={flat} />
+      <AdminOnly>
+        <UpdateFlatContent searchParams={searchParams} />
+      </AdminOnly>
     </Suspense>
+  );
+};
+
+const UpdateFlatContent = async ({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) => {
+  const { flatId } = await searchParams;
+
+  return (
+    <PrefetchBoundary
+      queries={[
+        {
+          queryKey: flatsQueries.keys.detail(flatId),
+          fetcher: () => getFlat({ flatId }),
+        },
+      ]}
+    >
+      <UpdateFlatForm flatId={flatId} />
+    </PrefetchBoundary>
   );
 };
 

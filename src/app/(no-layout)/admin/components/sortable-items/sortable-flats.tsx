@@ -4,25 +4,18 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { toast } from "sonner";
 
-import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { Button } from "@/components/ui/button";
 import { useUpdateFlatsOrder } from "@/hooks/mutations/use-update-flats-order";
-import {
-  getFlatsVisibleQueryKey,
-  useFlatsVisible,
-} from "@/hooks/queries/use-flats-visible";
+import { useVisibleFlats } from "@/hooks/queries/use-flats";
+import { flatsQueries } from "@/queries/flats";
 
 import SortableItem from "./sortable-item";
 import SortableRootList, {
   getSortingIsDisabledQueryStateParams,
 } from "./sortable-root-list";
 
-interface SortableFlatsProps {
-  initialData?: Array<FlatDTO>;
-}
-
-const SortableFlats = ({ initialData }: SortableFlatsProps) => {
-  const { data: flats = [] } = useFlatsVisible(initialData && { initialData });
+const SortableFlats = () => {
+  const { data: flats } = useVisibleFlats();
   const updateFlatsOrderMutation = useUpdateFlatsOrder();
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
     ...getSortingIsDisabledQueryStateParams()
@@ -46,7 +39,7 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
             setSortingIsDisabled((prev) => !prev);
             if (!sortingIsDisabled) {
               queryClient.invalidateQueries({
-                queryKey: getFlatsVisibleQueryKey(),
+                queryKey: flatsQueries.keys.visible(),
               });
             }
           }}
@@ -78,7 +71,7 @@ const SortableFlats = ({ initialData }: SortableFlatsProps) => {
       </div>
       <SortableRootList
         items={sortableFlats}
-        getQueryKeyFunction={getFlatsVisibleQueryKey}
+        getQueryKeyFunction={flatsQueries.keys.visible}
         className={`max-w-full ${sortingIsDisabled && "hidden"} md:block`}
       >
         {sortableFlats.map((item) => (

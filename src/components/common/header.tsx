@@ -1,15 +1,13 @@
 import Link from "next/link";
-
-import verifyUserLogged from "@/app/data/user/verify-user";
+import { Suspense } from "react";
 
 import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
 import SheetMenu from "./sheet-menu";
+import ShowWhenLogged from "./show-when-logged";
 import ToggleTheme from "./toggle-theme";
 
-const Header = async () => {
-  const userLogged = await verifyUserLogged();
-
+const Header = () => {
   return (
     <>
       <header className="w-full p-5 flex justify-between items-center">
@@ -18,13 +16,19 @@ const Header = async () => {
         </Link>
         <nav className="gap-4 hidden lg:flex font-semibold items-baseline">
           <MenuItemsList />
-          {userLogged && (
-            <Link key={"/admin"} className="px-4" href={"/admin"}>
-              Administração
-            </Link>
-          )}
+          <Suspense fallback={null}>
+            <ShowWhenLogged>
+              <Link key={"/admin"} className="px-4" href={"/admin"}>
+                Administração
+              </Link>
+            </ShowWhenLogged>
+          </Suspense>
           <ToggleTheme />
-          {userLogged && <LogoutButton />}
+          <Suspense fallback={null}>
+            <ShowWhenLogged>
+              <LogoutButton />
+            </ShowWhenLogged>
+          </Suspense>
         </nav>
 
         <nav className="flex gap-4 lg:hidden">

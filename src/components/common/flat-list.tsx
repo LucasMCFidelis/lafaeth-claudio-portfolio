@@ -3,14 +3,12 @@
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { flatTable } from "@/db/schema";
-import { useFlatsVisible } from "@/hooks/queries/use-flats-visible";
-import { useManyFlats } from "@/hooks/queries/use-many-flats";
+import { useFlatsList, useVisibleFlats } from "@/hooks/queries/use-flats";
 
 import ExpandItemButton from "./expand-item-button";
 import FlatItem from "./flat-item";
 
 type FlatListProps = {
-  initialData: Array<FlatDTO>;
   maxSizeItemsMd?: boolean;
   displayButtonOpenModal?: boolean;
 } & (
@@ -26,11 +24,10 @@ const FlatList = (props: FlatListProps) =>
   );
 
 const VisibleFlatList = ({
-  initialData,
   maxSizeItemsMd,
   displayButtonOpenModal,
 }: FlatListProps) => {
-  const { data: flats = [] } = useFlatsVisible({ initialData });
+  const { data: flats } = useVisibleFlats();
 
   return (
     <FlatGrid
@@ -42,14 +39,12 @@ const VisibleFlatList = ({
 };
 
 const AllFlatList = ({
-  initialData,
   maxSizeItemsMd,
   displayButtonOpenModal,
   ...props
 }: FlatListProps) => {
-  const { data: flats = [] } = useManyFlats({
+  const { data: flats } = useFlatsList({
     orderBy: props.variant === "all" ? props.orderBy : undefined,
-    params: { initialData },
   });
 
   return (

@@ -4,13 +4,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useQueryState } from "nuqs";
 import { toast } from "sonner";
 
-import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
 import { useUpdateHomeImagesOrder } from "@/hooks/mutations/use-update-home-images-order";
-import {
-  getHomeImagesQueryKey,
-  useHomeImages,
-} from "@/hooks/queries/use-home-images";
+import { useHomeImages } from "@/hooks/queries/use-images";
+import { imagesQueries } from "@/queries/images";
 
 import CadastreImageModal from "../cadastre-image-modal";
 import SortableItem from "./sortable-item";
@@ -18,14 +15,8 @@ import SortableRootList, {
   getSortingIsDisabledQueryStateParams,
 } from "./sortable-root-list";
 
-interface SortableImagesHomeProps {
-  initialData?: Array<ImageDTO>;
-}
-
-const SortableImagesHome = ({ initialData }: SortableImagesHomeProps) => {
-  const { data: imagesHome = [] } = useHomeImages(
-    initialData && { initialData }
-  );
+const SortableImagesHome = () => {
+  const { data: imagesHome } = useHomeImages();
   const queryClient = useQueryClient();
   const updateHomeImagesOrderMutation = useUpdateHomeImagesOrder();
 
@@ -39,7 +30,7 @@ const SortableImagesHome = ({ initialData }: SortableImagesHomeProps) => {
     <>
       <SortableRootList
         items={imagesHome}
-        getQueryKeyFunction={getHomeImagesQueryKey}
+        getQueryKeyFunction={imagesQueries.keys.home}
         className="grid md:grid-cols-2 lg:grid-cols-3"
       >
         {imagesHome.map((item) => (
@@ -57,7 +48,7 @@ const SortableImagesHome = ({ initialData }: SortableImagesHomeProps) => {
             setSortingIsDisabled((prev) => !prev);
             if (!sortingIsDisabled) {
               queryClient.invalidateQueries({
-                queryKey: getHomeImagesQueryKey(),
+                queryKey: imagesQueries.keys.home(),
               });
             }
           }}

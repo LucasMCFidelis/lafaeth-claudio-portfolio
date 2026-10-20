@@ -3,14 +3,15 @@
 import { IllustrationDTO } from "@/app/data/illustrations/illustration-dto";
 import { OrderByCondition } from "@/app/data/order-by-condition";
 import { illustrationsTable } from "@/db/schema";
-import { useIllustrationsVisible } from "@/hooks/queries/use-illustrations-visible";
-import { useManyIllustrations } from "@/hooks/queries/use-many-illustrations";
+import {
+  useIllustrationsList,
+  useVisibleIllustrations,
+} from "@/hooks/queries/use-illustrations";
 
 import ExpandItemButton from "./expand-item-button";
 import IllustrationItem from "./illustration-item";
 
 type IllustrationsListProps = {
-  initialData: Array<IllustrationDTO<true>>;
   displayButtonOpenModal?: boolean;
 } & (
   | { variant: "visible" }
@@ -25,12 +26,9 @@ const IllustrationsList = (props: IllustrationsListProps) =>
   );
 
 const VisibleIllustrationsList = ({
-  initialData,
   displayButtonOpenModal,
 }: IllustrationsListProps) => {
-  const { data: illustrations = [] } = useIllustrationsVisible({
-    initialData,
-  });
+  const { data: illustrations } = useVisibleIllustrations();
 
   return (
     <IllustrationsGrid
@@ -41,14 +39,11 @@ const VisibleIllustrationsList = ({
 };
 
 const AllIllustrationsList = ({
-  initialData,
   displayButtonOpenModal,
   ...props
 }: IllustrationsListProps) => {
-  const { data: illustrations = [] } = useManyIllustrations({
+  const { data: illustrations } = useIllustrationsList({
     orderBy: props.variant === "all" ? props.orderBy : undefined,
-    withImage: true,
-    params: { initialData },
   });
 
   return (

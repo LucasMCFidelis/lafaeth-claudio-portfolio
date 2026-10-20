@@ -2,21 +2,18 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import getManyIllustrations from "@/app/data/illustrations/get-many-illustration";
+import getVisibleIllustrationsCached from "@/app/data/illustrations/get-visible-illustrations";
 import { displayOrder } from "@/app/data/order-by-condition";
-import requireAdmin from "@/app/data/user/require-admin";
+import GridSkeleton from "@/components/common/grid-skeleton";
 import IllustrationsList from "@/components/common/illustrations-list";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
 import { Button } from "@/components/ui/button";
+import { illustrationsQueries } from "@/queries/illustrations";
 
+import AdminOnly from "../components/admin-only";
 import SortableIllustrations from "../components/sortable-items/sortable-illustrations";
 
-const IllustrationsAdminPage = async () => {
-  await requireAdmin();
-
-  const illustrations = await getManyIllustrations({
-    orderBy: displayOrder,
-    withImage: true,
-  });
-
+const IllustrationsAdminPage = () => {
   return (
     <>
       <Link href={"/admin/ilustracoes/cadastre"}>
@@ -26,19 +23,35 @@ const IllustrationsAdminPage = async () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <Suspense fallback={<>...</>}>
-          <SortableIllustrations
-            initialData={illustrations.filter(
-              (illustration) => illustration.visibleInIllustrations
-            )}
-          />
+        <Suspense fallback={<GridSkeleton />}>
+          <AdminOnly>
+            <PrefetchBoundary
+              queries={[
+                {
+                  queryKey: illustrationsQueries.keys.visible(),
+                  fetcher: getVisibleIllustrationsCached,
+                },
+                {
+                  queryKey: illustrationsQueries.keys.list({
+                    orderBy: displayOrder,
+                  }),
+                  fetcher: () =>
+                    getManyIllustrations({
+                      orderBy: displayOrder,
+                      withImage: true,
+                    }),
+                },
+              ]}
+            >
+              <SortableIllustrations />
+              <IllustrationsList
+                variant="all"
+                orderBy={displayOrder}
+                displayButtonOpenModal
+              />
+            </PrefetchBoundary>
+          </AdminOnly>
         </Suspense>
-        <IllustrationsList
-          variant="all"
-          orderBy={displayOrder}
-          displayButtonOpenModal
-          initialData={illustrations}
-        />
       </div>
     </>
   );

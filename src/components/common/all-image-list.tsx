@@ -6,8 +6,8 @@ import { parseAsBoolean, parseAsString, useQueryStates } from "nuqs";
 import CadastreImageModal from "@/app/(no-layout)/admin/components/cadastre-image-modal";
 import DetailImageModal from "@/app/(no-layout)/admin/components/detail-image-modal";
 import { ImageDTO } from "@/app/data/image/image-dto";
+import { useAllImages } from "@/hooks/queries/use-images";
 import { cn } from "@/lib/utils";
-import { useAllImagesContext } from "@/providers/all-images-provider";
 
 import ExpandItemButton from "./expand-item-button";
 
@@ -16,8 +16,8 @@ interface AllImageListProps {
 }
 
 const AllImageList = ({ actionOnClick }: AllImageListProps) => {
-  const { images } = useAllImagesContext();
-  
+  const { data: images, isPending } = useAllImages();
+
   const [{ imageId: imageSelected }, setStates] = useQueryStates({
     imageId: parseAsString,
     openDetailImage: parseAsBoolean.withDefault(false),
@@ -26,7 +26,9 @@ const AllImageList = ({ actionOnClick }: AllImageListProps) => {
   return (
     <>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-2">
-        {images && images.length > 0 ? (
+        {isPending ? (
+          <p className="col-span-full text-center">Carregando imagens...</p>
+        ) : images && images.length > 0 ? (
           images.map((image) => (
             <div
               key={image.id}

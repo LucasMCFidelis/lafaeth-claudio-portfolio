@@ -12,7 +12,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Portfólio do designer, ilustrador e quadrinista Lafaeth Claudio, com painel administrativo para o dono gerenciar o conteúdo.
 
-- **Área pública** (`src/app/(layout)`): `/` (sobre + imagens em destaque), `/cores`, `/flat`, `/quadrinhos`.
+- **Área pública** (`src/app/(layout)`): `/` (sobre + imagens em destaque), `/cores`, `/flat`, `/quadrinhos`, `/ilustracoes`.
 - **Galeria** (`src/app/(no-layout)/gallery`): visualização das imagens em tela cheia.
 - **Admin** (`src/app/(no-layout)/admin`): login em `/admin/auth`; cadastro, edição e ordenação (drag and drop) de imagens, cores, flats e quadrinhos; edição do perfil.
 
@@ -36,21 +36,44 @@ Cada recurso (cores, quadrinhos, flats, imagens, usuário) segue as mesmas camad
 1. **Schema**: `src/db/schema.ts` (`colorizationTable`). Conexão em `src/db/index.ts`.
 2. **Dados** (só servidor): `src/app/data/colorization/`
    - `get-many-colors.ts`, `get-one-color.ts`: consultas Drizzle com `import "server-only"`
+   - `get-visible-colors.ts`: leitura pública em cache (`"use cache"` + `cacheLife` + `cacheTag`), só os itens visíveis na ordem salva (`displayOrder`)
    - `colors-dto.ts` + `map-to-color.ts`: converte a linha do banco no DTO exposto ao resto do app
-   - Helpers comuns: `where-condition.ts`, `order-by-condition.ts`, `update-display-order-items.ts`
+   - Helpers comuns: `where-condition.ts`, `order-by-condition.ts` (tipos, seguros para o cliente), `query-builders.ts` (`buildWhere`/`buildOrderBy`, só servidor), `update-display-order-items.ts`
 3. **Validação**: `src/app/data/schemas/cadastre-color-schema.ts`, `update-color-schema.ts` (Zod)
-4. **Server Actions**: `src/actions/<verbo>-<entidade>/index.ts` com `"use server"` (ex.: `post-color`, `update-color`, `update-colors-order`, `get-colors`)
-5. **Hooks cliente**: `src/hooks/queries/use-*.ts` e `src/hooks/mutations/use-*.ts` (React Query), cada um exportando sua função `get*QueryKey`
-6. **UI**: páginas em `src/app/**/page.tsx` (Server Components que buscam os dados iniciais), componentes de rota em `src/app/**/components/`, compartilhados em `src/components/common/`, primitivas shadcn em `src/components/ui/`
+4. **Server Actions**: `src/actions/<verbo>-<entidade>/index.ts` com `"use server"` (ex.: `post-color`, `update-color`, `update-colors-order`). Leitura pública: `get-visible-colors` (filtro fixo, sem parâmetros). Leitura de admin: `get-colors`, `get-color` (exigem login).
+5. **Contratos de query**: `src/queries/<entidade>.ts` (ex.: `colorsQueries`) com as keys hierárquicas (`["colors"]`, `["colors", "visible"]`, `["colors", "list", filtros]`, `["colors", "detail", id]`) e os `queryOptions`. Sem diretiva e sem imports `server-only`, para servidor e cliente usarem a mesma identidade. Tags de cache do servidor em `src/queries/tags.ts`.
+6. **Hooks cliente**: `src/hooks/queries/use-<entidades>.ts` (finos, `useSuspenseQuery(colorsQueries.visible())`) e `src/hooks/mutations/use-*.ts`, que invalidam a key raiz da entidade no `onSuccess`.
+7. **UI**: páginas em `src/app/**/page.tsx` (Server Components), componentes de rota em `src/app/**/components/`, compartilhados em `src/components/common/`, primitivas shadcn em `src/components/ui/`
+
+### Carregamento de dados (Cache Components)
+
+`cacheComponents` está ativo no `next.config.ts`. A página entrega os dados ao React Query com o `PrefetchBoundary` (`src/components/common/prefetch-boundary.tsx`), sempre dentro de `<Suspense>`:
+
+```tsx
+<Suspense fallback={<GridSkeleton />}>
+  <PrefetchBoundary
+    tags={[cacheTags.colors, cacheTags.images]} // só quando os fetchers são "use cache"
+    queries={[{ queryKey: colorsQueries.keys.visible(), fetcher: getVisibleColorsCached }]}
+  >
+    <ColorsList variant="visible" />
+  </PrefetchBoundary>
+</Suspense>
+```
+
+- Páginas públicas usam leituras em cache e passam `tags`; assim entram no shell estático e o cliente não refaz a busca.
+- Páginas do admin envolvem o conteúdo em `<AdminOnly>` (checa a sessão) e não passam `tags` (dados lidos na hora).
+- Ler sessão, `headers()`, `cookies()` ou `searchParams` só dentro de `<Suspense>` (ex.: `ShowWhenLogged` no Header). Fora disso o Next acusa "blocking route" (ver `get_errors` do MCP).
 
 Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente), rota `src/app/api/auth/[...all]/route.ts`. O `src/proxy.ts` (antigo middleware) redireciona `/admin` para o login quando não há cookie de sessão.
 
 ## Regras
 
 - **Toda Server Action que altera dados** valida a entrada com o schema Zod **e** chama `verifyUserLogged()` (`src/app/data/user/verify-user.ts`) antes de tocar no banco. Server Actions são endpoints públicos; o proxy só checa se o cookie existe, então não serve como proteção.
-- Páginas do admin também chamam `verifyUserLogged()` e redirecionam para `/admin/auth`.
+- Toda Server Action de **leitura** que aceita filtros ou devolve itens ocultos também chama `verifyUserLogged()`. Leituras públicas têm filtro fixo.
+- Páginas do admin envolvem o conteúdo em `<AdminOnly>` (`src/app/(no-layout)/admin/components/admin-only.tsx`), que chama `requireAdmin()` e redireciona para `/admin/auth`.
+- **Toda Server Action que altera dados** chama `updateTag(cacheTags.<entidade>)` antes de retornar; ações sobre imagens usam `cacheTags.images` (todas as listas públicas também têm essa tag).
 - Componentes cliente nunca importam `@/db` nem `src/app/data/*` com acesso ao banco; usam actions e DTOs.
-- Query keys são únicas por entidade e incluem os filtros usados (`where`, `orderBy`). Após uma mutation, invalidar as keys afetadas.
+- Query keys vêm dos contratos em `src/queries/` e incluem os filtros usados (`where`, `orderBy`). A invalidação após mutation fica no hook da mutation, pela key raiz da entidade.
 - **Banco de dados:** mudanças no schema são aplicadas com `npx drizzle-kit push`, rodado pelo dono do projeto. Não usar `drizzle-kit generate`/`migrate` e não criar a pasta `drizzle/`.
 - `src/components/ui/*` é código gerado pelo shadcn: editar só o mínimo necessário.
 - Imagens remotas vêm do Google Drive (`next.config.ts` → `images.remotePatterns`); usar `next/image`.

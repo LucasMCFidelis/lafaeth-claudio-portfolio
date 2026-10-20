@@ -2,21 +2,18 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import getManyColors from "@/app/data/colorization/get-many-colors";
+import getVisibleColorsCached from "@/app/data/colorization/get-visible-colors";
 import { displayOrder } from "@/app/data/order-by-condition";
-import requireAdmin from "@/app/data/user/require-admin";
 import ColorsList from "@/components/common/colors-list";
+import GridSkeleton from "@/components/common/grid-skeleton";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
 import { Button } from "@/components/ui/button";
+import { colorsQueries } from "@/queries/colors";
 
+import AdminOnly from "../components/admin-only";
 import SortableColors from "../components/sortable-items/sortable-colors";
 
-const ColorsAdminPage = async () => {
-  await requireAdmin();
-
-  const colors = await getManyColors({
-    orderBy: displayOrder,
-    withImage: true,
-  });
-
+const ColorsAdminPage = () => {
   return (
     <>
       <Link href={"/admin/cores/cadastre"}>
@@ -26,17 +23,30 @@ const ColorsAdminPage = async () => {
       </Link>
 
       <div className="px-5 flex-1 flex flex-col mt-12">
-        <Suspense fallback={<>...</>}>
-          <SortableColors
-            initialData={colors.filter((color) => color.visibleInColors)}
-          />
+        <Suspense fallback={<GridSkeleton />}>
+          <AdminOnly>
+            <PrefetchBoundary
+              queries={[
+                {
+                  queryKey: colorsQueries.keys.visible(),
+                  fetcher: getVisibleColorsCached,
+                },
+                {
+                  queryKey: colorsQueries.keys.list({ orderBy: displayOrder }),
+                  fetcher: () =>
+                    getManyColors({ orderBy: displayOrder, withImage: true }),
+                },
+              ]}
+            >
+              <SortableColors />
+              <ColorsList
+                variant="all"
+                orderBy={displayOrder}
+                displayButtonOpenModal
+              />
+            </PrefetchBoundary>
+          </AdminOnly>
         </Suspense>
-        <ColorsList
-          variant="all"
-          orderBy={displayOrder}
-          displayButtonOpenModal
-          initialData={colors}
-        />
       </div>
     </>
   );

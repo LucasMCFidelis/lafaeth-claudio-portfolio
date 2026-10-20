@@ -4,18 +4,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { updateHomeImagesOrder } from "@/actions/update-home-images-order";
 import { ImageDTO } from "@/app/data/image/image-dto";
+import { imagesQueries } from "@/queries/images";
 
-import { getHomeImagesQueryKey } from "../queries/use-home-images";
-
-export const getUpdateHomeImagesOrderQueryKey = () =>
+export const getUpdateHomeImagesOrderMutationKey = () =>
   ["update-home-images-order"] as const;
 
 export const useUpdateHomeImagesOrder = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationKey: getUpdateHomeImagesOrderQueryKey(),
-    mutationFn: async (images: Array<ImageDTO>) => await updateHomeImagesOrder(images),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: getHomeImagesQueryKey() }),
+    mutationKey: getUpdateHomeImagesOrderMutationKey(),
+    mutationFn: async (images: Array<ImageDTO>) =>
+      await updateHomeImagesOrder(images),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: imagesQueries.keys.all });
+    },
   });
 };

@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -22,8 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { usePostColor } from "@/hooks/mutations/use-post-color";
-import { getColorsVisibleQueryKey } from "@/hooks/queries/use-colors-visible";
-import { useImage } from "@/hooks/queries/use-image";
+import { useImage } from "@/hooks/queries/use-images";
 
 import { ImageFormField } from "../../components/image-form-field";
 
@@ -35,19 +33,13 @@ const CadastreColorForm = () => {
     },
   });
 
-  const queryClient = useQueryClient();
   const postColorMutation = usePostColor();
   const { data: image } = useImage(formCadastreColor.watch("imageId"));
 
   function onSubmit(data: CadastreColorDTO) {
     postColorMutation.mutate(data, {
-      onSuccess: (newColor) => {
+      onSuccess: () => {
         formCadastreColor.reset();
-        if (newColor.visibleInColors) {
-          queryClient.invalidateQueries({
-            queryKey: getColorsVisibleQueryKey(),
-          });
-        }
         toast.success("Colorização cadastrada com sucesso");
       },
       onError: (error) =>

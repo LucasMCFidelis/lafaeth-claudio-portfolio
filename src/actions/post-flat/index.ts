@@ -1,5 +1,7 @@
 "use server";
 
+import { updateTag } from "next/cache";
+
 import { FlatDTO } from "@/app/data/flat/flat-dto";
 import mapToFlatDTO from "@/app/data/flat/map-to-flat-dto";
 import getOneImageById from "@/app/data/image/get-one-image-by-id";
@@ -10,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { flatTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const postFlat = async (data: CadastreFlatDTO): Promise<FlatDTO> => {
   const dataValidated = cadastreFlatSchema.parse(data);
@@ -30,6 +33,8 @@ export const postFlat = async (data: CadastreFlatDTO): Promise<FlatDTO> => {
     .insert(flatTable)
     .values(dataValidated)
     .returning();
+
+  updateTag(cacheTags.flats);
 
   return mapToFlatDTO({ data: newFlat, withImages: false });
 };
