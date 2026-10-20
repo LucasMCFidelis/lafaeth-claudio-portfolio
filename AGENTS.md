@@ -76,7 +76,8 @@ Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente)
 - Query keys vêm dos contratos em `src/queries/` e incluem os filtros usados (`where`, `orderBy`). A invalidação após mutation fica no hook da mutation, pela key raiz da entidade.
 - **Banco de dados:** mudanças no schema são aplicadas com `npx drizzle-kit push`, rodado pelo dono do projeto. Não usar `drizzle-kit generate`/`migrate` e não criar a pasta `drizzle/`.
 - `src/components/ui/*` é código gerado pelo shadcn: editar só o mínimo necessário.
-- Imagens remotas vêm do Google Drive (`next.config.ts` → `images.remotePatterns`); usar `next/image`.
+- Imagens remotas vêm do Google Drive (`next.config.ts` → `images.remotePatterns`); usar `next/image`. Toda `<Image fill>` recebe `sizes` (padrões em `src/helpers/image-sizes.ts`) e só as imagens da primeira dobra usam `imageLoadingProps(true)` (`loading="eager"` + `fetchPriority="high"`).
+- Telas de toque não têm hover: o que aparece no hover precisa da variante `touch:` (`@media (hover: none)`, definida em `globals.css`).
 
 ## Convenções
 
