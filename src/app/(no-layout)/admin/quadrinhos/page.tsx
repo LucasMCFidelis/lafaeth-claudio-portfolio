@@ -39,13 +39,11 @@ const ComicsAdminPage = () => {
               ]}
             >
               <SortableComics />
-              <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-                <ComicsList
-                  variant="all"
-                  orderBy={displayOrder}
-                  displayButtonOpenModal
-                />
-              </div>
+              <ComicsList
+                variant="all"
+                orderBy={displayOrder}
+                displayButtonOpenModal
+              />
             </PrefetchBoundary>
           </AdminOnly>
         </AnimatedSuspense>
