@@ -1,14 +1,16 @@
 "use client";
 
-import { ArrowBigLeft, ArrowBigRight, X } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Info, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ArtworkTransition from "@/components/common/artwork-transition";
 import FadeImage from "@/components/common/fade-image";
 import { Button } from "@/components/ui/button";
+import { useIsFullscreen } from "@/hooks/use-is-fullscreen";
+import { cn } from "@/lib/utils";
 
 import ExpandFullSizeButton from "../expand-full-size-button";
 import { GalleryBasicType } from "./gallery-basic-type";
@@ -21,6 +23,8 @@ interface GalleryRootListProps {
 /** Horizontal distance (px) a swipe must travel to change the image. */
 const SWIPE_THRESHOLD = 50;
 
+const DETAILS_PANEL_ID = "gallery-details";
+
 const GalleryRootList = ({
   itemsList,
   hrefBackToClose = "/",
@@ -28,6 +32,17 @@ const GalleryRootList = ({
   const router = useRouter();
   const [{ id }, setValues] = useQueryStates({ id: parseAsString });
   const swipeStartX = useRef<number | null>(null);
+  const isFullscreen = useIsFullscreen();
+
+  // In fullscreen the image takes the whole screen and the details start
+  // collapsed; they open over the image only when asked.
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [wasFullscreen, setWasFullscreen] = useState(isFullscreen);
+  if (wasFullscreen !== isFullscreen) {
+    setWasFullscreen(isFullscreen);
+    setDetailsOpen(false);
+  }
+  const showDetails = !isFullscreen || detailsOpen;
 
   // Without a valid ?id= (old link, removed item) start at the first image.
   const foundIndex = itemsList.findIndex((img) => img.id === id);
@@ -82,20 +97,51 @@ const GalleryRootList = ({
     return <p className="m-auto">Nenhuma imagem para exibir</p>;
   }
 
+  const counter = (
+    <p className="text-xs text-muted-foreground" aria-live="polite">
+      {currentIndex + 1} / {itemsList.length}
+    </p>
+  );
+
   return (
     <>
       <div className="absolute w-full flex justify-between z-10 px-5 pt-5">
-        <ExpandFullSizeButton aria-label="Tela cheia" />
-        <Button size="icon" asChild>
-          <Link href={hrefBackToClose} aria-label="Fechar galeria">
-            <X />
-          </Link>
-        </Button>
+        <ExpandFullSizeButton />
+        <div className="flex gap-2">
+          {isFullscreen && (
+            <Button
+              size="icon"
+              variant={detailsOpen ? "secondary" : "default"}
+              onClick={() => setDetailsOpen((open) => !open)}
+              aria-label={detailsOpen ? "Ocultar detalhes" : "Mostrar detalhes"}
+              aria-expanded={detailsOpen}
+              aria-controls={DETAILS_PANEL_ID}
+            >
+              <Info />
+            </Button>
+          )}
+          <Button size="icon" asChild>
+            <Link href={hrefBackToClose} aria-label="Fechar galeria">
+              <X />
+            </Link>
+          </Button>
+        </div>
       </div>
-      <div className="flex flex-col flex-1 p-5 w-full sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10">
+      <div
+        className={cn(
+          "relative flex flex-col flex-1 w-full",
+          !isFullscreen && "p-5 sm:grid sm:grid-cols-[1fr_25%] gap-5 md:gap-10"
+        )}
+      >
+        {/* Same position in both modes, so the image is not remounted. */}
         <ArtworkTransition imageId={item.id}>
           <div
-            className="flex-1 relative min-h-[60svh] sm:min-h-0 touch-pan-y"
+            className={cn(
+              "touch-pan-y",
+              isFullscreen
+                ? "absolute inset-0"
+                : "relative flex-1 min-h-[60svh] sm:min-h-0"
+            )}
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
             onPointerCancel={() => (swipeStartX.current = null)}
@@ -107,7 +153,7 @@ const GalleryRootList = ({
                 src={item.imageUrl}
                 alt={item.title}
                 fill
-                sizes="(max-width: 640px) 100vw, 75vw"
+                sizes={isFullscreen ? "100vw" : "(max-width: 640px) 100vw, 75vw"}
                 loading="eager"
                 fetchPriority="high"
                 draggable={false}
@@ -116,39 +162,72 @@ const GalleryRootList = ({
             )}
           </div>
         </ArtworkTransition>
-        <div className="flex flex-col justify-between sm:mt-10 min-w-0 wrap-anywhere">
-          <div className="flex-1">
-            <h2 className="font-medium text-xl md:text-3xl first-letter:uppercase">
-              {item.title}
-            </h2>
-            <div className="text-xs lg:text-sm">
-              <p className="first-letter:uppercase">{item.description}</p>
-              {item.screenwriter && <p>Roteiro: {item.screenwriter}</p>}
-              {item.colorist && <p>Cor: {item.colorist}</p>}
 
-              {item.productionYear && <p>Ano: {item.productionYear}</p>}
-              {item.productionSizePages && (
-                <p>Tamanho: {item.productionSizePages} páginas</p>
-              )}
-              {item.observations && <p>{item.observations}</p>}
-              {item.redirectUrl && (
-                <Link href={item.redirectUrl}>{item.redirectUrl}</Link>
-              )}
+        {showDetails ? (
+          <div
+            id={DETAILS_PANEL_ID}
+            className={cn(
+              "flex flex-col justify-between min-w-0 wrap-anywhere",
+              isFullscreen
+                ? // Over the image: bottom sheet on phones, side panel from sm.
+                  "absolute z-5 inset-x-0 bottom-0 max-h-[60%] overflow-y-auto gap-5 p-5 border-t bg-background/90 backdrop-blur-sm sm:inset-y-0 sm:left-auto sm:w-1/4 sm:min-w-72 sm:max-h-none sm:pt-20 sm:border-t-0 sm:border-l"
+                : "sm:mt-10"
+            )}
+          >
+            <div className="flex-1">
+              <h2 className="font-medium text-xl md:text-3xl first-letter:uppercase">
+                {item.title}
+              </h2>
+              <div className="text-xs lg:text-sm">
+                <p className="first-letter:uppercase">{item.description}</p>
+                {item.screenwriter && <p>Roteiro: {item.screenwriter}</p>}
+                {item.colorist && <p>Cor: {item.colorist}</p>}
+
+                {item.productionYear && <p>Ano: {item.productionYear}</p>}
+                {item.productionSizePages && (
+                  <p>Tamanho: {item.productionSizePages} páginas</p>
+                )}
+                {item.observations && <p>{item.observations}</p>}
+                {item.redirectUrl && (
+                  <Link href={item.redirectUrl}>{item.redirectUrl}</Link>
+                )}
+              </div>
+            </div>
+
+            <div className="flex w-full justify-between items-center mb-2">
+              <Button size="icon" onClick={goPrev} aria-label="Imagem anterior">
+                <ArrowBigLeft />
+              </Button>
+              {counter}
+              <Button size="icon" onClick={goNext} aria-label="Próxima imagem">
+                <ArrowBigRight />
+              </Button>
             </div>
           </div>
-
-          <div className="flex w-full justify-between items-center mb-2">
-            <Button size="icon" onClick={goPrev} aria-label="Imagem anterior">
+        ) : (
+          // Details collapsed: the navigation floats over the image.
+          <>
+            <Button
+              size="icon"
+              onClick={goPrev}
+              aria-label="Imagem anterior"
+              className="absolute z-10 left-5 top-1/2 -translate-y-1/2"
+            >
               <ArrowBigLeft />
             </Button>
-            <p className="text-xs text-muted-foreground" aria-live="polite">
-              {currentIndex + 1} / {itemsList.length}
-            </p>
-            <Button size="icon" onClick={goNext} aria-label="Próxima imagem">
+            <Button
+              size="icon"
+              onClick={goNext}
+              aria-label="Próxima imagem"
+              className="absolute z-10 right-5 top-1/2 -translate-y-1/2"
+            >
               <ArrowBigRight />
             </Button>
-          </div>
-        </div>
+            <div className="absolute z-10 bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-3 py-1">
+              {counter}
+            </div>
+          </>
+        )}
       </div>
     </>
   );
