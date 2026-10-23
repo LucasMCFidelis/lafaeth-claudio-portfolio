@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 import { imageLoadingProps } from "@/helpers/image-sizes";
 import { staggerClassName, staggerStyle } from "@/helpers/stagger";
 import { cn } from "@/lib/utils";
@@ -52,6 +54,17 @@ const FlatItem = ({
       ? "(max-width: 768px) 100vw, 318px"
       : "(max-width: 640px) 100vw, 530px";
 
+  // Real proportion of the artwork, read once it loads. Until then the
+  // orientation class gives an approximate shape. Matching the image keeps
+  // the divider from running over empty space beside it.
+  const [aspectRatio, setAspectRatio] = useState<number>();
+  const readAspectRatio = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    if (naturalWidth && naturalHeight) {
+      setAspectRatio(naturalWidth / naturalHeight);
+    }
+  };
+
   const imageProps = {
     fill: true,
     sizes,
@@ -63,7 +76,7 @@ const FlatItem = ({
   return (
     <CompareSlider
       label={`Comparar line e flat de ${title}`}
-      style={staggerStyle(index)}
+      style={{ ...staggerStyle(index), aspectRatio }}
       className={cn(
         "w-full mx-auto",
         staggerClassName,
@@ -73,12 +86,23 @@ const FlatItem = ({
       )}
       base={
         backImageUrl && (
-          <FadeImage src={backImageUrl} alt={`${title} - flat`} {...imageProps} />
+          <FadeImage
+            src={backImageUrl}
+            alt={`${title} - flat`}
+            onLoad={readAspectRatio}
+            {...imageProps}
+          />
         )
       }
       overlay={
         frontImageUrl && (
-          <FadeImage src={frontImageUrl} alt={`${title} - line`} {...imageProps} />
+          <FadeImage
+            src={frontImageUrl}
+            alt={`${title} - line`}
+            // The flat image sets the shape; the line only does it alone.
+            onLoad={backImageUrl ? undefined : readAspectRatio}
+            {...imageProps}
+          />
         )
       }
     >
