@@ -29,9 +29,7 @@ const ComicsPage = () => {
               },
             ]}
           >
-            <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-              <ComicsList variant="visible" />
-            </div>
+            <ComicsList variant="visible" />
           </PrefetchBoundary>
         </AnimatedSuspense>
       </div>
