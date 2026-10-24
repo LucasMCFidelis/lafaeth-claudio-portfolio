@@ -9,6 +9,7 @@ import { comicsQueries } from "@/queries/comics";
 import { flatsQueries } from "@/queries/flats";
 import { illustrationsQueries } from "@/queries/illustrations";
 import { imagesQueries } from "@/queries/images";
+import { projectsQueries } from "@/queries/projects";
 
 /** Root query key and DTO field of each entity. */
 const targets: Record<VisibilityEntity, { root: QueryKey; field: string }> = {
@@ -20,6 +21,8 @@ const targets: Record<VisibilityEntity, { root: QueryKey; field: string }> = {
     field: "visibleInIllustrations",
   },
   homeImage: { root: imagesQueries.keys.all, field: "visibleInHome" },
+  project: { root: projectsQueries.keys.all, field: "visibleInProjects" },
+  projectImage: { root: projectsQueries.keys.all, field: "visibleInProject" },
 };
 
 type WithId = { id: string } & Record<string, unknown>;

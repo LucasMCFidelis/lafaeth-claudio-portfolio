@@ -12,7 +12,7 @@ const Header = () => {
     <>
       {/* Named so it stays still during page transitions (globals.css). */}
       <header
-        className="w-full p-5 flex justify-between items-center"
+        className="w-full p-5 flex justify-between items-center lg:mb-6"
         style={{ viewTransitionName: "site-header" }}
       >
         <Link href={"/"} className="px-0 font-heading font-bold tracking-wider text-2xl md:text-3xl">

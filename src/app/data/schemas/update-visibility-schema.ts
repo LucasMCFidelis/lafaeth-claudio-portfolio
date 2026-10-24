@@ -7,6 +7,8 @@ export const visibilityEntities = [
   "flat",
   "illustration",
   "homeImage",
+  "project",
+  "projectImage",
 ] as const;
 
 export type VisibilityEntity = (typeof visibilityEntities)[number];

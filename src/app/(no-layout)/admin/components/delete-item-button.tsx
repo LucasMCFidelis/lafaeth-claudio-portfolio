@@ -23,7 +23,9 @@ interface DeleteItemButtonProps {
   itemName: string;
   onDelete: () => Promise<unknown>;
   /** Where to go after deleting (the list page). */
-  redirectTo: string;
+  redirectTo?: string;
+  description?: string;
+  label?: string;
   disabled?: boolean;
   className?: string;
 }
@@ -33,6 +35,8 @@ const DeleteItemButton = ({
   itemName,
   onDelete,
   redirectTo,
+  description = "Essa ação não pode ser desfeita. A imagem usada continua na biblioteca de imagens.",
+  label = "Excluir",
   disabled,
   className,
 }: DeleteItemButtonProps) => {
@@ -46,7 +50,7 @@ const DeleteItemButton = ({
       await onDelete();
       toast.success("Excluído com sucesso");
       setOpen(false);
-      router.push(redirectTo);
+      if (redirectTo) router.push(redirectTo);
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -71,16 +75,13 @@ const DeleteItemButton = ({
           )}
         >
           <Trash2 />
-          Excluir
+          {label}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Excluir {itemName}?</DialogTitle>
-          <DialogDescription>
-            Essa ação não pode ser desfeita. A imagem usada continua na
-            biblioteca de imagens.
-          </DialogDescription>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>

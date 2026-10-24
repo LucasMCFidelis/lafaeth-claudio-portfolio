@@ -15,6 +15,8 @@ import {
   flatTable,
   illustrationsTable,
   imagesTable,
+  projectImagesTable,
+  projectTable,
 } from "@/db/schema";
 import { cacheTags } from "@/queries/tags";
 
@@ -62,6 +64,18 @@ export const updateVisibility = async (data: UpdateVisibilityDTO) => {
           .set({ visibleInHome: visible, ...index })
           .where(eq(imagesTable.id, id))
           .returning({ id: imagesTable.id });
+      case "project":
+        return db
+          .update(projectTable)
+          .set({ visibleInProjects: visible, ...index })
+          .where(eq(projectTable.id, id))
+          .returning({ id: projectTable.id });
+      case "projectImage":
+        return db
+          .update(projectImagesTable)
+          .set({ visibleInProject: visible })
+          .where(eq(projectImagesTable.id, id))
+          .returning({ id: projectImagesTable.id });
     }
   })();
 
@@ -73,6 +87,8 @@ export const updateVisibility = async (data: UpdateVisibilityDTO) => {
     flat: cacheTags.flats,
     illustration: cacheTags.illustrations,
     homeImage: cacheTags.images,
+    project: cacheTags.projects,
+    projectImage: cacheTags.projects,
   } as const;
   updateTag(tags[entity]);
 

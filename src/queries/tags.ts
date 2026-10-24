@@ -11,5 +11,6 @@ export const cacheTags = {
   flats: "flats",
   illustrations: "illustrations",
   images: "images",
+  projects: "projects",
   user: "user",
 } as const;
