@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { ArrowDownUp } from "lucide-react";
-import { useQueryState } from "nuqs";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,9 +19,7 @@ import { cn } from "@/lib/utils";
 import { projectsQueries } from "@/queries/projects";
 
 import SortableItem from "./sortable-item";
-import SortableRootList, {
-  getSortingIsDisabledQueryStateParams,
-} from "./sortable-root-list";
+import SortableRootList from "./sortable-root-list";
 
 interface SortableProjectImagesProps {
   projectId: string;
@@ -30,29 +28,39 @@ interface SortableProjectImagesProps {
 const SortableProjectImages = ({ projectId }: SortableProjectImagesProps) => {
   const { data: images } = useProjectImages(projectId);
   const updateOrderMutation = useUpdateProjectImagesOrder();
-  const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
-    ...getSortingIsDisabledQueryStateParams()
-  );
+  const [isSorting, setIsSorting] = useState(false);
   const queryClient = useQueryClient();
 
-  const toggleSortingState = () => {
-    setSortingIsDisabled((prev) => !prev);
-    if (!sortingIsDisabled) {
-      queryClient.invalidateQueries({
-        queryKey: projectsQueries.keys.images(projectId),
-      });
-    }
+  const cancelSorting = () => {
+    setIsSorting(false);
+    queryClient.invalidateQueries({
+      queryKey: projectsQueries.keys.images(projectId),
+    });
   };
+
+  const saveSorting = () =>
+    updateOrderMutation.mutate(images, {
+      onSuccess: () => {
+        toast.success("Ordem das imagens atualizada com sucesso");
+        setIsSorting(false);
+      },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Erro ao atualizar ordem das imagens"
+        ),
+    });
 
   if (images.length < 2) return;
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={toggleSortingState}>
+      <Button type="button" variant="outline" onClick={() => setIsSorting(true)}>
         <ArrowDownUp />
         Editar ordem
       </Button>
-      <Dialog open={!sortingIsDisabled}>
+      <Dialog open={isSorting}>
         <DialogContent
           className="md:max-w-full h-full flex flex-col"
           showCloseButton={false}
@@ -79,7 +87,7 @@ const SortableProjectImages = ({ projectId }: SortableProjectImagesProps) => {
                 >
                   <SortableItem
                     item={image}
-                    disabled={sortingIsDisabled}
+                    disabled={!isSorting}
                     className="size-full aspect-auto"
                   />
                   <span className="absolute top-1 left-1 rounded-full bg-background/90 px-2 text-xs font-medium pointer-events-none">
@@ -91,28 +99,17 @@ const SortableProjectImages = ({ projectId }: SortableProjectImagesProps) => {
           </SortableRootList>
           <div className="w-full flex gap-4">
             <Button
-              onClick={toggleSortingState}
+              onClick={cancelSorting}
               variant={"destructive"}
               className="flex-1"
+              disabled={updateOrderMutation.isPending}
             >
               Cancelar edição
             </Button>
             <Button
               className="w-1/2"
               disabled={updateOrderMutation.isPending}
-              onClick={async () => {
-                await updateOrderMutation.mutateAsync(images, {
-                  onSuccess: () =>
-                    toast.success("Ordem das imagens atualizada com sucesso"),
-                  onError: (error) =>
-                    toast.error(
-                      error instanceof Error
-                        ? error.message
-                        : "Erro ao atualizar ordem das imagens"
-                    ),
-                });
-                setSortingIsDisabled(true);
-              }}
+              onClick={saveSorting}
             >
               Salvar Ordenação
             </Button>

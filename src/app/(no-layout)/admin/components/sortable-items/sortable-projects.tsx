@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { useQueryState } from "nuqs";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -16,16 +16,12 @@ import { useVisibleProjects } from "@/hooks/queries/use-projects";
 import { projectsQueries } from "@/queries/projects";
 
 import SortableItem from "./sortable-item";
-import SortableRootList, {
-  getSortingIsDisabledQueryStateParams,
-} from "./sortable-root-list";
+import SortableRootList from "./sortable-root-list";
 
 const SortableProjects = () => {
   const { data: projects } = useVisibleProjects();
   const updateProjectsOrderMutation = useUpdateProjectsOrder();
-  const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
-    ...getSortingIsDisabledQueryStateParams()
-  );
+  const [isSorting, setIsSorting] = useState(false);
   const queryClient = useQueryClient();
   const sortableProjects = projects.map((project) => ({
     id: project.id,
@@ -33,26 +29,38 @@ const SortableProjects = () => {
     imageUrl: project.cover?.imageUrl ?? "",
   }));
 
-  const toggleSortingState = () => {
-    setSortingIsDisabled((prev) => !prev);
-    if (!sortingIsDisabled) {
-      queryClient.invalidateQueries({
-        queryKey: projectsQueries.keys.visible(),
-      });
-    }
+  const cancelSorting = () => {
+    setIsSorting(false);
+    queryClient.invalidateQueries({
+      queryKey: projectsQueries.keys.visible(),
+    });
   };
+
+  const saveSorting = () =>
+    updateProjectsOrderMutation.mutate(projects, {
+      onSuccess: () => {
+        toast.success("Ordem dos projetos atualizada com sucesso");
+        setIsSorting(false);
+      },
+      onError: (error) =>
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Erro ao atualizar ordem dos projetos"
+        ),
+    });
 
   if (projects.length === 0) return;
 
   return (
     <>
       <Button
-        onClick={toggleSortingState}
+        onClick={() => setIsSorting(true)}
         className="absolute top-0 left-0 translate-x-10 translate-y-4"
       >
         Editar ordem
       </Button>
-      <Dialog open={!sortingIsDisabled}>
+      <Dialog open={isSorting}>
         <DialogContent
           className="md:max-w-full h-full flex flex-col"
           showCloseButton={false}
@@ -73,7 +81,7 @@ const SortableProjects = () => {
                 >
                   <SortableItem
                     item={item}
-                    disabled={sortingIsDisabled}
+                    disabled={!isSorting}
                     className="size-full aspect-auto"
                   />
                   <span className="absolute inset-x-0 bottom-0 bg-background/80 px-2 py-1 text-center text-sm pointer-events-none">
@@ -85,28 +93,17 @@ const SortableProjects = () => {
           </SortableRootList>
           <div className="w-full flex gap-4">
             <Button
-              onClick={toggleSortingState}
+              onClick={cancelSorting}
               variant={"destructive"}
               className="flex-1"
+              disabled={updateProjectsOrderMutation.isPending}
             >
               Cancelar edição
             </Button>
             <Button
               className="w-1/2"
               disabled={updateProjectsOrderMutation.isPending}
-              onClick={async () => {
-                await updateProjectsOrderMutation.mutateAsync(projects, {
-                  onSuccess: () =>
-                    toast.success("Ordem dos projetos atualizada com sucesso"),
-                  onError: (error) =>
-                    toast.error(
-                      error instanceof Error
-                        ? error.message
-                        : "Erro ao atualizar ordem dos projetos"
-                    ),
-                });
-                setSortingIsDisabled(true);
-              }}
+              onClick={saveSorting}
             >
               Salvar Ordenação
             </Button>
