@@ -1,18 +1,15 @@
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+import getProjectStaticParams from "@/app/data/project/get-project-static-params";
 import getVisibleProjectBySlugCached from "@/app/data/project/get-visible-project-by-slug";
-import getVisibleProjectsCached from "@/app/data/project/get-visible-projects";
 
 import { GalleryBasicType } from "../../components/gallery-list/gallery-basic-type";
 import GalleryRootList from "../../components/gallery-list/gallery-root-list";
 
 type Params = PageProps<"/gallery/portfolio/[slug]">["params"];
 
-export async function generateStaticParams() {
-  const projects = await getVisibleProjectsCached();
-  return projects.map(({ slug }) => ({ slug }));
-}
+export const generateStaticParams = getProjectStaticParams;
 
 export default function GalleryProjectPage({
   params,

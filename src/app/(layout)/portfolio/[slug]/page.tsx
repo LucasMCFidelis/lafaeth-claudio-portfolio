@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import getProjectStaticParams from "@/app/data/project/get-project-static-params";
 import getVisibleProjectBySlugCached from "@/app/data/project/get-visible-project-by-slug";
-import getVisibleProjectsCached from "@/app/data/project/get-visible-projects";
 import AnimatedSuspense from "@/components/common/animated-suspense";
 import PageTransition from "@/components/common/page-transition";
 
@@ -14,10 +14,7 @@ import ProjectSkeleton from "./components/project-skeleton";
 
 type Params = PageProps<"/portfolio/[slug]">["params"];
 
-export async function generateStaticParams() {
-  const projects = await getVisibleProjectsCached();
-  return projects.map(({ slug }) => ({ slug }));
-}
+export const generateStaticParams = getProjectStaticParams;
 
 export async function generateMetadata({
   params,

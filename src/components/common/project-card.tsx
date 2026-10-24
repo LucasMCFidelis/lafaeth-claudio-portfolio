@@ -1,9 +1,6 @@
 import Link from "next/link";
 
 import { ProjectSummaryDTO } from "@/app/data/project/project-dto";
-import ArtworkCaption from "@/components/common/artwork-caption";
-import ArtworkTransition from "@/components/common/artwork-transition";
-import FadeImage from "@/components/common/fade-image";
 import {
   gridImageSizes,
   imageLoadingProps,
@@ -12,20 +9,32 @@ import {
 import { staggerClassName, staggerStyle } from "@/helpers/stagger";
 import { cn } from "@/lib/utils";
 
+import ArtworkCaption from "./artwork-caption";
+import ArtworkTransition from "./artwork-transition";
+import FadeImage from "./fade-image";
+
 interface ProjectCardProps {
   project: ProjectSummaryDTO;
   index: number;
+  disableLink?: boolean;
+  children?: React.ReactNode;
 }
 
-const ProjectCard = ({ project, index }: ProjectCardProps) => {
-  const { slug, title, cover } = project;
+const ProjectCard = ({
+  project,
+  index,
+  disableLink,
+  children,
+}: ProjectCardProps) => {
+  const { slug, title, cover, visibleInProjects } = project;
 
   const card = (
     <div
       style={staggerStyle(index)}
       className={cn(
         "group relative aspect-square overflow-hidden bg-muted",
-        staggerClassName
+        staggerClassName,
+        !visibleInProjects && "opacity-50"
       )}
     >
       {cover && (
@@ -38,9 +47,12 @@ const ProjectCard = ({ project, index }: ProjectCardProps) => {
           className="object-cover group-hover:scale-[1.02]"
         />
       )}
-      <ArtworkCaption title={title} />
+      <ArtworkCaption title={title} className={cn(!cover && "opacity-100")} />
+      {children}
     </div>
   );
+
+  if (disableLink) return card;
 
   return (
     <Link href={`/portfolio/${slug}`} aria-label={title}>

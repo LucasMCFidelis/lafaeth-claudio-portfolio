@@ -5,10 +5,9 @@ import AnimatedSuspense from "@/components/common/animated-suspense";
 import GridSkeleton from "@/components/common/grid-skeleton";
 import PageTransition from "@/components/common/page-transition";
 import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import ProjectsList from "@/components/common/projects-list";
 import { projectsQueries } from "@/queries/projects";
 import { cacheTags } from "@/queries/tags";
-
-import ProjectsList from "./components/projects-list";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Portfólio",
@@ -32,7 +31,7 @@ const PortfolioPage = () => {
               },
             ]}
           >
-            <ProjectsList />
+            <ProjectsList variant="visible" />
           </PrefetchBoundary>
         </AnimatedSuspense>
       </div>

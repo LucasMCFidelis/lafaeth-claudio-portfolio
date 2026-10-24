@@ -4,11 +4,19 @@ export type ProjectImageDTO = {
   imageUrl: string;
 };
 
+export type ProjectImageAdminDTO = ProjectImageDTO & {
+  projectId: string;
+  visibleInProject: boolean;
+  index: number | null;
+};
+
 export type ProjectSummaryDTO = {
   id: string;
   slug: string;
   title: string;
   cover: ProjectImageDTO | null;
+  visibleInProjects: boolean;
+  index: number | null;
 };
 
 export type ProjectDTO = ProjectSummaryDTO & {
@@ -18,6 +26,8 @@ export type ProjectDTO = ProjectSummaryDTO & {
   endDate: string | null;
   images: ProjectImageDTO[];
 };
+
+export type ProjectAdminDTO = Omit<ProjectDTO, "cover" | "images">;
 
 export type ProjectLinkDTO = {
   slug: string;
