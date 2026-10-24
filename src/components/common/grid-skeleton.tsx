@@ -3,10 +3,15 @@ import { cn } from "@/lib/utils";
 interface GridSkeletonProps {
   items?: number;
   className?: string;
+  itemClassName?: string;
 }
 
 /** Loading placeholder for the image grids, used as a Suspense fallback. */
-const GridSkeleton = ({ items = 6, className }: GridSkeletonProps) => {
+const GridSkeleton = ({
+  items = 6,
+  className,
+  itemClassName,
+}: GridSkeletonProps) => {
   return (
     <div
       aria-busy
@@ -17,7 +22,13 @@ const GridSkeleton = ({ items = 6, className }: GridSkeletonProps) => {
       )}
     >
       {Array.from({ length: items }, (_, i) => (
-        <div key={i} className="shimmer aspect-[21/29.5] w-full rounded-xl" />
+        <div
+          key={i}
+          className={cn(
+            "shimmer aspect-[21/29.5] w-full rounded-xl",
+            itemClassName
+          )}
+        />
       ))}
     </div>
   );

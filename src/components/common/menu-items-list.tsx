@@ -12,8 +12,11 @@ const menuItemsList: Array<{ label: string; href: string }> = [
   { label: "Cores", href: "/cores" },
   { label: "Quadrinhos", href: "/quadrinhos" },
   { label: "Ilustrações", href: "/ilustracoes" },
-  // { label: "Portfólio", href: "/portfolio" },
+  { label: "Portfólio", href: "/portfolio" },
 ];
+
+const isActiveItem = (pathname: string, href: string) =>
+  pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
 function MenuItemsListComponent() {
   const pathname = usePathname();
@@ -21,7 +24,7 @@ function MenuItemsListComponent() {
   return (
     <>
       {menuItemsList.map((item) => {
-        const isActive = pathname === item.href;
+        const isActive = isActiveItem(pathname, item.href);
         return (
           <Link
             key={item.href}

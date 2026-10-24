@@ -202,3 +202,41 @@ export const illustrationsRelations = relations(
     }),
   })
 );
+
+export const projectTable = pgTable("project", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  projectType: text("project_type"),
+  startDate: date("start_date").notNull().defaultNow(),
+  endDate: date("end_date"),
+  visibleInProjects: boolean("visible_in_projects").notNull().default(false),
+  index: integer("index"),
+});
+
+export const projectImagesTable = pgTable("project_images", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  projectId: uuid("project_id")
+    .notNull()
+    .references(() => projectTable.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  imageUrl: text("image_url").notNull(),
+  visibleInProject: boolean("visible_in_project").notNull().default(true),
+  index: integer("index"),
+  createdAt: date("created_at").defaultNow().notNull(),
+});
+
+export const projectRelations = relations(projectTable, ({ many }) => ({
+  images: many(projectImagesTable),
+}));
+
+export const projectImagesRelations = relations(
+  projectImagesTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [projectImagesTable.projectId],
+      references: [projectTable.id],
+    }),
+  })
+);
