@@ -6,7 +6,7 @@ import { updateTag } from "next/cache";
 import { mapToProjectImageAdmin } from "@/app/data/project/map-to-project";
 import { ProjectImageAdminDTO } from "@/app/data/project/project-dto";
 import {
-  UpdateProjectImageDTO,
+  UpdateProjectImageInput,
   updateProjectImageSchema,
 } from "@/app/data/schemas/update-project-image-schema";
 import verifyUserLogged from "@/app/data/user/verify-user";
@@ -15,7 +15,7 @@ import { projectImagesTable } from "@/db/schema";
 import { cacheTags } from "@/queries/tags";
 
 export const updateProjectImage = async (
-  data: UpdateProjectImageDTO
+  data: UpdateProjectImageInput
 ): Promise<ProjectImageAdminDTO> => {
   const dataValidated = updateProjectImageSchema.parse(data);
 
@@ -24,7 +24,10 @@ export const updateProjectImage = async (
 
   const [image] = await db
     .update(projectImagesTable)
-    .set({ title: dataValidated.title })
+    .set({
+      title: dataValidated.title,
+      ...(dataValidated.imageUrl && { imageUrl: dataValidated.imageUrl }),
+    })
     .where(eq(projectImagesTable.id, dataValidated.id))
     .returning();
 

@@ -2,13 +2,15 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil } from "lucide-react";
+import Image from "next/image";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
+import z from "zod";
 
 import { ProjectImageAdminDTO } from "@/app/data/project/project-dto";
 import {
-  UpdateProjectImageDTO,
+  projectImageUrlSchema,
   updateProjectImageSchema,
 } from "@/app/data/schemas/update-project-image-schema";
 import { Button } from "@/components/ui/button";
@@ -38,27 +40,58 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
   const [open, setOpen] = useState(false);
   const updateProjectImageMutation = useUpdateProjectImage();
 
-  const defaultValues: UpdateProjectImageDTO = {
+  const formSchema = z.object({
+    id: updateProjectImageSchema.shape.id,
+    title: updateProjectImageSchema.shape.title,
+    imageUrl: z.string().transform((value, ctx) => {
+      if (value === image.imageUrl) return value;
+      const result = projectImageUrlSchema.safeParse(value);
+      if (result.success) return result.data;
+      ctx.addIssue({
+        code: "custom",
+        message: result.error.issues[0]?.message ?? "Link inválido",
+      });
+      return z.NEVER;
+    }),
+  });
+  type FormInput = z.input<typeof formSchema>;
+  type FormOutput = z.infer<typeof formSchema>;
+
+  const defaultValues: FormInput = {
     id: image.id,
     title: image.title,
+    imageUrl: image.imageUrl,
   };
 
-  const form = useForm<UpdateProjectImageDTO>({
-    resolver: zodResolver(updateProjectImageSchema),
+  const form = useForm<FormInput, unknown, FormOutput>({
+    resolver: zodResolver(formSchema),
     defaultValues,
   });
 
-  function onSubmit(data: UpdateProjectImageDTO) {
-    updateProjectImageMutation.mutate(data, {
-      onSuccess: () => {
-        toast.success("Título atualizado");
-        setOpen(false);
+  const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
+  const preview =
+    imageUrl === image.imageUrl
+      ? image.imageUrl
+      : projectImageUrlSchema.safeParse(imageUrl).data;
+
+  function onSubmit(data: FormOutput) {
+    updateProjectImageMutation.mutate(
+      {
+        id: data.id,
+        title: data.title,
+        imageUrl: data.imageUrl === image.imageUrl ? undefined : data.imageUrl,
       },
-      onError: (error) =>
-        toast.error(
-          error instanceof Error ? error.message : "Erro ao atualizar imagem"
-        ),
-    });
+      {
+        onSuccess: () => {
+          toast.success("Imagem atualizada");
+          setOpen(false);
+        },
+        onError: (error) =>
+          toast.error(
+            error instanceof Error ? error.message : "Erro ao atualizar imagem"
+          ),
+      }
+    );
   }
 
   return (
@@ -84,6 +117,33 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="flex flex-col gap-4"
           >
+            <div className="relative aspect-video rounded-lg bg-accent">
+              {preview && (
+                <Image
+                  src={preview}
+                  alt="Prévia da imagem"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 512px"
+                  className="object-contain rounded-lg"
+                />
+              )}
+            </div>
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Link da imagem no Drive</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="https://drive.google.com/file/d/..."
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="title"
