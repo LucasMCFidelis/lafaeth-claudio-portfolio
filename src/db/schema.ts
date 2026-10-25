@@ -95,7 +95,11 @@ export const imagesTable = pgTable("images", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   description: text("description").notNull(),
+  // Version shown on the site (WebP, at most 3840 px). Images saved before
+  // original_url existed keep the original file here.
   imageUrl: text("image_url").notNull(),
+  // Original file, offered for download. Null when imageUrl is the original.
+  originalUrl: text("original_url"),
   artist: text("artist").notNull(),
   screenwriter: text("screenwriter"),
   colorist: text("colorist"),
@@ -221,7 +225,9 @@ export const projectImagesTable = pgTable("project_images", {
     .notNull()
     .references(() => projectTable.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
+  // Version shown on the site; see imagesTable.
   imageUrl: text("image_url").notNull(),
+  originalUrl: text("original_url"),
   visibleInProject: boolean("visible_in_project").notNull().default(true),
   index: integer("index"),
   createdAt: date("created_at").defaultNow().notNull(),

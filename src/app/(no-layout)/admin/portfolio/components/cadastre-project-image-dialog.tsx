@@ -32,6 +32,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { usePostProjectImage } from "@/hooks/mutations/use-post-project-image";
 
+import { ImageUploadInput } from "../../components/image-upload-input";
+
 interface CadastreProjectImageDialogProps {
   projectId: string;
 }
@@ -41,11 +43,13 @@ const CadastreProjectImageDialog = ({
 }: CadastreProjectImageDialogProps) => {
   const [open, setOpen] = useState(false);
   const postProjectImageMutation = usePostProjectImage();
+  const [isUploading, setIsUploading] = useState(false);
 
   const defaultValues: CadastreProjectImageInput = {
     projectId,
     title: "",
     imageUrl: "",
+    originalUrl: null,
   };
 
   const form = useForm<
@@ -58,8 +62,6 @@ const CadastreProjectImageDialog = ({
   });
 
   const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
-  const preview =
-    cadastreProjectImageSchema.shape.imageUrl.safeParse(imageUrl);
 
   function onSubmit(data: CadastreProjectImageDTO) {
     postProjectImageMutation.mutate(data, {
@@ -102,9 +104,9 @@ const CadastreProjectImageDialog = ({
             className="flex flex-col gap-4"
           >
             <div className="relative aspect-video rounded-lg bg-accent">
-              {preview.success && (
+              {imageUrl && (
                 <Image
-                  src={preview.data}
+                  src={imageUrl}
                   alt="Prévia da imagem"
                   fill
                   sizes="(max-width: 640px) 100vw, 512px"
@@ -117,11 +119,16 @@ const CadastreProjectImageDialog = ({
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Link da imagem no Drive</FormLabel>
+                  <FormLabel>Imagem</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="https://drive.google.com/file/d/..."
-                      {...field}
+                    <ImageUploadInput
+                      value={field.value}
+                      onChange={({ imageUrl, originalUrl }) => {
+                        field.onChange(imageUrl);
+                        form.setValue("originalUrl", originalUrl);
+                      }}
+                      folder="projects"
+                      onUploadingChange={setIsUploading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -141,7 +148,10 @@ const CadastreProjectImageDialog = ({
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={postProjectImageMutation.isPending}>
+            <Button
+              type="submit"
+              disabled={postProjectImageMutation.isPending || isUploading}
+            >
               Adicionar
             </Button>
           </form>

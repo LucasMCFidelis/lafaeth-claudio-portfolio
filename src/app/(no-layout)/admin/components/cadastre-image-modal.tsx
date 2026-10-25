@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -33,8 +33,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { matchUrlDrive } from "@/helpers/match-url-drive";
 import { usePostHomeImage } from "@/hooks/mutations/use-post-home-image";
+
+import { ImageUploadInput } from "./image-upload-input";
 
 interface CadastreImageModalProps {
   textToTrigger?: string;
@@ -54,6 +55,7 @@ const CadastreImageModal = ({
     parseAsBoolean.withDefault(false)
   );
   const postHomeImageMutation = usePostHomeImage();
+  const [isUploading, setIsUploading] = useState(false);
 
   const formCadastreImage = useForm<CadastreImageDTO>({
     resolver: zodResolver(cadastreImageSchema),
@@ -61,6 +63,7 @@ const CadastreImageModal = ({
       title: "",
       description: "",
       imageUrl: "",
+      originalUrl: null,
       visibleInHome: false,
       ...(initialData && {
         artist: initialData.artist,
@@ -139,7 +142,7 @@ const CadastreImageModal = ({
                   className="size-22 sm:size-32 md:size-48 mx-auto"
                 >
                   <ImageHome
-                    src={matchUrlDrive(valueImageUrl)}
+                    src={valueImageUrl}
                     alt="Imagem que será salva"
                     sizes="(max-width: 640px) 88px, (max-width: 768px) 128px, 192px"
                   />
@@ -154,9 +157,17 @@ const CadastreImageModal = ({
                       className="flex-1 flex gap-2 flex-col justify-end
                     "
                     >
-                      <FormLabel>Url da Imagem</FormLabel>
+                      <FormLabel>Imagem</FormLabel>
                       <FormControl>
-                        <Input placeholder="Insira a url" {...field} />
+                        <ImageUploadInput
+                          value={field.value}
+                          onChange={({ imageUrl, originalUrl }) => {
+                            field.onChange(imageUrl);
+                            formCadastreImage.setValue("originalUrl", originalUrl);
+                          }}
+                          folder="images"
+                          onUploadingChange={setIsUploading}
+                        />
                       </FormControl>
                       <FormMessage />
                     </div>
@@ -275,7 +286,7 @@ const CadastreImageModal = ({
               <Button
                 type="submit"
                 className="w-full col-span-full"
-                disabled={postHomeImageMutation.isPending}
+                disabled={postHomeImageMutation.isPending || isUploading}
               >
                 Cadastrar Imagem
               </Button>

@@ -23,6 +23,7 @@ const mapToProjectImage = (image: ProjectImageRow): ProjectImageDTO => ({
   id: image.id,
   title: image.title,
   imageUrl: image.imageUrl,
+  originalUrl: image.originalUrl,
 });
 
 export const mapToProjectImageAdmin = (

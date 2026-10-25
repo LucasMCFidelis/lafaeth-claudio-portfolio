@@ -2,7 +2,9 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 
+import deleteUnusedImageFiles from "@/app/data/image/delete-unused-image-files";
 import { mapToProjectImageAdmin } from "@/app/data/project/map-to-project";
 import { ProjectImageAdminDTO } from "@/app/data/project/project-dto";
 import {
@@ -22,11 +24,23 @@ export const updateProjectImage = async (
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
+  const [current] = await db
+    .select({
+      imageUrl: projectImagesTable.imageUrl,
+      originalUrl: projectImagesTable.originalUrl,
+    })
+    .from(projectImagesTable)
+    .where(eq(projectImagesTable.id, dataValidated.id));
+
   const [image] = await db
     .update(projectImagesTable)
     .set({
       title: dataValidated.title,
-      ...(dataValidated.imageUrl && { imageUrl: dataValidated.imageUrl }),
+      // The original always goes with the image it belongs to.
+      ...(dataValidated.imageUrl && {
+        imageUrl: dataValidated.imageUrl,
+        originalUrl: dataValidated.originalUrl ?? null,
+      }),
     })
     .where(eq(projectImagesTable.id, dataValidated.id))
     .returning();
@@ -34,6 +48,15 @@ export const updateProjectImage = async (
   if (!image) throw new Error("Project image not found");
 
   updateTag(cacheTags.projects);
+  if (
+    current &&
+    (current.imageUrl !== image.imageUrl ||
+      current.originalUrl !== image.originalUrl)
+  ) {
+    after(() =>
+      deleteUnusedImageFiles([current.imageUrl, current.originalUrl])
+    );
+  }
 
   return mapToProjectImageAdmin(image);
 };

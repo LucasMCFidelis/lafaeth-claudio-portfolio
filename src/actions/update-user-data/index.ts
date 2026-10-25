@@ -2,7 +2,9 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 
+import deleteUnusedImageFiles from "@/app/data/image/delete-unused-image-files";
 import { updateUserSchema } from "@/app/data/schemas/update-user-schema";
 import getUserData from "@/app/data/user/get-user-data";
 import { UserUpdateDTO } from "@/app/data/user/user-update-dto";
@@ -17,6 +19,12 @@ export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
   if (!userIsLogged) throw new Error("Unauthorize");
 
   const user = await getUserData();
+
+  // Read straight from the database: getUserData() is cached.
+  const [current] = await db
+    .select({ image: userTable.image })
+    .from(userTable)
+    .where(eq(userTable.id, user.id));
 
   await db
     .update(userTable)
@@ -38,6 +46,9 @@ export const updateUserData = async (dataUpdate: UserUpdateDTO) => {
     .where(eq(userTable.id, user.id));
 
   updateTag(cacheTags.user);
+  if (current?.image && current.image !== dataValidated.image) {
+    after(() => deleteUnusedImageFiles([current.image]));
+  }
 
   return { success: true };
 };

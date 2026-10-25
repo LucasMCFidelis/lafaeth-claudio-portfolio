@@ -14,6 +14,7 @@ export default async function GalleryIllustrationPage() {
         title: illustration.image!.title,
         description: illustration.description ?? "",
         imageUrl: illustration.image!.imageUrl,
+        originalUrl: illustration.image!.originalUrl,
         ...(illustration.redirectUrl && {
           redirectUrl: illustration.redirectUrl,
         }),

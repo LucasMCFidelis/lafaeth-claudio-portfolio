@@ -2,6 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -25,6 +26,7 @@ import { useUpdateImage } from "@/hooks/mutations/use-update-image";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "./actions-update-forms";
+import { ImageUploadInput } from "./image-upload-input";
 
 interface UpdateImageFormProps {
   initialData: ImageDTO;
@@ -36,6 +38,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
     title: initialData.title ?? "",
     description: initialData.description ?? "",
     imageUrl: initialData.imageUrl ?? "",
+    originalUrl: initialData.originalUrl,
     artist: initialData.artist ?? "",
     screenwriter: initialData.screenwriter ?? "",
     colorist: initialData.colorist ?? "",
@@ -49,6 +52,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const updateImageMutation = useUpdateImage(formDefaultValues.id);
+  const [isUploading, setIsUploading] = useState(false);
 
   async function onSubmit(data: UpdateImageDTO) {
     updateImageMutation.mutate(data, {
@@ -91,12 +95,17 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
                   className="flex-1 flex gap-2 flex-col justify-end
                     "
                 >
-                  <FormLabel>Url da Imagem</FormLabel>
+                  <FormLabel>Imagem</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Insira a url"
-                      {...field}
+                    <ImageUploadInput
+                      value={field.value}
+                      onChange={({ imageUrl, originalUrl }) => {
+                        field.onChange(imageUrl);
+                        formUpdateImage.setValue("originalUrl", originalUrl);
+                      }}
+                      folder="images"
                       disabled={!formIsEditable}
+                      onUploadingChange={setIsUploading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -230,7 +239,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
           </div>
           <ActionsUpdateForm
             textSaveUpdateAction="Atualizar Imagem"
-            disableSaveUpdateAction={updateImageMutation.isPending}
+            disableSaveUpdateAction={updateImageMutation.isPending || isUploading}
             resetForm={() => formUpdateImage.reset(formDefaultValues)}
             className="col-span-full"
           />

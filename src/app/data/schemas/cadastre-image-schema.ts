@@ -1,6 +1,6 @@
 import z from "zod";
 
-import { matchUrlDrive } from "@/helpers/match-url-drive";
+import { imageUrlSchema } from "./image-url-schema";
 
 export const cadastreImageSchema = z.object({
   title: z
@@ -11,20 +11,9 @@ export const cadastreImageSchema = z.object({
     .string({ message: "Descrição inválida." })
     .trim()
     .min(1, "Descrição é obrigatória."),
-  imageUrl: z
-    .string()
-    .max(255, "URL muito longa")
-    .refine(
-      (val) =>
-        val.includes("https://drive.google.com/") &&
-        z.url().safeParse(val).success,
-      {
-        message: "Url da imagem deve ser uma URL válida do drive",
-      }
-    )
-    .transform((val) => {
-      return matchUrlDrive(val);
-    }),
+  imageUrl: imageUrlSchema,
+  // Original file for download; null/undefined when imageUrl is the original.
+  originalUrl: imageUrlSchema.nullish(),
   visibleInHome: z.boolean().catch(false),
   artist: z
     .string({ message: "Artista inválido" })

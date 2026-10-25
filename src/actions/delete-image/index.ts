@@ -2,8 +2,10 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 import z from "zod";
 
+import deleteUnusedImageFiles from "@/app/data/image/delete-unused-image-files";
 import getImagesUsage from "@/app/data/image/get-images-usage";
 import {
   emptyImageUsage,
@@ -44,12 +46,17 @@ export const deleteImage = async (
   const [deleted] = await db
     .delete(imagesTable)
     .where(eq(imagesTable.id, imageId))
-    .returning({ id: imagesTable.id });
+    .returning({
+      id: imagesTable.id,
+      imageUrl: imagesTable.imageUrl,
+      originalUrl: imagesTable.originalUrl,
+    });
 
   if (!deleted) throw new Error("Image not found");
 
   // Every public list (and the home banner) is also tagged with images.
   updateTag(cacheTags.images);
+  after(() => deleteUnusedImageFiles([deleted.imageUrl, deleted.originalUrl]));
 
   return { deleted: true };
 };
