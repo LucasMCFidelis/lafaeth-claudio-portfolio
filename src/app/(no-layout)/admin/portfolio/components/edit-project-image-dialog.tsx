@@ -56,6 +56,7 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
       });
       return z.NEVER;
     }),
+    originalUrl: z.string().nullish(),
   });
   type FormInput = z.input<typeof formSchema>;
   type FormOutput = z.infer<typeof formSchema>;
@@ -64,6 +65,7 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
     id: image.id,
     title: image.title,
     imageUrl: image.imageUrl,
+    originalUrl: image.originalUrl,
   };
 
   const form = useForm<FormInput, unknown, FormOutput>({
@@ -74,11 +76,16 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
   const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
 
   function onSubmit(data: FormOutput) {
+    const imageChanged = data.imageUrl !== image.imageUrl;
     updateProjectImageMutation.mutate(
       {
         id: data.id,
         title: data.title,
-        imageUrl: data.imageUrl === image.imageUrl ? undefined : data.imageUrl,
+        // The original is sent only together with the image it belongs to.
+        ...(imageChanged && {
+          imageUrl: data.imageUrl,
+          originalUrl: data.originalUrl,
+        }),
       },
       {
         onSuccess: () => {
@@ -136,7 +143,10 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
                   <FormControl>
                     <ImageUploadInput
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={({ imageUrl, originalUrl }) => {
+                        field.onChange(imageUrl);
+                        form.setValue("originalUrl", originalUrl);
+                      }}
                       folder="projects"
                       onUploadingChange={setIsUploading}
                     />

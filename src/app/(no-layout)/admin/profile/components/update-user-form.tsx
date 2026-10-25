@@ -101,8 +101,9 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
                 <FormControl>
                   <ImageUploadInput
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={({ imageUrl }) => field.onChange(imageUrl)}
                     folder="profile"
+                    withDisplayVersion={false}
                     onUploadingChange={setIsUploading}
                   />
                 </FormControl>

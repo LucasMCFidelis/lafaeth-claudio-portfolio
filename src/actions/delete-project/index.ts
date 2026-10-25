@@ -20,7 +20,10 @@ export const deleteProject = async (id: string) => {
   // The project images are deleted with it (on delete cascade), so read
   // their URLs first to remove the files.
   const images = await db
-    .select({ imageUrl: projectImagesTable.imageUrl })
+    .select({
+      imageUrl: projectImagesTable.imageUrl,
+      originalUrl: projectImagesTable.originalUrl,
+    })
     .from(projectImagesTable)
     .where(eq(projectImagesTable.projectId, idValidated));
 
@@ -32,7 +35,11 @@ export const deleteProject = async (id: string) => {
   if (!deleted) throw new Error("Project not found");
 
   updateTag(cacheTags.projects);
-  after(() => deleteUnusedImageFiles(images.map((image) => image.imageUrl)));
+  after(() =>
+    deleteUnusedImageFiles(
+      images.flatMap((image) => [image.imageUrl, image.originalUrl])
+    )
+  );
 
   return { success: true };
 };

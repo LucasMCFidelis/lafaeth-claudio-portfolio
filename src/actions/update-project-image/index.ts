@@ -25,7 +25,10 @@ export const updateProjectImage = async (
   if (!userIsLogged) throw new Error("Unauthorize");
 
   const [current] = await db
-    .select({ imageUrl: projectImagesTable.imageUrl })
+    .select({
+      imageUrl: projectImagesTable.imageUrl,
+      originalUrl: projectImagesTable.originalUrl,
+    })
     .from(projectImagesTable)
     .where(eq(projectImagesTable.id, dataValidated.id));
 
@@ -33,7 +36,11 @@ export const updateProjectImage = async (
     .update(projectImagesTable)
     .set({
       title: dataValidated.title,
-      ...(dataValidated.imageUrl && { imageUrl: dataValidated.imageUrl }),
+      // The original always goes with the image it belongs to.
+      ...(dataValidated.imageUrl && {
+        imageUrl: dataValidated.imageUrl,
+        originalUrl: dataValidated.originalUrl ?? null,
+      }),
     })
     .where(eq(projectImagesTable.id, dataValidated.id))
     .returning();
@@ -41,8 +48,14 @@ export const updateProjectImage = async (
   if (!image) throw new Error("Project image not found");
 
   updateTag(cacheTags.projects);
-  if (current && current.imageUrl !== image.imageUrl) {
-    after(() => deleteUnusedImageFiles([current.imageUrl]));
+  if (
+    current &&
+    (current.imageUrl !== image.imageUrl ||
+      current.originalUrl !== image.originalUrl)
+  ) {
+    after(() =>
+      deleteUnusedImageFiles([current.imageUrl, current.originalUrl])
+    );
   }
 
   return mapToProjectImageAdmin(image);

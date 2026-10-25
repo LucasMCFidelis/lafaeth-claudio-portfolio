@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   DeleteObjectCommand,
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
@@ -10,6 +11,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { createR2Client, getR2Bucket } from "./r2-client";
 
 const UPLOAD_URL_EXPIRES_IN_SECONDS = 10 * 60;
+const DOWNLOAD_URL_EXPIRES_IN_SECONDS = 60;
 
 let client: S3Client | undefined;
 const getR2Client = () => (client ??= createR2Client());
@@ -37,6 +39,27 @@ export const createPresignedUpload = ({
       // Not signed by default: without this the browser could send any type.
       signableHeaders: new Set(["content-type"]),
     }
+  );
+
+/**
+ * Short-lived URL that makes the browser save the file instead of showing it
+ * (a plain link to another domain would only open the image).
+ */
+export const createPresignedDownload = ({
+  key,
+  filename,
+}: {
+  key: string;
+  filename: string;
+}) =>
+  getSignedUrl(
+    getR2Client(),
+    new GetObjectCommand({
+      Bucket: getR2Bucket(),
+      Key: key,
+      ResponseContentDisposition: `attachment; filename="${filename}"`,
+    }),
+    { expiresIn: DOWNLOAD_URL_EXPIRES_IN_SECONDS }
   );
 
 /** Deletes the files; a failure is only logged. */

@@ -49,6 +49,7 @@ const CadastreProjectImageDialog = ({
     projectId,
     title: "",
     imageUrl: "",
+    originalUrl: null,
   };
 
   const form = useForm<
@@ -122,7 +123,10 @@ const CadastreProjectImageDialog = ({
                   <FormControl>
                     <ImageUploadInput
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={({ imageUrl, originalUrl }) => {
+                        field.onChange(imageUrl);
+                        form.setValue("originalUrl", originalUrl);
+                      }}
                       folder="projects"
                       onUploadingChange={setIsUploading}
                     />

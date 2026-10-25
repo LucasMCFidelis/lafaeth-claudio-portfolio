@@ -63,6 +63,7 @@ const CadastreImageModal = ({
       title: "",
       description: "",
       imageUrl: "",
+      originalUrl: null,
       visibleInHome: false,
       ...(initialData && {
         artist: initialData.artist,
@@ -160,7 +161,10 @@ const CadastreImageModal = ({
                       <FormControl>
                         <ImageUploadInput
                           value={field.value}
-                          onChange={field.onChange}
+                          onChange={({ imageUrl, originalUrl }) => {
+                            field.onChange(imageUrl);
+                            formCadastreImage.setValue("originalUrl", originalUrl);
+                          }}
                           folder="images"
                           onUploadingChange={setIsUploading}
                         />

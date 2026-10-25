@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowBigLeft, ArrowBigRight, Info, X } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Download, Info, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
@@ -108,6 +108,18 @@ const GalleryRootList = ({
       <div className="absolute w-full flex justify-between z-10 px-5 pt-5">
         <ExpandFullSizeButton />
         <div className="flex gap-2">
+          {item.originalUrl && (
+            <Button size="icon" asChild>
+              {/* Plain link: the route answers with a file to save. */}
+              <a
+                href={`/api/download/${item.id}`}
+                aria-label="Baixar original"
+                title="Baixar original"
+              >
+                <Download />
+              </a>
+            </Button>
+          )}
           {isFullscreen && (
             <Button
               size="icon"

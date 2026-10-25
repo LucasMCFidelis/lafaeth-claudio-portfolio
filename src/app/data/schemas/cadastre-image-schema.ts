@@ -12,6 +12,8 @@ export const cadastreImageSchema = z.object({
     .trim()
     .min(1, "Descrição é obrigatória."),
   imageUrl: imageUrlSchema,
+  // Original file for download; null/undefined when imageUrl is the original.
+  originalUrl: imageUrlSchema.nullish(),
   visibleInHome: z.boolean().catch(false),
   artist: z
     .string({ message: "Artista inválido" })

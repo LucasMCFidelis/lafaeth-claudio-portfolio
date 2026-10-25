@@ -33,6 +33,7 @@ export const postProjectImage = async (
       projectId: dataValidated.projectId,
       title: dataValidated.title,
       imageUrl: dataValidated.imageUrl,
+      originalUrl: dataValidated.originalUrl ?? null,
       index: lastIndex === null ? 0 : lastIndex + 1,
     })
     .returning();

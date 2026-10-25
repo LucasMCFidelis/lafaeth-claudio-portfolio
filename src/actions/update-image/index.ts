@@ -28,7 +28,10 @@ export const updateImage = async (
   if (!userIsLogged) throw new Error("Unauthorize");
 
   const [current] = await db
-    .select({ imageUrl: imagesTable.imageUrl })
+    .select({
+      imageUrl: imagesTable.imageUrl,
+      originalUrl: imagesTable.originalUrl,
+    })
     .from(imagesTable)
     .where(eq(imagesTable.id, imageId));
 
@@ -45,8 +48,14 @@ export const updateImage = async (
   if (!updatedImage) throw new Error("Image not found");
 
   updateTag(cacheTags.images);
-  if (current && current.imageUrl !== updatedImage.imageUrl) {
-    after(() => deleteUnusedImageFiles([current.imageUrl]));
+  if (
+    current &&
+    (current.imageUrl !== updatedImage.imageUrl ||
+      current.originalUrl !== updatedImage.originalUrl)
+  ) {
+    after(() =>
+      deleteUnusedImageFiles([current.imageUrl, current.originalUrl])
+    );
   }
 
   return mapToImageDTO({ image: updatedImage });

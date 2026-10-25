@@ -46,13 +46,17 @@ export const deleteImage = async (
   const [deleted] = await db
     .delete(imagesTable)
     .where(eq(imagesTable.id, imageId))
-    .returning({ id: imagesTable.id, imageUrl: imagesTable.imageUrl });
+    .returning({
+      id: imagesTable.id,
+      imageUrl: imagesTable.imageUrl,
+      originalUrl: imagesTable.originalUrl,
+    });
 
   if (!deleted) throw new Error("Image not found");
 
   // Every public list (and the home banner) is also tagged with images.
   updateTag(cacheTags.images);
-  after(() => deleteUnusedImageFiles([deleted.imageUrl]));
+  after(() => deleteUnusedImageFiles([deleted.imageUrl, deleted.originalUrl]));
 
   return { deleted: true };
 };

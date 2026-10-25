@@ -38,6 +38,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
     title: initialData.title ?? "",
     description: initialData.description ?? "",
     imageUrl: initialData.imageUrl ?? "",
+    originalUrl: initialData.originalUrl,
     artist: initialData.artist ?? "",
     screenwriter: initialData.screenwriter ?? "",
     colorist: initialData.colorist ?? "",
@@ -98,7 +99,10 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
                   <FormControl>
                     <ImageUploadInput
                       value={field.value}
-                      onChange={field.onChange}
+                      onChange={({ imageUrl, originalUrl }) => {
+                        field.onChange(imageUrl);
+                        formUpdateImage.setValue("originalUrl", originalUrl);
+                      }}
                       folder="images"
                       disabled={!formIsEditable}
                       onUploadingChange={setIsUploading}

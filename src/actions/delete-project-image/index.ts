@@ -23,12 +23,13 @@ export const deleteProjectImage = async (id: string) => {
     .returning({
       id: projectImagesTable.id,
       imageUrl: projectImagesTable.imageUrl,
+      originalUrl: projectImagesTable.originalUrl,
     });
 
   if (!deleted) throw new Error("Project image not found");
 
   updateTag(cacheTags.projects);
-  after(() => deleteUnusedImageFiles([deleted.imageUrl]));
+  after(() => deleteUnusedImageFiles([deleted.imageUrl, deleted.originalUrl]));
 
   return { success: true };
 };

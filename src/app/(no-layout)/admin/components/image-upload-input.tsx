@@ -6,15 +6,23 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ACCEPTED_IMAGE_TYPE_LIST, ImageFolder } from "@/helpers/image-upload";
-import { useUploadImage } from "@/hooks/mutations/use-upload-image";
+import {
+  UploadedImage,
+  useUploadImage,
+} from "@/hooks/mutations/use-upload-image";
 import { cn } from "@/lib/utils";
 
 interface ImageUploadInputProps {
   /** URL already in the field; only changes the button text. */
   value?: string;
-  /** Receives the public URL once the file is in R2. */
-  onChange: (url: string) => void;
+  /** Receives the URLs to save once the file is in R2. */
+  onChange: (uploaded: UploadedImage) => void;
   folder: ImageFolder;
+  /**
+   * JPEG and PNG also get a lighter WebP version, shown on the site, while the
+   * file sent stays as the original (default). False uploads the file as is.
+   */
+  withDisplayVersion?: boolean;
   disabled?: boolean;
   /** Lets the form disable its submit button while a file is uploading. */
   onUploadingChange?: (uploading: boolean) => void;
@@ -33,6 +41,7 @@ export function ImageUploadInput({
   value,
   onChange,
   folder,
+  withDisplayVersion,
   disabled,
   onUploadingChange,
   className,
@@ -40,7 +49,7 @@ export function ImageUploadInput({
 }: ImageUploadInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
-  const upload = useUploadImage(folder);
+  const upload = useUploadImage(folder, { withDisplayVersion });
   const uploading = upload.isPending;
   const blocked = disabled || uploading;
 
@@ -51,7 +60,7 @@ export function ImageUploadInput({
   const handleFile = (file?: File) => {
     if (!file || blocked) return;
     upload.mutate(file, {
-      onSuccess: (url) => onChange(url),
+      onSuccess: (uploaded) => onChange(uploaded),
       onError: (error) =>
         toast.error(error.message || "Erro ao enviar a imagem"),
     });

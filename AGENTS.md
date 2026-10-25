@@ -31,8 +31,8 @@ Node 24 ou superior (campo `engines` do `package.json`). Variáveis de ambiente 
 
 Scripts rodados pelo dono com `npx tsx` (leem o `.env`). A pasta `scripts/` está no `.gitignore`, então eles existem só na máquina do dono:
 
-- `scripts/migrate-images-to-r2.ts [--dry-run]`: copia para o R2 as imagens salvas como link do Drive/Wix e atualiza as URLs no banco. Pode rodar de novo.
-- `scripts/cleanup-r2-orphans.ts [--delete]`: lista (e com `--delete` apaga) os arquivos do bucket com mais de 24 h que nenhuma linha usa.
+- `scripts/migrate-images-to-r2.ts [--dry-run]`: copia para o R2 as imagens salvas como link do Drive/Wix e cria a versão WebP (`sharp`) das imagens JPEG/PNG, guardando o arquivo anterior em `original_url`. Pode rodar de novo; rode antes `npx drizzle-kit push`.
+- `scripts/cleanup-r2-orphans.ts [--delete]`: lista (e com `--delete` apaga) os arquivos do bucket com mais de 24 h que nenhuma linha usa (`image_url` e `original_url` contam como uso).
 
 ## Arquitetura
 
@@ -84,8 +84,10 @@ Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente)
 - **Banco de dados:** mudanças no schema são aplicadas com `npx drizzle-kit push`, rodado pelo dono do projeto. Não usar `drizzle-kit generate`/`migrate` e não criar a pasta `drizzle/`.
 - `src/components/ui/*` é código gerado pelo shadcn: editar só o mínimo necessário.
 - **Upload de imagens (Cloudflare R2):** o arquivo vai do navegador direto para o bucket, sem passar pelo Next (Server Actions aceitam no máximo 1 MB). Nos formulários do admin, o campo de URL usa `<ImageUploadInput folder>` (`src/app/(no-layout)/admin/components/image-upload-input.tsx`), que chama a action `create-image-upload-url` (login + Zod; devolve URL assinada de `PUT` e a URL pública), envia com `useUploadImage` e coloca a URL pública no campo; o submit salva a URL como antes. Tipos e tamanho máximo em `src/helpers/image-upload.ts`. Cliente S3 em `src/lib/r2.ts` (`server-only`; `src/lib/r2-client.ts` só para ele e para os scripts).
+- **Versão exibida e original:** `images` e `project_images` têm `image_url` (versão mostrada no site) e `original_url` (arquivo para download, nulo quando `image_url` já é o original). Ao enviar um JPEG/PNG, o navegador gera um WebP (lado maior até 3840 px, qualidade 90, `src/helpers/create-display-image.ts`) e envia os dois; `useUploadImage` devolve `{ imageUrl, originalUrl }` e o formulário preenche os dois campos. O motivo é que o otimizador do Next desiste de baixar a imagem original depois de 7 s (fixo, não configurável): originais de dezenas de MB davam 504. A foto de perfil não ganha versão WebP (`withDisplayVersion={false}`). Todo código que mostra a imagem continua usando `imageUrl`; só o download usa `originalUrl`.
+- **Download do original:** a galeria mostra "Baixar original" quando o item tem `originalUrl`, que abre `/api/download/[id]` (`src/app/api/download/[id]/route.ts`; id de `images` ou `project_images`). A rota redireciona para uma URL assinada do R2 de 1 minuto com `Content-Disposition: attachment`.
 - URLs de imagem são validadas por `imageUrlSchema` (`src/app/data/schemas/image-url-schema.ts`): aceita URLs do R2 e, até a migração terminar, links antigos do Drive/Wix.
-- Actions que excluem uma linha com imagem ou trocam a URL chamam `after(() => deleteUnusedImageFiles([urlAntiga]))` (`src/app/data/image/delete-unused-image-files.ts`), que apaga o arquivo do R2 se nenhuma outra linha usar a mesma URL. Hoje: `delete-image`, `delete-project-image`, `delete-project`, `update-image`, `update-project-image`, `update-user-data`.
+- Actions que excluem uma linha com imagem ou trocam a URL chamam `after(() => deleteUnusedImageFiles([urlAntiga]))` (`src/app/data/image/delete-unused-image-files.ts`), que apaga o arquivo do R2 se nenhuma outra linha usar a mesma URL. Passam a URL da imagem e a do original. Hoje: `delete-image`, `delete-project-image`, `delete-project`, `update-image`, `update-project-image`, `update-user-data`.
 - Imagens remotas vêm do R2 (`NEXT_PUBLIC_R2_PUBLIC_URL`) e, as antigas, do Drive/Wix (`next.config.ts` → `images.remotePatterns`); usar `next/image`. Toda `<Image fill>` recebe `sizes` (padrões em `src/helpers/image-sizes.ts`) e só as imagens da primeira dobra usam `imageLoadingProps(true)` (`loading="eager"` + `fetchPriority="high"`).
 - Animações (sem biblioteca; CSS em `globals.css`, todas desligadas com `prefers-reduced-motion`):
   - Imagens de conteúdo usam `FadeImage` (`src/components/common/fade-image.tsx`): shimmer enquanto carrega e fade-in.
