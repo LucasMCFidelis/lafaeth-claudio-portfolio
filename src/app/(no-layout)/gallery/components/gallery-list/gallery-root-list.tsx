@@ -166,6 +166,7 @@ const GalleryRootList = ({
                 alt={item.title}
                 fill
                 sizes={isFullscreen ? "100vw" : "(max-width: 640px) 100vw, 75vw"}
+                quality={95}
                 loading="eager"
                 fetchPriority="high"
                 draggable={false}
