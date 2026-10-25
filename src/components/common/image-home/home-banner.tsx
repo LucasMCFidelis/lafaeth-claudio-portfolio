@@ -32,7 +32,6 @@ const HomeBanner = ({ image, className }: HomeBannerProps) => {
         fill
         // Full screen width: ask for the largest version the original has.
         sizes="100vw"
-        quality={90}
         // The banner is the largest element above the fold (LCP).
         loading="eager"
         fetchPriority="high"

@@ -10,7 +10,14 @@ import { cn } from "@/lib/utils";
  * Use it like <Image fill />: the parent must be positioned (relative).
  * To restart the effect when the image changes, give it a `key` (e.g. src).
  */
-const FadeImage = ({ className, onLoad, onError, alt, ...rest }: ImageProps) => {
+const FadeImage = ({
+  className,
+  onLoad,
+  onError,
+  alt,
+  quality = 90,
+  ...rest
+}: ImageProps) => {
   const [loaded, setLoaded] = useState(false);
 
   return (
@@ -24,6 +31,7 @@ const FadeImage = ({ className, onLoad, onError, alt, ...rest }: ImageProps) => 
       />
       <Image
         alt={alt}
+        quality={quality}
         {...rest}
         onLoad={(e) => {
           setLoaded(true);
