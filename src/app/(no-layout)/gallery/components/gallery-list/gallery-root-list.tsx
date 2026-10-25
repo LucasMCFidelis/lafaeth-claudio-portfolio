@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowBigLeft, ArrowBigRight, Download, Info, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Download, Info, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { parseAsString, useQueryStates } from "nuqs";
@@ -109,7 +109,7 @@ const GalleryRootList = ({
         <ExpandFullSizeButton />
         <div className="flex gap-2">
           {item.originalUrl && (
-            <Button size="icon" asChild>
+            <Button size="icon" variant="overlay" asChild>
               {/* Plain link: the route answers with a file to save. */}
               <a
                 href={`/api/download/${item.id}`}
@@ -123,7 +123,7 @@ const GalleryRootList = ({
           {isFullscreen && (
             <Button
               size="icon"
-              variant={detailsOpen ? "secondary" : "default"}
+              variant={detailsOpen ? "secondary" : "overlay"}
               onClick={() => setDetailsOpen((open) => !open)}
               aria-label={detailsOpen ? "Ocultar detalhes" : "Mostrar detalhes"}
               aria-expanded={detailsOpen}
@@ -132,7 +132,7 @@ const GalleryRootList = ({
               <Info />
             </Button>
           )}
-          <Button size="icon" asChild>
+          <Button size="icon" variant="overlay" asChild>
             <Link href={hrefBackToClose} aria-label="Fechar galeria">
               <X />
             </Link>
@@ -207,12 +207,22 @@ const GalleryRootList = ({
             </div>
 
             <div className="flex w-full justify-between items-center mb-2">
-              <Button size="icon" onClick={goPrev} aria-label="Imagem anterior">
-                <ArrowBigLeft />
+              <Button
+                size="icon"
+                variant="overlay"
+                onClick={goPrev}
+                aria-label="Imagem anterior"
+              >
+                <ChevronLeft />
               </Button>
               {counter}
-              <Button size="icon" onClick={goNext} aria-label="Próxima imagem">
-                <ArrowBigRight />
+              <Button
+                size="icon"
+                variant="overlay"
+                onClick={goNext}
+                aria-label="Próxima imagem"
+              >
+                <ChevronRight />
               </Button>
             </div>
           </div>
@@ -221,19 +231,21 @@ const GalleryRootList = ({
           <>
             <Button
               size="icon"
+              variant="overlay"
               onClick={goPrev}
               aria-label="Imagem anterior"
               className="absolute z-10 left-5 top-1/2 -translate-y-1/2"
             >
-              <ArrowBigLeft />
+              <ChevronLeft />
             </Button>
             <Button
               size="icon"
+              variant="overlay"
               onClick={goNext}
               aria-label="Próxima imagem"
               className="absolute z-10 right-5 top-1/2 -translate-y-1/2"
             >
-              <ArrowBigRight />
+              <ChevronRight />
             </Button>
             <div className="absolute z-10 bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-background/80 px-3 py-1">
               {counter}

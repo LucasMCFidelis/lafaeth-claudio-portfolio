@@ -24,6 +24,7 @@ const ExpandFullSizeButton = ({
   return (
     <Button
       size="icon"
+      variant="overlay"
       aria-label={isFullscreen ? "Sair da tela cheia" : "Tela cheia"}
       onClick={(e) => (onClick ? onClick(e) : toggleFullscreen())}
       {...rest}
