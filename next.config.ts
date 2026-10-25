@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
     // 31 days to update. R2 uploads always get a new file name, so they
     // show right away.
     minimumCacheTTL: 2678400,
+    // The optimizer reads source images up to 50 MB by default. Uploads can
+    // be up to 100 MB (MAX_IMAGE_UPLOAD_BYTES in src/helpers/image-upload.ts).
+    maximumResponseBody: 100 * 1024 * 1024,
     formats: ["image/avif", "image/webp"],
     // 75 is the default; 90 is used by the home banner, which is shown at
     // full screen width and shows compression artifacts at 75.

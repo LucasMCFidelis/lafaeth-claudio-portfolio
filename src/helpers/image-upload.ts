@@ -17,8 +17,11 @@ export const ACCEPTED_IMAGE_TYPE_LIST = Object.keys(ACCEPTED_IMAGE_TYPES) as [
 export const isAcceptedImageType = (type: string): type is AcceptedImageType =>
   Object.hasOwn(ACCEPTED_IMAGE_TYPES, type);
 
-/** The Next image optimizer reads source files up to 50 MB. */
-export const MAX_IMAGE_UPLOAD_BYTES = 20 * 1024 * 1024;
+/**
+ * Keep images.maximumResponseBody in next.config.ts above this value: the
+ * Next image optimizer refuses source files larger than that (50 MB default).
+ */
+export const MAX_IMAGE_UPLOAD_BYTES = 100 * 1024 * 1024;
 
 /** Top level folder of the file in the bucket. */
 export const IMAGE_FOLDERS = ["images", "projects", "profile"] as const;
@@ -33,6 +36,6 @@ export const IMAGE_CACHE_CONTROL = "public, max-age=31536000, immutable";
 
 export const imageUploadMessages = {
   invalidType: "Formato não aceito. Envie JPG, PNG, WebP, AVIF ou GIF.",
-  tooLarge: "A imagem deve ter no máximo 20 MB.",
+  tooLarge: "A imagem deve ter no máximo 100 MB.",
   empty: "O arquivo está vazio.",
 };

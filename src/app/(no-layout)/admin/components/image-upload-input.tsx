@@ -112,7 +112,7 @@ export function ImageUploadInput({
         </div>
       )}
       <p className="text-xs text-muted-foreground">
-        JPG, PNG, WebP, AVIF ou GIF, até 20 MB. Também dá para soltar o arquivo
+        JPG, PNG, WebP, AVIF ou GIF, até 100 MB. Também dá para soltar o arquivo
         aqui.
       </p>
     </div>
