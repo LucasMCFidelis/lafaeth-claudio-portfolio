@@ -2,7 +2,7 @@ import { Menu } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 
-import { Button } from "../ui/button";
+import { buttonVariants } from "../ui/button";
 import {
   Sheet,
   SheetContent,
@@ -18,10 +18,11 @@ import ShowWhenLogged from "./show-when-logged";
 const SheetMenu = () => {
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Abrir menu">
-          <Menu />
-        </Button>
+      <SheetTrigger
+        className={buttonVariants({ variant: "ghost", size: "icon" })}
+        aria-label="Abrir menu"
+      >
+        <Menu />
       </SheetTrigger>
       <SheetContent className="font-nav">
         <SheetHeader>
