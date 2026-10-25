@@ -32,6 +32,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUpdateProjectImage } from "@/hooks/mutations/use-update-project-image";
 
+import { ImageUploadInput } from "../../components/image-upload-input";
+
 interface EditProjectImageDialogProps {
   image: ProjectImageAdminDTO;
 }
@@ -39,6 +41,7 @@ interface EditProjectImageDialogProps {
 const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
   const [open, setOpen] = useState(false);
   const updateProjectImageMutation = useUpdateProjectImage();
+  const [isUploading, setIsUploading] = useState(false);
 
   const formSchema = z.object({
     id: updateProjectImageSchema.shape.id,
@@ -69,10 +72,6 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
   });
 
   const imageUrl = useWatch({ control: form.control, name: "imageUrl" });
-  const preview =
-    imageUrl === image.imageUrl
-      ? image.imageUrl
-      : projectImageUrlSchema.safeParse(imageUrl).data;
 
   function onSubmit(data: FormOutput) {
     updateProjectImageMutation.mutate(
@@ -118,9 +117,9 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
             className="flex flex-col gap-4"
           >
             <div className="relative aspect-video rounded-lg bg-accent">
-              {preview && (
+              {imageUrl && (
                 <Image
-                  src={preview}
+                  src={imageUrl}
                   alt="Prévia da imagem"
                   fill
                   sizes="(max-width: 640px) 100vw, 512px"
@@ -133,11 +132,13 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
               name="imageUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Link da imagem no Drive</FormLabel>
+                  <FormLabel>Imagem</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="https://drive.google.com/file/d/..."
-                      {...field}
+                    <ImageUploadInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      folder="projects"
+                      onUploadingChange={setIsUploading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -159,7 +160,7 @@ const EditProjectImageDialog = ({ image }: EditProjectImageDialogProps) => {
             />
             <Button
               type="submit"
-              disabled={updateProjectImageMutation.isPending}
+              disabled={updateProjectImageMutation.isPending || isUploading}
             >
               Salvar
             </Button>

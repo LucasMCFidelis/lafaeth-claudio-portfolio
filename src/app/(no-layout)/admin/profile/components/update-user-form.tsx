@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -26,6 +27,7 @@ import { useImage } from "@/hooks/queries/use-images";
 import { useOriginalImageSize } from "@/hooks/use-original-image-size";
 
 import { ImageFormField } from "../../components/image-form-field";
+import { ImageUploadInput } from "../../components/image-upload-input";
 
 interface UpdateUserFormProps {
   initialData: UserDTO;
@@ -33,6 +35,7 @@ interface UpdateUserFormProps {
 
 const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
   const updateUserDataMutation = useUpdateUserData();
+  const [isUploading, setIsUploading] = useState(false);
   const form = useForm<UserUpdateDTO>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
@@ -94,9 +97,14 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             name="image"
             render={({ field }) => (
               <FormItem className="flex-1 h-fit lg:self-end">
-                <FormLabel>Imagem</FormLabel>
+                <FormLabel>Foto de perfil</FormLabel>
                 <FormControl>
-                  <Input placeholder="Url para sua foto de perfil" {...field} />
+                  <ImageUploadInput
+                    value={field.value}
+                    onChange={field.onChange}
+                    folder="profile"
+                    onUploadingChange={setIsUploading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -286,7 +294,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
         <Button
           type="submit"
           className="w-full max-w-md lg:col-span-2 justify-self-center mt-4"
-          disabled={updateUserDataMutation.isPending}
+          disabled={updateUserDataMutation.isPending || isUploading}
         >
           Atualizar
         </Button>

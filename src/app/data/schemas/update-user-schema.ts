@@ -1,18 +1,11 @@
 import z from "zod";
 
+import { imageUrlSchema } from "./image-url-schema";
+
 export const updateUserSchema = z.object({
   name: z.string("Nome inválido.").trim().min(1, "Nome é obrigatório."),
   email: z.email("E-mail inválido!"),
-  image: z
-    .string()
-    .refine(
-      (val) =>
-        val.includes("https://drive.google.com/") &&
-        z.string().url().safeParse(val).success,
-      {
-        message: "Url da imagem deve ser uma URL válida do drive",
-      }
-    ),
+  image: imageUrlSchema,
   description: z.string().optional(),
   birthDate: z
     .union([z.string(), z.null()])

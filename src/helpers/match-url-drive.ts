@@ -1,16 +1,14 @@
+/** Id of the file in a Google Drive link (/file/d/<id>/ or ?id=<id>). */
+export function extractDriveFileId(url: string): string | null {
+  return (
+    url.match(/\/file\/d\/([^/?#]+)/)?.[1] ??
+    url.match(/[?&]id=([^&#]+)/)?.[1] ??
+    null
+  );
+}
+
+/** Turns a Drive sharing link into the direct link of the file. */
 export function matchUrlDrive(url: string): string {
-  // 1) Caso do formato /file/d/<ID>/
-      const matchFile = url.match(/\/file\/d\/([^/]+)\//);
-      if (matchFile) {
-        return `https://drive.google.com/uc?id=${matchFile[1]}`;
-      }
-
-      // 2) Caso do formato open?id=<ID>
-      const matchOpen = url.match(/[?&]id=([^&]+)/);
-      if (matchOpen) {
-        return `https://drive.google.com/uc?id=${matchOpen[1]}`;
-      }
-
-      // 3) Se não bater, retorna o original (já validado)
-      return url;
+  const fileId = extractDriveFileId(url);
+  return fileId ? `https://drive.google.com/uc?id=${fileId}` : url;
 }
