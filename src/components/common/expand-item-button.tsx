@@ -31,13 +31,15 @@ const ExpandItemButton = <TypeLink extends boolean>({
   const router = useRouter();
   return (
     <Button
+      size="icon"
+      variant="overlay"
       onClick={(event) => {
         onClick?.(event);
         if (typeLink && href) {
           router.push(href);
         }
       }}
-      className={cn(className, "absolute top-0 right-0 z-30")}
+      className={cn(className, "absolute top-2 right-2 z-30")}
       {...rest}
     >
       {children ? children : <Expand />}
