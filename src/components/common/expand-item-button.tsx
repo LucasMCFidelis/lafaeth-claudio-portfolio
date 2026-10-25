@@ -33,6 +33,7 @@ const ExpandItemButton = <TypeLink extends boolean>({
     <Button
       size="icon"
       variant="overlay"
+      aria-label="Editar"
       onClick={(event) => {
         onClick?.(event);
         if (typeLink && href) {
