@@ -2,7 +2,9 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 
+import deleteUnusedImageFiles from "@/app/data/image/delete-unused-image-files";
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { mapToImageDTO } from "@/app/data/image/map-to-image-dto";
 import {
@@ -25,6 +27,11 @@ export const updateImage = async (
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
+  const [current] = await db
+    .select({ imageUrl: imagesTable.imageUrl })
+    .from(imagesTable)
+    .where(eq(imagesTable.id, imageId));
+
   const [updatedImage] = await db
     .update(imagesTable)
     .set({
@@ -38,6 +45,9 @@ export const updateImage = async (
   if (!updatedImage) throw new Error("Image not found");
 
   updateTag(cacheTags.images);
+  if (current && current.imageUrl !== updatedImage.imageUrl) {
+    after(() => deleteUnusedImageFiles([current.imageUrl]));
+  }
 
   return mapToImageDTO({ image: updatedImage });
 };

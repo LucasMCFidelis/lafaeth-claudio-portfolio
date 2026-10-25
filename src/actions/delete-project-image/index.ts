@@ -2,8 +2,10 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 import z from "zod";
 
+import deleteUnusedImageFiles from "@/app/data/image/delete-unused-image-files";
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { projectImagesTable } from "@/db/schema";
@@ -18,11 +20,15 @@ export const deleteProjectImage = async (id: string) => {
   const [deleted] = await db
     .delete(projectImagesTable)
     .where(eq(projectImagesTable.id, idValidated))
-    .returning({ id: projectImagesTable.id });
+    .returning({
+      id: projectImagesTable.id,
+      imageUrl: projectImagesTable.imageUrl,
+    });
 
   if (!deleted) throw new Error("Project image not found");
 
   updateTag(cacheTags.projects);
+  after(() => deleteUnusedImageFiles([deleted.imageUrl]));
 
   return { success: true };
 };

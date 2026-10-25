@@ -2,7 +2,9 @@
 
 import { eq } from "drizzle-orm";
 import { updateTag } from "next/cache";
+import { after } from "next/server";
 
+import deleteUnusedImageFiles from "@/app/data/image/delete-unused-image-files";
 import { mapToProjectImageAdmin } from "@/app/data/project/map-to-project";
 import { ProjectImageAdminDTO } from "@/app/data/project/project-dto";
 import {
@@ -22,6 +24,11 @@ export const updateProjectImage = async (
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
+  const [current] = await db
+    .select({ imageUrl: projectImagesTable.imageUrl })
+    .from(projectImagesTable)
+    .where(eq(projectImagesTable.id, dataValidated.id));
+
   const [image] = await db
     .update(projectImagesTable)
     .set({
@@ -34,6 +41,9 @@ export const updateProjectImage = async (
   if (!image) throw new Error("Project image not found");
 
   updateTag(cacheTags.projects);
+  if (current && current.imageUrl !== image.imageUrl) {
+    after(() => deleteUnusedImageFiles([current.imageUrl]));
+  }
 
   return mapToProjectImageAdmin(image);
 };
