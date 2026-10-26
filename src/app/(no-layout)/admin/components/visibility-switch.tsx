@@ -14,6 +14,8 @@ interface VisibilitySwitchProps {
   visible: boolean;
   /** Text next to the switch when visible (default "Visível"). */
   visibleLabel?: string;
+  /** Text next to the switch when hidden (default "Oculto"). */
+  hiddenLabel?: string;
   className?: string;
 }
 
@@ -23,6 +25,7 @@ const VisibilitySwitch = ({
   id,
   visible,
   visibleLabel = "Visível",
+  hiddenLabel = "Oculto",
   className,
 }: VisibilitySwitchProps) => {
   const switchId = useId();
@@ -51,7 +54,7 @@ const VisibilitySwitch = ({
         }
       />
       <label htmlFor={switchId} className="cursor-pointer select-none">
-        {visible ? visibleLabel : "Oculto"}
+        {visible ? visibleLabel : hiddenLabel}
       </label>
     </div>
   );

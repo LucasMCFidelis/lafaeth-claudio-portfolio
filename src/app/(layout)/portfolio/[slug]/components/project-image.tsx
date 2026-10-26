@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 
 interface ProjectImageProps {
   image: ProjectImageDTO;
-  galleryHref: string;
+  /** Without it (draft preview) the image is not a link to the gallery. */
+  galleryHref?: string;
   sizes: string;
   priority?: boolean;
   className?: string;
@@ -25,28 +26,38 @@ const ProjectImage = ({
   imageClassName,
   style,
 }: ProjectImageProps) => {
+  const content = (
+    <div className="group relative overflow-hidden">
+      <FadeImage
+        src={image.imageUrl}
+        alt={image.title}
+        width={1600}
+        height={1000}
+        sizes={sizes}
+        {...imageLoadingProps(priority)}
+        className={cn(
+          "w-full h-auto group-hover:scale-[1.02]",
+          imageClassName
+        )}
+      />
+    </div>
+  );
+
+  if (!galleryHref) {
+    return (
+      <div className={cn("block", className)} style={style}>
+        {content}
+      </div>
+    );
+  }
+
   return (
     <Link
       href={`${galleryHref}?id=${image.id}`}
       className={cn("block", className)}
       style={style}
     >
-      <ArtworkTransition imageId={image.id}>
-        <div className="group relative overflow-hidden">
-          <FadeImage
-            src={image.imageUrl}
-            alt={image.title}
-            width={1600}
-            height={1000}
-            sizes={sizes}
-            {...imageLoadingProps(priority)}
-            className={cn(
-              "w-full h-auto group-hover:scale-[1.02]",
-              imageClassName
-            )}
-          />
-        </div>
-      </ArtworkTransition>
+      <ArtworkTransition imageId={image.id}>{content}</ArtworkTransition>
     </Link>
   );
 };

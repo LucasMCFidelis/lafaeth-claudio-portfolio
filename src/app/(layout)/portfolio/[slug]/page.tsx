@@ -6,10 +6,7 @@ import getVisibleProjectBySlugCached from "@/app/data/project/get-visible-projec
 import AnimatedSuspense from "@/components/common/animated-suspense";
 import PageTransition from "@/components/common/page-transition";
 
-import ProjectHeader from "./components/project-header";
-import ProjectImage from "./components/project-image";
-import ProjectImagesColumns from "./components/project-images-columns";
-import ProjectNavigation from "./components/project-navigation";
+import ProjectArticle from "./components/project-article";
 import ProjectSkeleton from "./components/project-skeleton";
 
 type Params = PageProps<"/portfolio/[slug]">["params"];
@@ -48,27 +45,14 @@ const ProjectContent = async ({ params }: { params: Params }) => {
   if (!page) notFound();
 
   const { project, prev, next } = page;
-  const galleryHref = `/gallery/portfolio/${project.slug}`;
 
   return (
-    <article className="flex flex-col gap-10 w-11/12 mx-auto">
-      <ProjectHeader project={project} />
-      {project.cover && (
-        <ProjectImage
-          image={project.cover}
-          galleryHref={galleryHref}
-          sizes="92vw"
-          priority
-          imageClassName="h-svh object-cover"
-        />
-      )}
-      <ProjectImagesColumns
-        images={project.images}
-        columns={project.imageColumns}
-        galleryHref={galleryHref}
-      />
-      <ProjectNavigation prev={prev} next={next} />
-    </article>
+    <ProjectArticle
+      project={project}
+      prev={prev}
+      next={next}
+      galleryHref={`/gallery/portfolio/${project.slug}`}
+    />
   );
 };
 

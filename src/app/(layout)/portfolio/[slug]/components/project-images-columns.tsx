@@ -6,7 +6,7 @@ import ProjectImage from "./project-image";
 interface ProjectImagesColumnsProps {
   images: ProjectImageDTO[];
   columns: 1 | 2;
-  galleryHref: string;
+  galleryHref?: string;
 }
 
 /** One column fills the article (w-11/12); two columns split it from md up. */

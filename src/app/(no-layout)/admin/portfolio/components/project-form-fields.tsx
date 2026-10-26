@@ -171,15 +171,20 @@ const ProjectFormFields = ({
         control={form.control}
         name="visibleInProjects"
         render={({ field }) => (
-          <FormItem className="flex items-center md:col-span-2">
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-                disabled={disabled}
-              />
-            </FormControl>
-            <FormLabel>Exibir na página de portfólio</FormLabel>
+          <FormItem className="md:col-span-2">
+            <div className="flex items-center gap-2">
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={disabled}
+                />
+              </FormControl>
+              <FormLabel>Publicar no portfólio</FormLabel>
+            </div>
+            <FormDescription>
+              Desligado, o projeto fica como rascunho: só você vê, pela prévia.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}
