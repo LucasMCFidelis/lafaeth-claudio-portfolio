@@ -28,6 +28,7 @@ const CadastreProjectForm = () => {
       endDate: "",
       description: "",
       visibleInProjects: false,
+      imageColumns: 2,
     },
   });
   const postProjectMutation = usePostProject();

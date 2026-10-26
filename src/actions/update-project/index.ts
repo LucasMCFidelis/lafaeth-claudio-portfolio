@@ -37,6 +37,7 @@ export const updateProject = async (
       endDate: dataValidated.endDate || null,
       description: dataValidated.description,
       visibleInProjects: dataValidated.visibleInProjects,
+      imageColumns: dataValidated.imageColumns,
       ...(!dataValidated.visibleInProjects && { index: null }),
     })
     .where(eq(projectTable.id, dataValidated.id))

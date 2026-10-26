@@ -216,6 +216,7 @@ export const projectTable = pgTable("project", {
   startDate: date("start_date").notNull().defaultNow(),
   endDate: date("end_date"),
   visibleInProjects: boolean("visible_in_projects").notNull().default(false),
+  imageColumns: integer("image_columns").notNull().default(2),
   index: integer("index"),
 });
 

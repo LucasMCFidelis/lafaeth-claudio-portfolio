@@ -41,6 +41,7 @@ const UpdateProjectForm = ({ projectId }: UpdateProjectFormProps) => {
     endDate: project.endDate?.slice(0, 7) ?? "",
     description: project.description,
     visibleInProjects: project.visibleInProjects,
+    imageColumns: project.imageColumns,
   };
 
   const form = useForm<UpdateProjectInput, unknown, UpdateProjectDTO>({
