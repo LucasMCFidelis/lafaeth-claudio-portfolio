@@ -1,30 +1,42 @@
 import Link from "next/link";
-
-import verifyUserLogged from "@/app/data/user/verify-user";
+import { Suspense } from "react";
 
 import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
 import SheetMenu from "./sheet-menu";
+import ShowWhenLogged from "./show-when-logged";
 import ToggleTheme from "./toggle-theme";
 
-const Header = async () => {
-  const userLogged = await verifyUserLogged();
-
+const Header = () => {
   return (
     <>
-      <header className="w-full p-5 flex justify-between items-center">
-        <Link href={"/"} className="px-0 font-extrabold text-2xl md:text-3xl">
+      {/* Named so it stays still during page transitions (globals.css). */}
+      <header
+        className="w-full p-5 flex justify-between items-center lg:mb-6"
+        style={{ viewTransitionName: "site-header" }}
+      >
+        <Link href={"/"} className="px-0 font-heading font-bold tracking-wider text-2xl md:text-3xl">
           Lafaeth Claudio
         </Link>
-        <nav className="gap-4 hidden lg:flex font-semibold items-baseline">
+        <nav className="gap-4 hidden lg:flex font-nav items-center">
           <MenuItemsList />
-          {userLogged && (
-            <Link key={"/admin"} className="px-4" href={"/admin"}>
-              Administração
-            </Link>
-          )}
+          <Suspense fallback={null}>
+            <ShowWhenLogged>
+              <Link
+                key={"/admin"}
+                className="px-4 text-muted-foreground transition-colors hover:text-foreground"
+                href={"/admin"}
+              >
+                Administração
+              </Link>
+            </ShowWhenLogged>
+          </Suspense>
           <ToggleTheme />
-          {userLogged && <LogoutButton />}
+          <Suspense fallback={null}>
+            <ShowWhenLogged>
+              <LogoutButton />
+            </ShowWhenLogged>
+          </Suspense>
         </nav>
 
         <nav className="flex gap-4 lg:hidden">

@@ -1,0 +1,135 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+# Lafaeth Claudio Portfolio
+
+Portfólio do designer, ilustrador e quadrinista Lafaeth Claudio, com painel administrativo para o dono gerenciar o conteúdo.
+
+- **Área pública** (`src/app/(layout)`): `/` (sobre + imagens em destaque), `/cores`, `/flat`, `/quadrinhos`, `/ilustracoes`.
+- **Galeria** (`src/app/(no-layout)/gallery`): visualização das imagens em tela cheia.
+- **Admin** (`src/app/(no-layout)/admin`): login em `/admin/auth`; cadastro, edição, exclusão e ordenação (drag and drop) de imagens, cores, flats, quadrinhos e ilustrações; mostrar/ocultar direto no card; edição do perfil (inclui o banner da Home).
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind CSS 4 + shadcn/ui (`new-york`, ícones lucide) · Drizzle ORM + Postgres (Neon) · better-auth (email e senha) · Cloudflare R2 (arquivos das imagens, via `@aws-sdk/client-s3`) · TanStack Query · nuqs · react-hook-form + Zod 4 · dnd-kit · sonner.
+
+## Comandos
+
+- `npm run dev`: servidor de desenvolvimento
+- `npm run build`: build de produção (precisa do `.env`)
+- `npm run lint`: ESLint (`eslint .`; o `next lint` não existe mais no Next 16)
+- `npm run typecheck`: `tsc --noEmit`
+
+Node 24 ou superior (campo `engines` do `package.json`). Variáveis de ambiente em `.env.example`.
+
+Scripts rodados pelo dono com `npx tsx` (leem o `.env`). A pasta `scripts/` está no `.gitignore`, então eles existem só na máquina do dono:
+
+- `scripts/migrate-images-to-r2.ts [--dry-run]`: copia para o R2 as imagens salvas como link do Drive/Wix e cria a versão WebP (`sharp`) das imagens JPEG/PNG, guardando o arquivo anterior em `original_url`. Pode rodar de novo; rode antes `npx drizzle-kit push`.
+- `scripts/cleanup-r2-orphans.ts [--delete]`: lista (e com `--delete` apaga) os arquivos do bucket com mais de 24 h que nenhuma linha usa (`image_url` e `original_url` contam como uso).
+
+## Arquitetura
+
+Cada recurso (cores, quadrinhos, flats, imagens, usuário) segue as mesmas camadas. Exemplo com cores:
+
+1. **Schema**: `src/db/schema.ts` (`colorizationTable`). Conexão em `src/db/index.ts`.
+2. **Dados** (só servidor): `src/app/data/colorization/`
+   - `get-many-colors.ts`, `get-one-color.ts`: consultas Drizzle com `import "server-only"`
+   - `get-visible-colors.ts`: leitura pública em cache (`"use cache"` + `cacheLife` + `cacheTag`), só os itens visíveis na ordem salva (`displayOrder`)
+   - `colors-dto.ts` + `map-to-color.ts`: converte a linha do banco no DTO exposto ao resto do app
+   - Helpers comuns: `where-condition.ts`, `order-by-condition.ts` (tipos, seguros para o cliente), `query-builders.ts` (`buildWhere`/`buildOrderBy`, só servidor), `update-display-order-items.ts`
+3. **Validação**: `src/app/data/schemas/cadastre-color-schema.ts`, `update-color-schema.ts` (Zod)
+4. **Server Actions**: `src/actions/<verbo>-<entidade>/index.ts` com `"use server"` (ex.: `post-color`, `update-color`, `update-colors-order`). Leitura pública: `get-visible-colors` (filtro fixo, sem parâmetros). Leitura de admin: `get-colors`, `get-color` (exigem login).
+5. **Contratos de query**: `src/queries/<entidade>.ts` (ex.: `colorsQueries`) com as keys hierárquicas (`["colors"]`, `["colors", "visible"]`, `["colors", "list", filtros]`, `["colors", "detail", id]`) e os `queryOptions`. Sem diretiva e sem imports `server-only`, para servidor e cliente usarem a mesma identidade. Tags de cache do servidor em `src/queries/tags.ts`.
+6. **Hooks cliente**: `src/hooks/queries/use-<entidades>.ts` (finos, `useSuspenseQuery(colorsQueries.visible())`) e `src/hooks/mutations/use-*.ts`, que invalidam a key raiz da entidade no `onSuccess`.
+7. **UI**: páginas em `src/app/**/page.tsx` (Server Components), componentes de rota em `src/app/**/components/`, compartilhados em `src/components/common/`, primitivas shadcn em `src/components/ui/`
+
+### Carregamento de dados (Cache Components)
+
+`cacheComponents` está ativo no `next.config.ts`. A página entrega os dados ao React Query com o `PrefetchBoundary` (`src/components/common/prefetch-boundary.tsx`), sempre dentro de `<Suspense>`:
+
+```tsx
+<Suspense fallback={<GridSkeleton />}>
+  <PrefetchBoundary
+    tags={[cacheTags.colors, cacheTags.images]} // só quando os fetchers são "use cache"
+    queries={[{ queryKey: colorsQueries.keys.visible(), fetcher: getVisibleColorsCached }]}
+  >
+    <ColorsList variant="visible" />
+  </PrefetchBoundary>
+</Suspense>
+```
+
+- Páginas públicas usam leituras em cache e passam `tags`; assim entram no shell estático e o cliente não refaz a busca.
+- Páginas do admin envolvem o conteúdo em `<AdminOnly>` (checa a sessão) e não passam `tags` (dados lidos na hora).
+- Ler sessão, `headers()`, `cookies()` ou `searchParams` só dentro de `<Suspense>` (ex.: `ShowWhenLogged` no Header). Fora disso o Next acusa "blocking route" (ver `get_errors` do MCP).
+
+Autenticação: `src/lib/auth.ts` (servidor), `src/lib/auth-client.ts` (cliente), rota `src/app/api/auth/[...all]/route.ts`. O `src/proxy.ts` (antigo middleware) redireciona `/admin` para o login quando não há cookie de sessão.
+
+## Regras
+
+- **Toda Server Action que altera dados** valida a entrada com o schema Zod **e** chama `verifyUserLogged()` (`src/app/data/user/verify-user.ts`) antes de tocar no banco. Server Actions são endpoints públicos; o proxy só checa se o cookie existe, então não serve como proteção.
+- Toda Server Action de **leitura** que aceita filtros ou devolve itens ocultos também chama `verifyUserLogged()`. Leituras públicas têm filtro fixo.
+- Páginas do admin envolvem o conteúdo em `<AdminOnly>` (`src/app/(no-layout)/admin/components/admin-only.tsx`), que chama `requireAdmin()` e redireciona para `/admin/auth`.
+- **Toda Server Action que altera dados** chama `updateTag(cacheTags.<entidade>)` antes de retornar; ações sobre imagens usam `cacheTags.images` (todas as listas públicas também têm essa tag).
+- Exclusão: actions `delete-<entidade>` recebem o id (Zod `uuid`). `delete-image` não lança erro quando a imagem está em uso: devolve `{ deleted: false, usage }` para o admin confirmar (mensagens de erro de Server Action somem em produção). Hooks de exclusão não invalidam o detalhe do item excluído (`isDetailOf`), que quebraria ao refazer a busca.
+- **Rascunho de projeto:** é o projeto com `visibleInProjects` falso (o admin mostra "Rascunho"/"Publicado"); todo projeto novo nasce rascunho. A prévia fica em `/portfolio/preview/[id]` (`src/app/(layout)/portfolio/preview/[id]`): só admin (`AdminOnly`), sem cache, com o mesmo `ProjectArticle` da página pública, sem link para a galeria (que só lê projetos publicados) e com o botão "Publicar". A action `duplicate-project` copia o projeto e as imagens como rascunho; as imagens copiadas apontam para os mesmos arquivos do R2.
+- Visibilidade: `update-visibility` (uma action para todas as entidades) + `useUpdateVisibility(entity)`, com atualização otimista; usado pelo `VisibilitySwitch` dos cards do admin.
+- Componentes cliente nunca importam `@/db` nem `src/app/data/*` com acesso ao banco; usam actions e DTOs.
+- Query keys vêm dos contratos em `src/queries/` e incluem os filtros usados (`where`, `orderBy`). A invalidação após mutation fica no hook da mutation, pela key raiz da entidade.
+- **Banco de dados:** mudanças no schema são aplicadas com `npx drizzle-kit push`, rodado pelo dono do projeto. Não usar `drizzle-kit generate`/`migrate` e não criar a pasta `drizzle/`.
+- `src/components/ui/*` é código gerado pelo shadcn: editar só o mínimo necessário.
+- **Upload de imagens (Cloudflare R2):** o arquivo vai do navegador direto para o bucket, sem passar pelo Next (Server Actions aceitam no máximo 1 MB). Nos formulários do admin, o campo de URL usa `<ImageUploadInput folder>` (`src/app/(no-layout)/admin/components/image-upload-input.tsx`), que chama a action `create-image-upload-url` (login + Zod; devolve URL assinada de `PUT` e a URL pública), envia com `useUploadImage` e coloca a URL pública no campo; o submit salva a URL como antes. Tipos e tamanho máximo em `src/helpers/image-upload.ts`. Cliente S3 em `src/lib/r2.ts` (`server-only`; `src/lib/r2-client.ts` só para ele e para os scripts).
+- **Versão exibida e original:** `images` e `project_images` têm `image_url` (versão mostrada no site) e `original_url` (arquivo para download, nulo quando `image_url` já é o original). Ao enviar um JPEG/PNG, o navegador gera um WebP (lado maior até 3840 px, qualidade 90, `src/helpers/create-display-image.ts`) e envia os dois; `useUploadImage` devolve `{ imageUrl, originalUrl }` e o formulário preenche os dois campos. O motivo é que o otimizador do Next desiste de baixar a imagem original depois de 7 s (fixo, não configurável): originais de dezenas de MB davam 504. A foto de perfil não ganha versão WebP (`withDisplayVersion={false}`). Todo código que mostra a imagem continua usando `imageUrl`; só o download usa `originalUrl`.
+- **Download do original:** a galeria mostra "Baixar original" quando o item tem `originalUrl`, que abre `/api/download/[id]` (`src/app/api/download/[id]/route.ts`; id de `images` ou `project_images`). A rota redireciona para uma URL assinada do R2 de 1 minuto com `Content-Disposition: attachment`.
+- URLs de imagem são validadas por `imageUrlSchema` (`src/app/data/schemas/image-url-schema.ts`): aceita URLs do R2 e, até a migração terminar, links antigos do Drive/Wix.
+- Actions que excluem uma linha com imagem ou trocam a URL chamam `after(() => deleteUnusedImageFiles([urlAntiga]))` (`src/app/data/image/delete-unused-image-files.ts`), que apaga o arquivo do R2 se nenhuma outra linha usar a mesma URL. Passam a URL da imagem e a do original. Hoje: `delete-image`, `delete-project-image`, `delete-project`, `update-image`, `update-project-image`, `update-user-data`.
+- Imagens remotas vêm do R2 (`NEXT_PUBLIC_R2_PUBLIC_URL`) e, as antigas, do Drive/Wix (`next.config.ts` → `images.remotePatterns`); usar `next/image`. Toda `<Image fill>` recebe `sizes` (padrões em `src/helpers/image-sizes.ts`) e só as imagens da primeira dobra usam `imageLoadingProps(true)` (`loading="eager"` + `fetchPriority="high"`).
+- Animações (sem biblioteca; CSS em `globals.css`, todas desligadas com `prefers-reduced-motion`):
+  - Imagens de conteúdo usam `FadeImage` (`src/components/common/fade-image.tsx`): shimmer enquanto carrega e fade-in.
+  - Cards de grade usam `staggerClassName` + `staggerStyle(index)` (`src/helpers/stagger.ts`) para entrar em sequência.
+  - Seções com dados usam `<AnimatedSuspense fallback={<GridSkeleton />}>` em vez de `<Suspense>`; páginas públicas ficam dentro de `<PageTransition>` (no `page.tsx`, não no layout).
+  - Miniatura e imagem da galeria compartilham `<ArtworkTransition imageId>`; o nome precisa ser único na página (não usar nas listas do admin).
+- Telas de toque não têm hover: o que aparece no hover precisa da variante `touch:` (`@media (hover: none)`, definida em `globals.css`).
+
+## Convenções
+
+- Arquivos e pastas em kebab-case; componentes React em PascalCase.
+- Textos da interface, rotas e mensagens de validação em português (pt-BR); nomes no código em inglês.
+- Imports ordenados pelo `simple-import-sort` (`npm run lint -- --fix` corrige).
+- Commits em inglês no padrão conventional commits: `feat:`, `fix:`, `chore:`, `style:`, `docs:`, `refactor:`.
+
+## Fluxo de trabalho (git flow)
+
+O projeto segue o git flow, com duas branches permanentes:
+
+- `main`: código em produção. Só recebe merge de `release/*` e `hotfix/*`, sempre com tag de versão.
+- `develop`: integração do que está em desenvolvimento. É a base de todo trabalho novo.
+
+Branches de apoio, sempre em kebab-case e com o prefixo do tipo:
+
+| Prefixo | Sai de | Volta para | Uso |
+| --- | --- | --- | --- |
+| `feature/<nome>` | `develop` | `develop` | Funcionalidade nova, refatoração, estilo, dependências, docs |
+| `bugfix/<nome>` | `develop` | `develop` | Correção de bug ainda não publicado |
+| `release/<versão>` | `develop` | `main` e `develop` | Preparar uma publicação (ajustes finais e versão) |
+| `hotfix/<nome>` | `main` | `main` e `develop` | Correção urgente em produção |
+
+Regras:
+
+- Nunca commitar direto em `main` nem em `develop`: criar a branch de apoio a partir da `develop` (ou da `main`, no caso de `hotfix`).
+- Uma branch por assunto. Misturar tarefas diferentes na mesma branch dificulta revisar e desfazer.
+- **Todo trabalho entra por pull request, nunca por merge local.** `feature/*` e `bugfix/*` abrem PR com **`--base develop`** (o padrão do GitHub neste repositório é a `main`). `release/*` e `hotfix/*` abrem um PR para a `main` e outro para a `develop`. O merge é feito no GitHub, com merge commit, para preservar o histórico da branch.
+- O tipo do commit (`feat:`, `fix:`, `chore:`...) segue o conventional commits, independente do prefixo da branch. Ex.: `feature/upgrade-next-16` pode ter commits `chore:` e `fix:`.
+- Antes de abrir o PR, a branch deve passar em `npm run typecheck` e `npm run lint`.
+- Para abrir um PR: `git push -u origin <branch>` e `gh pr create --base develop --title "<tipo>: <resumo>" --body "<descrição>"`. O título segue o conventional commits, em inglês. A descrição traz o que mudou, o porquê e como testar.
+- O agente só faz push da branch de apoio e abre o PR quando o dono do projeto pedir. Nunca faz merge de PR, nunca faz push em `main`/`develop` e nunca cria tags.
+
+## Estado atual
+
+- Páginas em andamento ficam com o link comentado em `src/components/common/menu-items-list.tsx`. Confira esse arquivo na branch atual: o conteúdo muda entre `main` e `develop`.

@@ -1,5 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
+
+import {
+  gridImageSizes,
+  imageLoadingProps,
+  PRIORITY_ITEMS,
+  wideGridImageSizes,
+} from "@/helpers/image-sizes";
+import { staggerClassName, staggerStyle } from "@/helpers/stagger";
+import { cn } from "@/lib/utils";
+
+import ArtworkCaption from "./artwork-caption";
+import ArtworkTransition from "./artwork-transition";
+import FadeImage from "./fade-image";
 
 interface ColorItemProps {
   imageId: string;
@@ -8,6 +20,8 @@ interface ColorItemProps {
   visibleInColors?: boolean;
   horizontalPage: boolean;
   disableLink?: boolean;
+  /** Position in the grid: drives the entrance delay and eager loading. */
+  index?: number;
   children: React.ReactNode;
 }
 
@@ -18,26 +32,40 @@ const ColorItem = ({
   visibleInColors,
   horizontalPage,
   disableLink,
+  index = 0,
   children,
 }: ColorItemProps) => {
-  const content = (
+  const card = (
     <div
-      className={`relative ${!visibleInColors && "opacity-50"} ${
+      style={staggerStyle(index)}
+      className={cn(
+        "group relative overflow-hidden",
+        staggerClassName,
+        !visibleInColors && "opacity-50",
         horizontalPage ? "aspect-[29.5/21]" : "aspect-[21/29.5]"
-      }`}
+      )}
     >
-      <Image src={imageUrl} alt={title} fill className="object-contain" />
-      <div className="absolute inset-0 z-20 bg-primary/70 text-primary-foreground flex justify-center items-center opacity-0 hover:opacity-100 transition-opacity duration-1000 ease-in-out font-semibold">
-        <p className="first-letter:uppercase">{title}</p>
-      </div>
+      <FadeImage
+        src={imageUrl}
+        alt={title}
+        fill
+        sizes={horizontalPage ? wideGridImageSizes : gridImageSizes}
+        {...imageLoadingProps(index < PRIORITY_ITEMS)}
+        className="object-contain group-hover:scale-[1.02]"
+      />
+      <ArtworkCaption title={title} />
       {children}
     </div>
   );
 
-  if (disableLink) return content;
+  if (disableLink) return card;
   if (!imageId) throw new Error("imageId is required with link enabled");
 
-  return <Link href={`/gallery/cores?id=${imageId}`}>{content}</Link>;
+  return (
+    <Link href={`/gallery/cores?id=${imageId}`}>
+      <ArtworkTransition imageId={imageId}>{card}</ArtworkTransition>
+    </Link>
+  );
 };
 
 export default ColorItem;

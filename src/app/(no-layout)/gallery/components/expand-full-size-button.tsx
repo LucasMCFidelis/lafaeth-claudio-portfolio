@@ -1,19 +1,16 @@
 "use client";
 
 import { ExpandIcon, Minimize } from "lucide-react";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { ButtonHTMLAttributes, useEffect } from "react";
+import { ButtonHTMLAttributes } from "react";
 
 import { Button } from "@/components/ui/button";
+import { useIsFullscreen } from "@/hooks/use-is-fullscreen";
 
 const ExpandFullSizeButton = ({
   onClick,
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement>) => {
-  const [isFullscreen, setIsFullscreen] = useQueryState(
-    "full-screen",
-    parseAsBoolean.withDefault(false)
-  );
+  const isFullscreen = useIsFullscreen();
 
   const toggleFullscreen = () => {
     const target = document.getElementById("gallery-container");
@@ -24,17 +21,11 @@ const ExpandFullSizeButton = ({
     }
   };
 
-  useEffect(() => {
-    const handler = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, [setIsFullscreen]);
-
   return (
     <Button
       size="icon"
+      variant="overlay"
+      aria-label={isFullscreen ? "Sair da tela cheia" : "Tela cheia"}
       onClick={(e) => (onClick ? onClick(e) : toggleFullscreen())}
       {...rest}
     >

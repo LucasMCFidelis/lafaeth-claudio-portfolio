@@ -1,14 +1,24 @@
-import Image, { ImageProps } from "next/image";
+import { ImageProps } from "next/image";
 
+import { gridImageSizes } from "@/helpers/image-sizes";
 import { cn } from "@/lib/utils";
 
-const ImageHome = ({ src, alt, className, ...rest }: ImageProps) => {
+import FadeImage from "../fade-image";
+
+const ImageHome = ({
+  src,
+  alt,
+  className,
+  sizes = gridImageSizes,
+  ...rest
+}: ImageProps) => {
   return (
-    <Image
+    <FadeImage
       src={src}
       alt={alt}
       fill
-      className={cn("object-cover", className)}
+      sizes={sizes}
+      className={cn("object-cover group-hover:scale-[1.02]", className)}
       {...rest}
     />
   );

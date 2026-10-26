@@ -1,11 +1,14 @@
 import { Suspense } from "react";
 
+import AdminOnly from "../../components/admin-only";
 import CadastreColorForm from "../components/cadastre-color-form";
 
 const CadastreColorPage = () => {
   return (
     <Suspense fallback={<p>Carregando formulário</p>}>
-      <CadastreColorForm />;
+      <AdminOnly>
+        <CadastreColorForm />
+      </AdminOnly>
     </Suspense>
   );
 };

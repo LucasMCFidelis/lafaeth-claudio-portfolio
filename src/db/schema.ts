@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  AnyPgColumn,
   bigint,
   boolean,
   date,
@@ -23,12 +24,25 @@ export const userTable = pgTable("user", {
   whatsappMessage: text("whatsapp_message"),
   whatsappNumber: bigint("whatsapp_number", { mode: "number" }),
   lattes: text("lattes"),
+  // Wide image at the top of the home page. The explicit AnyPgColumn type
+  // breaks the circular inference with imagesTable, declared further down.
+  bannerImageId: uuid("banner_image_id").references(
+    (): AnyPgColumn => imagesTable.id,
+    { onDelete: "set null" }
+  ),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const userRelations = relations(userTable, ({ one }) => ({
+  bannerImage: one(imagesTable, {
+    fields: [userTable.bannerImageId],
+    references: [imagesTable.id],
+  }),
+}));
 
 export const sessionTable = pgTable("session", {
   id: text("id").primaryKey(),
@@ -81,7 +95,11 @@ export const imagesTable = pgTable("images", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
   description: text("description").notNull(),
+  // Version shown on the site (WebP, at most 3840 px). Images saved before
+  // original_url existed keep the original file here.
   imageUrl: text("image_url").notNull(),
+  // Original file, offered for download. Null when imageUrl is the original.
+  originalUrl: text("original_url"),
   artist: text("artist").notNull(),
   screenwriter: text("screenwriter"),
   colorist: text("colorist"),
@@ -159,6 +177,73 @@ export const colorizationRelations = relations(
     image: one(imagesTable, {
       fields: [colorizationTable.imageId],
       references: [imagesTable.id],
+    }),
+  })
+);
+
+export const illustrationsTable = pgTable("illustrations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  imageId: uuid("image_id").references(() => imagesTable.id, {
+    onDelete: "set null",
+  }),
+  horizontalIllustration: boolean("horizontal_illustration")
+    .notNull()
+    .default(false),
+  redirectUrl: text("redirect_url"),
+  description: text("description"),
+  visibleInIllustrations: boolean("visible_in_illustrations")
+    .notNull()
+    .default(false),
+  index: integer("index"),
+});
+
+export const illustrationsRelations = relations(
+  illustrationsTable,
+  ({ one }) => ({
+    image: one(imagesTable, {
+      fields: [illustrationsTable.imageId],
+      references: [imagesTable.id],
+    }),
+  })
+);
+
+export const projectTable = pgTable("project", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  projectType: text("project_type"),
+  startDate: date("start_date").notNull().defaultNow(),
+  endDate: date("end_date"),
+  visibleInProjects: boolean("visible_in_projects").notNull().default(false),
+  imageColumns: integer("image_columns").notNull().default(2),
+  index: integer("index"),
+});
+
+export const projectImagesTable = pgTable("project_images", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  projectId: uuid("project_id")
+    .notNull()
+    .references(() => projectTable.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  // Version shown on the site; see imagesTable.
+  imageUrl: text("image_url").notNull(),
+  originalUrl: text("original_url"),
+  visibleInProject: boolean("visible_in_project").notNull().default(true),
+  index: integer("index"),
+  createdAt: date("created_at").defaultNow().notNull(),
+});
+
+export const projectRelations = relations(projectTable, ({ many }) => ({
+  images: many(projectImagesTable),
+}));
+
+export const projectImagesRelations = relations(
+  projectImagesTable,
+  ({ one }) => ({
+    project: one(projectTable, {
+      fields: [projectImagesTable.projectId],
+      references: [projectTable.id],
     }),
   })
 );

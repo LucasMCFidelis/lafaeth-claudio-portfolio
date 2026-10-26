@@ -1,8 +1,13 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Image from "next/image";
-import { memo, useRef, useState } from "react";
+import { useState } from "react";
+
+import { imageLoadingProps } from "@/helpers/image-sizes";
+import { staggerClassName, staggerStyle } from "@/helpers/stagger";
+import { cn } from "@/lib/utils";
+
+import CompareSlider from "./compare-slider";
+import FadeImage from "./fade-image";
 
 interface FlatItemProps {
   horizontalPage?: boolean;
@@ -10,100 +15,110 @@ interface FlatItemProps {
   title: string;
   artist: string;
   screenwriter?: string;
+  /** Line art, revealed on the left of the divider. */
   frontImageUrl?: string;
+  /** Flat colors, shown on the right of the divider. */
   backImageUrl?: string;
-  maxSizeItemsMd?: boolean
-  children?: React.ReactNode
+  /** Smaller maximum size, used in the admin list next to the sidebar. */
+  maxSizeItemsMd?: boolean;
+  /** Position in the list: drives the entrance delay; the first loads eagerly. */
+  index?: number;
+  children?: React.ReactNode;
 }
 
-const FlatItem = memo(
-  ({
-    horizontalPage,
-    visibleInFlat,
-    title,
-    artist,
-    screenwriter,
-    frontImageUrl,
-    backImageUrl,
-    maxSizeItemsMd, children
-  }: FlatItemProps) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [dividerX, setDividerX] = useState(50);
-    const [dragging, setDragging] = useState(false);
+const FlatItem = ({
+  horizontalPage,
+  visibleInFlat,
+  title,
+  artist,
+  screenwriter,
+  frontImageUrl,
+  backImageUrl,
+  maxSizeItemsMd,
+  index = 0,
+  children,
+}: FlatItemProps) => {
+  // Same widths the fixed sizes used to reach, now fluid below them.
+  const maxWidth = horizontalPage
+    ? maxSizeItemsMd
+      ? "max-w-[622px]"
+      : "max-w-[933px]"
+    : maxSizeItemsMd
+      ? "max-w-[318px]"
+      : "max-w-[530px]";
+  const sizes = horizontalPage
+    ? maxSizeItemsMd
+      ? "(max-width: 768px) 100vw, 622px"
+      : "(max-width: 1024px) 100vw, 933px"
+    : maxSizeItemsMd
+      ? "(max-width: 768px) 100vw, 318px"
+      : "(max-width: 640px) 100vw, 530px";
 
-    const startDrag = () => setDragging(true);
-    const stopDrag = () => setDragging(false);
+  // Real proportion of the artwork, read once it loads. Until then the
+  // orientation class gives an approximate shape. Matching the image keeps
+  // the divider from running over empty space beside it.
+  const [aspectRatio, setAspectRatio] = useState<number>();
+  const readAspectRatio = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const { naturalWidth, naturalHeight } = e.currentTarget;
+    if (naturalWidth && naturalHeight) {
+      setAspectRatio(naturalWidth / naturalHeight);
+    }
+  };
 
-    const onDrag = (e: React.MouseEvent) => {
-      if (!dragging || !containerRef.current) return;
+  const imageProps = {
+    fill: true,
+    sizes,
+    draggable: false,
+    ...imageLoadingProps(index === 0),
+    className: "object-contain pointer-events-none",
+  };
 
-      const rect = containerRef.current.getBoundingClientRect();
-      const newX = ((e.clientX - rect.left) / rect.width) * 100;
-
-      if (newX >= 0 && newX <= (horizontalPage ? 100 : 94)) {
-        setDividerX(newX);
-      }
-    };
-
-    return (
-      <div
-        ref={containerRef}
-        onMouseMove={onDrag}
-        onMouseUp={stopDrag}
-        onMouseLeave={stopDrag}
-        className={`relative flex mx-auto select-none ${
-          horizontalPage
-            ? // horizontal
-              `h-[200px] w-[311px] sm:h-[300px] sm:w-[466px] md:h-[400px] md:w-[622px] ${!maxSizeItemsMd && "lg:h-[500px] lg:w-[777px] xl:h-[600px] xl:w-[933px]"}`
-            : // vertical
-              `h-[250px] w-[177px] sm:h-[350px] sm:w-[248px] md:h-[450px] md:w-[318px] ${!maxSizeItemsMd && "lg:h-[600px] lg:w-[424px] xl:h-[750px] xl:w-[530px]"}`
-        } ${!visibleInFlat && "opacity-50"}`}
-      >
-        <div
-          className="absolute top-0 bottom-0 z-30 w-px bg-primary"
-          style={{ left: `${dividerX}%`, transform: "translateX(-50%)" }}
-        >
-          <div
-            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center size-5 md:size-10 rounded-full bg-primary/60 text-primary-foreground cursor-col-resize"
-            onMouseDown={startDrag}
-          >
-            <ChevronLeft className="size-4" />
-            <ChevronRight className="size-4" />
-          </div>
-        </div>
-
-        <Image
-          src={backImageUrl || ""}
-          alt={`${title} - flat`}
-          fill
-          className={`object-contain overflow-hidden object-left z-10 pointer-events-none`}
-        />
-
-        <div className="absolute z-30 w-full flex justify-between text-primary-foreground text-[0.5rem]">
-          {screenwriter && (
-            <p className="bg-primary/70 px-2">Roteiro: {screenwriter}</p>
-          )}
-          <p className="bg-primary/70 px-2">Arte: {artist}</p>
-        </div>
-
-        <div
-          className="relative z-20 overflow-hidden"
-          style={{ width: `${dividerX}%` }}
-        >
-          <Image
-            src={frontImageUrl || ""}
-            alt={`${title} - line`}
-            fill
-            className={`object-cover object-left pointer-events-none`}
+  return (
+    <CompareSlider
+      label={`Comparar line e flat de ${title}`}
+      style={{ ...staggerStyle(index), aspectRatio }}
+      className={cn(
+        "w-full mx-auto",
+        staggerClassName,
+        maxWidth,
+        horizontalPage ? "aspect-[29.5/21]" : "aspect-[21/29.5]",
+        !visibleInFlat && "opacity-50"
+      )}
+      base={
+        backImageUrl && (
+          <FadeImage
+            src={backImageUrl}
+            alt={`${title} - flat`}
+            onLoad={readAspectRatio}
+            {...imageProps}
           />
-        </div>
-
-        {children}
+        )
+      }
+      overlay={
+        frontImageUrl && (
+          <FadeImage
+            src={frontImageUrl}
+            alt={`${title} - line`}
+            // The flat image sets the shape; the line only does it alone.
+            onLoad={backImageUrl ? undefined : readAspectRatio}
+            {...imageProps}
+          />
+        )
+      }
+    >
+      <div className="absolute inset-x-0 bottom-0 z-30 flex justify-between gap-2 text-[0.65rem] sm:text-xs text-primary-foreground dark:text-foreground pointer-events-none">
+        {screenwriter && (
+          <p className="bg-primary/70 dark:bg-background/75 px-2 py-0.5">
+            Roteiro: {screenwriter}
+          </p>
+        )}
+        <p className="ml-auto bg-primary/70 dark:bg-background/75 px-2 py-0.5">
+          Arte: {artist}
+        </p>
       </div>
-    );
-  }
-);
-
-FlatItem.displayName = "FlatItem";
+      {children}
+    </CompareSlider>
+  );
+};
 
 export default FlatItem;

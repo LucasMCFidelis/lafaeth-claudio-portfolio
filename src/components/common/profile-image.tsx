@@ -1,7 +1,8 @@
 import { User } from "lucide-react";
-import Image from "next/image";
 
 import { cn } from "@/lib/utils";
+
+import FadeImage from "./fade-image";
 
 interface ProfileImageProps {
   src?: string | null;
@@ -18,7 +19,15 @@ const ProfileImage = ({ src, alt, className }: ProfileImageProps) => {
       )}
     >
       {src ? (
-        <Image src={src} alt={alt} fill className="object-contain" />
+        <FadeImage
+          src={src}
+          alt={alt}
+          fill
+          sizes="(max-width: 640px) 144px, 240px"
+          loading="eager"
+          fetchPriority="high"
+          className="object-contain"
+        />
       ) : (
         <User className="size-full text-primary/70" />
       )}

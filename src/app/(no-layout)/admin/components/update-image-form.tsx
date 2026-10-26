@@ -1,8 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -23,10 +23,10 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateImage } from "@/hooks/mutations/use-update-image";
-import { getHomeImagesQueryKey } from "@/hooks/queries/use-home-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "./actions-update-forms";
+import { ImageUploadInput } from "./image-upload-input";
 
 interface UpdateImageFormProps {
   initialData: ImageDTO;
@@ -38,6 +38,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
     title: initialData.title ?? "",
     description: initialData.description ?? "",
     imageUrl: initialData.imageUrl ?? "",
+    originalUrl: initialData.originalUrl,
     artist: initialData.artist ?? "",
     screenwriter: initialData.screenwriter ?? "",
     colorist: initialData.colorist ?? "",
@@ -50,15 +51,12 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
   });
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
-  const queryClient = useQueryClient();
   const updateImageMutation = useUpdateImage(formDefaultValues.id);
+  const [isUploading, setIsUploading] = useState(false);
 
   async function onSubmit(data: UpdateImageDTO) {
     updateImageMutation.mutate(data, {
-      onSuccess: (data) => {
-        if (data.visibleInHome !== formDefaultValues.visibleInHome) {
-          queryClient.invalidateQueries({ queryKey: getHomeImagesQueryKey() });
-        }
+      onSuccess: () => {
         toast.success("Imagem atualizada com sucesso");
       },
       onError: (error) =>
@@ -78,6 +76,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
           src={valueImageUrl}
           alt={"teste"}
           fill
+          sizes="(max-width: 768px) 100vw, 65vw"
           className="object-contain"
         />
       </div>
@@ -96,12 +95,17 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
                   className="flex-1 flex gap-2 flex-col justify-end
                     "
                 >
-                  <FormLabel>Url da Imagem</FormLabel>
+                  <FormLabel>Imagem</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="Insira a url"
-                      {...field}
+                    <ImageUploadInput
+                      value={field.value}
+                      onChange={({ imageUrl, originalUrl }) => {
+                        field.onChange(imageUrl);
+                        formUpdateImage.setValue("originalUrl", originalUrl);
+                      }}
+                      folder="images"
                       disabled={!formIsEditable}
+                      onUploadingChange={setIsUploading}
                     />
                   </FormControl>
                   <FormMessage />
@@ -235,7 +239,7 @@ const UpdateImageForm = ({ initialData }: UpdateImageFormProps) => {
           </div>
           <ActionsUpdateForm
             textSaveUpdateAction="Atualizar Imagem"
-            disableSaveUpdateAction={updateImageMutation.isPending}
+            disableSaveUpdateAction={updateImageMutation.isPending || isUploading}
             resetForm={() => formUpdateImage.reset(formDefaultValues)}
             className="col-span-full"
           />

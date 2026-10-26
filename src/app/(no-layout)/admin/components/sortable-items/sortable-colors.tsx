@@ -13,24 +13,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUpdateColorsOrder } from "@/hooks/mutations/use-update-colors-order";
-import {
-  getColorsVisibleQueryKey,
-  useColorsVisible,
-} from "@/hooks/queries/use-colors-visible";
+import { useVisibleColors } from "@/hooks/queries/use-colors";
+import { colorsQueries } from "@/queries/colors";
 
 import SortableItem from "./sortable-item";
 import SortableRootList, {
   getSortingIsDisabledQueryStateParams,
 } from "./sortable-root-list";
 
-interface SortableColorsProps {
-  initialData?: Array<ColorDTO>;
-}
-
-const SortableColors = ({ initialData }: SortableColorsProps) => {
-  const { data: colors = [] } = useColorsVisible(
-    initialData && { initialData }
-  );
+const SortableColors = () => {
+  const { data: colors } = useVisibleColors();
   const updateColorsOrderMutation = useUpdateColorsOrder();
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
     ...getSortingIsDisabledQueryStateParams()
@@ -47,7 +39,7 @@ const SortableColors = ({ initialData }: SortableColorsProps) => {
     setSortingIsDisabled((prev) => !prev);
     if (!sortingIsDisabled) {
       queryClient.invalidateQueries({
-        queryKey: getColorsVisibleQueryKey(),
+        queryKey: colorsQueries.keys.visible(),
       });
     }
   };
@@ -72,7 +64,7 @@ const SortableColors = ({ initialData }: SortableColorsProps) => {
           </DialogHeader>
           <SortableRootList
             items={sortableColors}
-            getQueryKeyFunction={getColorsVisibleQueryKey}
+            getQueryKeyFunction={colorsQueries.keys.visible}
             className={`max-w-full ${sortingIsDisabled && "hidden"} `}
           >
             <div className="w-full flex-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">

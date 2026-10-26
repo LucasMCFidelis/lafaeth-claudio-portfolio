@@ -12,7 +12,12 @@ interface LogoutButtonProps {
 
 const LogoutButton = ({ typeComplexity = "basic" }: LogoutButtonProps) => {
   return (
-    <Button onClick={() => authClient.signOut()} size={typeComplexity === "basic" ? "icon" : "default"}>
+    <Button
+      onClick={() => authClient.signOut()}
+      size={typeComplexity === "basic" ? "icon" : "default"}
+      variant={typeComplexity === "basic" ? "ghost" : "default"}
+      aria-label={typeComplexity === "basic" ? "Sair" : undefined}
+    >
       {typeComplexity === "full" && <>Sair</>}
       <LogOut />
     </Button>

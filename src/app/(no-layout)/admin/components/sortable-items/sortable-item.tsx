@@ -35,12 +35,15 @@ const SortableItem = <T extends BasicItemToSortable>({
       {...(!disabled ? listeners : {})}
       className={cn("cursor-move relative aspect-square size-52 overflow-hidden rounded-xl", className)}
     >
-      <Image
-        src={item.imageUrl}
-        alt={item.imageUrl}
-        fill
-        className="object-contain object-top"
-      />
+      {item.imageUrl && (
+        <Image
+          src={item.imageUrl}
+          alt={item.imageUrl}
+          fill
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-contain object-top"
+        />
+      )}
     </button>
   );
 };

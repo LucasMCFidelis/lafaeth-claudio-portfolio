@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--browser",
+        "chrome",
+        "--headless",
+        "--user-data-dir",
+        ".playwright-mcp/profile",
+        "--output-dir",
+        ".playwright-mcp/output",
+        "--viewport-size",
+        "1366x768",
+        "--console-level",
+        "warning",
+        "--caps",
+        "devtools"
+      ]
+    },
+    "playwright-external": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@playwright/mcp@0.0.83",
+        "--browser",
+        "chrome",
+        "--headless",
+        "--isolated",
+        "--output-dir",
+        ".playwright-mcp/output/external",
+        "--viewport-size",
+        "1366x768",
+        "--block-service-workers",
+        "--blocked-origins",
+        "http://localhost:3000"
+      ]
+    }
+  }
+}

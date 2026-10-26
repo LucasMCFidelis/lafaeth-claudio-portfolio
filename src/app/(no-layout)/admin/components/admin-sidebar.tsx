@@ -1,4 +1,4 @@
-import { Home, Image, Images, SkipBack } from "lucide-react";
+import { FolderOpen, Home, Image, Images, SkipBack } from "lucide-react";
 import Link from "next/link";
 
 import getUserData from "@/app/data/user/get-user-data";
@@ -45,6 +45,16 @@ const items = [
     title: "Cores",
     url: "/admin/cores",
     icon: Image,
+  },
+  {
+    title: "Ilustrações",
+    url: "/admin/ilustracoes",
+    icon: Image,
+  },
+  {
+    title: "Portfólio",
+    url: "/admin/portfolio",
+    icon: FolderOpen,
   },
 ];
 

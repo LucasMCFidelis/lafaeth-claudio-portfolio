@@ -1,22 +1,42 @@
 import { Suspense } from "react";
 
 import getOneComicById from "@/app/data/comics/get-one-comic-by-id";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import { comicsQueries } from "@/queries/comics";
 
+import AdminOnly from "../../components/admin-only";
 import UpdateComicForm from "../components/update-comic-form";
 
-const UpdateComicPage = async ({
+type SearchParams = Promise<{ comicId: string }>;
+
+const UpdateComicPage = ({ searchParams }: { searchParams: SearchParams }) => {
+  return (
+    <Suspense fallback={<p>Carregando formulário</p>}>
+      <AdminOnly>
+        <UpdateComicContent searchParams={searchParams} />
+      </AdminOnly>
+    </Suspense>
+  );
+};
+
+const UpdateComicContent = async ({
   searchParams,
 }: {
-  searchParams: Promise<{ comicId: string }>;
+  searchParams: SearchParams;
 }) => {
   const { comicId } = await searchParams;
 
-  const comic = await getOneComicById({ comicId });
-
   return (
-    <Suspense fallback={<p>Carregando formulário</p>}>
-      <UpdateComicForm initialData={comic} />;
-    </Suspense>
+    <PrefetchBoundary
+      queries={[
+        {
+          queryKey: comicsQueries.keys.detail(comicId),
+          fetcher: () => getOneComicById({ comicId }),
+        },
+      ]}
+    >
+      <UpdateComicForm comicId={comicId} />
+    </PrefetchBoundary>
   );
 };
 

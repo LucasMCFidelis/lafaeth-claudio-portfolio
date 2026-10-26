@@ -1,11 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import { ComicDTO } from "@/app/data/comics/comic-dto";
 import {
   UpdateComicDTO,
   updateComicSchema,
@@ -20,32 +18,32 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { useDeleteComic } from "@/hooks/mutations/use-delete-comic";
 import { useUpdateComic } from "@/hooks/mutations/use-update-comic";
-import { useComic } from "@/hooks/queries/use-comic";
-import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
-import { useImage } from "@/hooks/queries/use-image";
+import { useComic } from "@/hooks/queries/use-comics";
+import { useImage } from "@/hooks/queries/use-images";
 import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 
 import ActionsUpdateForm from "../../components/actions-update-forms";
+import DeleteItemButton from "../../components/delete-item-button";
 import { ImageFormField } from "../../components/image-form-field";
 
 interface UpdateComicFormProps {
-  initialData: ComicDTO;
+  comicId: string;
 }
 
-const UpdateComicForm = ({ initialData }: UpdateComicFormProps) => {
-  const { data: currentComic } = useComic(initialData.id, { initialData });
-  if (!currentComic) throw new Error(`Comic ${initialData.id} not found`);
+const UpdateComicForm = ({ comicId }: UpdateComicFormProps) => {
+  const { data: currentComic } = useComic(comicId);
   const updateComicMutation = useUpdateComic(currentComic.id);
-  const queryClient = useQueryClient();
+  const deleteComicMutation = useDeleteComic();
 
   const [formIsEditable, setFormIsEditable] = useFormIsEditable();
   const formDefaultValues: UpdateComicDTO = {
-    id: initialData.id,
-    imageId: initialData.imageId ?? "",
-    productionSizePages: initialData.productionSizePages,
-    productionYear: initialData.productionYear,
-    visibleInComics: initialData.visibleInComics ?? false,
+    id: currentComic.id,
+    imageId: currentComic.imageId ?? "",
+    productionSizePages: currentComic.productionSizePages,
+    productionYear: currentComic.productionYear,
+    visibleInComics: currentComic.visibleInComics ?? false,
   };
   const formUpdateComic = useForm<UpdateComicDTO>({
     resolver: zodResolver(updateComicSchema),
@@ -56,12 +54,7 @@ const UpdateComicForm = ({ initialData }: UpdateComicFormProps) => {
 
   function onSubmit(data: UpdateComicDTO) {
     updateComicMutation.mutate(data, {
-      onSuccess: (newComic) => {
-        if (newComic.visibleInComics != formDefaultValues.visibleInComics) {
-          queryClient.invalidateQueries({
-            queryKey: getComicsVisibleQueryKey(),
-          });
-        }
+      onSuccess: () => {
         toast.success("Quadrinho atualizado com sucesso");
       },
       onError: (error) =>
@@ -161,6 +154,12 @@ const UpdateComicForm = ({ initialData }: UpdateComicFormProps) => {
               textSaveUpdateAction="Atualizar Quadrinho"
               disableSaveUpdateAction={updateComicMutation.isPending}
               resetForm={() => formUpdateComic.reset(formDefaultValues)}
+            />
+            <DeleteItemButton
+              itemName="este quadrinho"
+              onDelete={() => deleteComicMutation.mutateAsync(currentComic.id)}
+              redirectTo="/admin/quadrinhos"
+              disabled={updateComicMutation.isPending}
             />
           </div>
         </form>

@@ -1,10 +1,9 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 
 import { FlatDTO } from "@/app/data/flat/flat-dto";
-import getOneFlat from "@/app/data/flat/get-one-flat";
 import mapToFlatDTO from "@/app/data/flat/map-to-flat-dto";
 import {
   UpdateFlatDTO,
@@ -13,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { flatTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const updateFlat = async (
   flatId: string,
@@ -22,8 +22,6 @@ export const updateFlat = async (
 
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
-
-  getOneFlat({ where: { field: "id", value: flatId }, withImages: true });
 
   const [flatUpdated] = await db
     .update(flatTable)
@@ -37,7 +35,9 @@ export const updateFlat = async (
     .where(eq(flatTable.id, flatId))
     .returning();
 
-  revalidatePath(`/admin/flat/update`);
+  if (!flatUpdated) throw new Error("Flat not found");
+
+  updateTag(cacheTags.flats);
 
   return mapToFlatDTO({ data: flatUpdated, withImages: true });
 };

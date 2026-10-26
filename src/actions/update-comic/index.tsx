@@ -1,10 +1,9 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 
 import { ComicDTO } from "@/app/data/comics/comic-dto";
-import getOneComicById from "@/app/data/comics/get-one-comic-by-id";
 import mapToComicDTO from "@/app/data/comics/map-to-comic";
 import {
   UpdateComicDTO,
@@ -13,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { comicsTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const updateComic = async (
   comicId: string,
@@ -22,8 +22,6 @@ export const updateComic = async (
 
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
-
-  getOneComicById({ comicId });
 
   const [comicUpdated] = await db
     .update(comicsTable)
@@ -36,7 +34,9 @@ export const updateComic = async (
     .where(eq(comicsTable.id, comicId))
     .returning();
 
-  revalidatePath(`/admin/quadrinhos/update`);
+  if (!comicUpdated) throw new Error("Comic not found");
+
+  updateTag(cacheTags.comics);
 
   return mapToComicDTO({ data: comicUpdated, withImage: true });
 };

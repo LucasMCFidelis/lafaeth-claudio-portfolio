@@ -1,8 +1,8 @@
 import { Menu } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
-import verifyUserLogged from "@/app/data/user/verify-user";
-
+import { buttonVariants } from "../ui/button";
 import {
   Sheet,
   SheetContent,
@@ -13,32 +13,38 @@ import {
 } from "../ui/sheet";
 import LogoutButton from "./logout-button";
 import MenuItemsList from "./menu-items-list";
+import ShowWhenLogged from "./show-when-logged";
 
-const SheetMenu = async () => {
-  const userLogged = await verifyUserLogged();
-
+const SheetMenu = () => {
   return (
     <Sheet>
-      <SheetTrigger>
+      <SheetTrigger
+        className={buttonVariants({ variant: "ghost", size: "icon" })}
+        aria-label="Abrir menu"
+      >
         <Menu />
       </SheetTrigger>
-      <SheetContent className="font-semibold">
+      <SheetContent className="font-nav">
         <SheetHeader>
-          <SheetTitle className="font-bold">Menu</SheetTitle>
+          <SheetTitle className="font-heading font-medium">Menu</SheetTitle>
         </SheetHeader>
         <div className="gap-2 flex flex-col items-start">
           <MenuItemsList />
-          {userLogged && (
-            <Link key={"/admin"} className="px-4" href={"/admin"}>
-              Administração
-            </Link>
-          )}
+          <Suspense fallback={null}>
+            <ShowWhenLogged>
+              <Link key={"/admin"} className="px-4" href={"/admin"}>
+                Administração
+              </Link>
+            </ShowWhenLogged>
+          </Suspense>
         </div>
-        {userLogged && (
-          <SheetFooter>
-            <LogoutButton typeComplexity="full" />
-          </SheetFooter>
-        )}
+        <Suspense fallback={null}>
+          <ShowWhenLogged>
+            <SheetFooter>
+              <LogoutButton typeComplexity="full" />
+            </SheetFooter>
+          </ShowWhenLogged>
+        </Suspense>
       </SheetContent>
     </Sheet>
   );

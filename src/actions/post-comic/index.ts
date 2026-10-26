@@ -1,7 +1,9 @@
 "use server";
 
+import { eq } from "drizzle-orm";
+import { updateTag } from "next/cache";
+
 import { ComicDTO } from "@/app/data/comics/comic-dto";
-import getOneComic from "@/app/data/comics/get-one-comic";
 import mapToComicDTO from "@/app/data/comics/map-to-comic";
 import {
   CadastreComicDTO,
@@ -10,6 +12,7 @@ import {
 import verifyUserLogged from "@/app/data/user/verify-user";
 import { db } from "@/db";
 import { comicsTable } from "@/db/schema";
+import { cacheTags } from "@/queries/tags";
 
 export const postComic = async (data: CadastreComicDTO): Promise<ComicDTO> => {
   const dataValidated = cadastreComicSchema.parse(data);
@@ -17,20 +20,11 @@ export const postComic = async (data: CadastreComicDTO): Promise<ComicDTO> => {
   const userIsLogged = await verifyUserLogged();
   if (!userIsLogged) throw new Error("Unauthorize");
 
-  let comic;
-  try {
-    comic = await getOneComic({
-      where: { field: "imageId", value: dataValidated.imageId },
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === "Comic not found") {
-      comic = null;
-    } else {
-      console.error("Unexpected error fetching comic:", error);
-      throw error;
-    }
-  }
-  if (comic) {
+  const existingComic = await db.query.comicsTable.findFirst({
+    columns: { id: true },
+    where: eq(comicsTable.imageId, dataValidated.imageId),
+  });
+  if (existingComic) {
     throw new Error(
       "Duplicate imageId: a comic with this image already exists"
     );
@@ -40,6 +34,8 @@ export const postComic = async (data: CadastreComicDTO): Promise<ComicDTO> => {
     .insert(comicsTable)
     .values(dataValidated)
     .returning();
+
+  updateTag(cacheTags.comics);
 
   return mapToComicDTO({ data: newComic, withImage: true });
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -20,7 +21,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateToInput } from "@/helpers/format-date-to-input";
+import { BANNER_MIN_WIDTH } from "@/helpers/image-sizes";
 import { useUpdateUserData } from "@/hooks/mutations/use-update-user-data";
+import { useImage } from "@/hooks/queries/use-images";
+import { useOriginalImageSize } from "@/hooks/use-original-image-size";
+
+import { ImageFormField } from "../../components/image-form-field";
+import { ImageUploadInput } from "../../components/image-upload-input";
 
 interface UpdateUserFormProps {
   initialData: UserDTO;
@@ -28,6 +35,7 @@ interface UpdateUserFormProps {
 
 const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
   const updateUserDataMutation = useUpdateUserData();
+  const [isUploading, setIsUploading] = useState(false);
   const form = useForm<UserUpdateDTO>({
     resolver: zodResolver(updateUserSchema),
     defaultValues: {
@@ -46,6 +54,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
         typeof initialData.whatsappNumber === "number"
           ? initialData.whatsappNumber
           : undefined,
+      bannerImageId: initialData.bannerImageId,
     },
   });
 
@@ -58,6 +67,18 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
   }
 
   const valueImageUrl = form.watch("image");
+  const bannerImageId = form.watch("bannerImageId");
+  const { data: bannerImage } = useImage(bannerImageId, {
+    initialData:
+      bannerImageId === initialData.bannerImageId
+        ? (initialData.bannerImage ?? undefined)
+        : undefined,
+  });
+  // Size of the original file, to warn when it would look blurry full width.
+  const bannerSize = useOriginalImageSize(
+    bannerImageId ? bannerImage?.imageUrl : null
+  );
+  const bannerTooSmall = !!bannerSize && bannerSize.width < BANNER_MIN_WIDTH;
 
   return (
     <Form {...form}>
@@ -76,9 +97,15 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
             name="image"
             render={({ field }) => (
               <FormItem className="flex-1 h-fit lg:self-end">
-                <FormLabel>Imagem</FormLabel>
+                <FormLabel>Foto de perfil</FormLabel>
                 <FormControl>
-                  <Input placeholder="Url para sua foto de perfil" {...field} />
+                  <ImageUploadInput
+                    value={field.value}
+                    onChange={({ imageUrl }) => field.onChange(imageUrl)}
+                    folder="profile"
+                    withDisplayVersion={false}
+                    onUploadingChange={setIsUploading}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -124,6 +151,45 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
               </FormControl>
               <FormMessage />
             </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bannerImageId"
+          render={() => (
+            <div className="lg:col-span-2 flex flex-col gap-2">
+              <ImageFormField
+                label="Banner da página inicial"
+                image={bannerImageId ? bannerImage : null}
+                onSelectImage={(id) =>
+                  form.setValue("bannerImageId", id, { shouldDirty: true })
+                }
+                triggerTextToSelect={
+                  bannerImageId ? "Trocar banner" : "Escolher banner"
+                }
+              />
+              {bannerTooSmall && (
+                <p className="text-sm text-amber-700 dark:text-amber-400">
+                  Esta imagem tem {bannerSize.width} × {bannerSize.height} px.
+                  O banner ocupa a largura toda da tela e vai aparecer
+                  embaçado em monitores grandes. Use uma imagem com pelo menos{" "}
+                  {BANNER_MIN_WIDTH} px de largura.
+                </p>
+              )}
+              {bannerImageId && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="self-start"
+                  onClick={() =>
+                    form.setValue("bannerImageId", null, { shouldDirty: true })
+                  }
+                >
+                  Remover banner
+                </Button>
+              )}
+            </div>
           )}
         />
 
@@ -229,7 +295,7 @@ const UpdateUserForm = ({ initialData }: UpdateUserFormProps) => {
         <Button
           type="submit"
           className="w-full max-w-md lg:col-span-2 justify-self-center mt-4"
-          disabled={updateUserDataMutation.isPending}
+          disabled={updateUserDataMutation.isPending || isUploading}
         >
           Atualizar
         </Button>

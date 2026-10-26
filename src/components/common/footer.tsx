@@ -1,12 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
-import { memo } from "react";
 
 import getUserMediaData from "@/app/data/user/get-user-medias-data";
 
 import { Button } from "../ui/button";
 
-async function FooterComponent() {
+async function Footer() {
   const mediasUrls = await getUserMediaData();
   const socialLinks: Array<{ href: string | null; img: string; alt?: string }> =
     [
@@ -39,7 +38,13 @@ async function FooterComponent() {
           href && (
             <Button key={href} variant="ghost" size="icon" asChild>
               <Link href={href} target="_blank" className="relative">
-                <Image fill src={img} alt={alt ?? ""} className="dark:invert" />
+                <Image
+                  fill
+                  sizes="40px"
+                  src={img}
+                  alt={alt ?? ""}
+                  className="dark:invert dark:opacity-85"
+                />
               </Link>
             </Button>
           )
@@ -48,5 +53,4 @@ async function FooterComponent() {
   );
 }
 
-const Footer = memo(FooterComponent);
 export default Footer;

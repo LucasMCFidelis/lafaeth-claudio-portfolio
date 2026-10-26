@@ -1,12 +1,13 @@
 import { Metadata } from "next";
 
-import getManyColors, {
-  GetManyColorsProps,
-} from "@/app/data/colorization/get-many-colors";
-import { OrderByCondition } from "@/app/data/order-by-condition";
-import { WhereCondition } from "@/app/data/where-condition";
+import getVisibleColorsCached from "@/app/data/colorization/get-visible-colors";
+import AnimatedSuspense from "@/components/common/animated-suspense";
 import ColorsList from "@/components/common/colors-list";
-import { colorizationTable } from "@/db/schema";
+import GridSkeleton from "@/components/common/grid-skeleton";
+import PageTransition from "@/components/common/page-transition";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import { colorsQueries } from "@/queries/colors";
+import { cacheTags } from "@/queries/tags";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Cores",
@@ -14,28 +15,25 @@ export const metadata: Metadata = {
     "Página dos projetos de colorização no portfolio do Design, Ilustrador e Quadrinista Lafaeth Claudio. Essa página é destinada aos projetos desenvolvidos pelo autor na área de cores",
 };
 
-const ColorsPage = async () => {
-  const where: WhereCondition<typeof colorizationTable> = {
-    field: "visibleInColorization",
-    value: true,
-  };
-  const orderBy: OrderByCondition<typeof colorizationTable> = {
-    field: "index",
-    type: "asc",
-  };
-  const clauseGetColors: GetManyColorsProps<true> = {
-    where,
-    orderBy,
-    withImage: true,
-  };
-  const colorizationVisible = await getManyColors<
-    typeof clauseGetColors.withImage
-  >({ ...clauseGetColors });
-
+const ColorsPage = () => {
   return (
-    <div className="px-5 flex-1 flex flex-col">
-      <ColorsList initialData={colorizationVisible} {...clauseGetColors} />
-    </div>
+    <PageTransition>
+      <div className="px-5 flex-1 flex flex-col">
+        <AnimatedSuspense fallback={<GridSkeleton />}>
+          <PrefetchBoundary
+            tags={[cacheTags.colors, cacheTags.images]}
+            queries={[
+              {
+                queryKey: colorsQueries.keys.visible(),
+                fetcher: getVisibleColorsCached,
+              },
+            ]}
+          >
+            <ColorsList variant="visible" />
+          </PrefetchBoundary>
+        </AnimatedSuspense>
+      </div>
+    </PageTransition>
   );
 };
 

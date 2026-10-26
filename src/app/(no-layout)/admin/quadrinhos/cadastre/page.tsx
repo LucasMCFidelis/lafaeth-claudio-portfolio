@@ -1,11 +1,14 @@
 import { Suspense } from "react";
 
+import AdminOnly from "../../components/admin-only";
 import CadastreComicForm from "../components/cadastre-comic-form";
 
-const CadastreComicPage = async () => {
+const CadastreComicPage = () => {
   return (
     <Suspense fallback={<p>Carregando formulário</p>}>
-      <CadastreComicForm />
+      <AdminOnly>
+        <CadastreComicForm />
+      </AdminOnly>
     </Suspense>
   );
 };

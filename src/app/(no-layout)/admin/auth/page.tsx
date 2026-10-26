@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 import verifyUserLogged from "@/app/data/user/verify-user";
 import {
@@ -11,14 +12,19 @@ import {
 
 import LoginForm from "./components/login-form";
 
-const AuthPage = async () => {
+/** Sends a visitor who is already logged in to the admin. */
+const RedirectIfLogged = async () => {
   const userLogged = await verifyUserLogged();
-  if (userLogged) {
-    redirect("/admin");
-  }
+  if (userLogged) redirect("/admin");
+  return null;
+};
 
+const AuthPage = () => {
   return (
     <Card className="w-full sm:max-w-md">
+      <Suspense fallback={null}>
+        <RedirectIfLogged />
+      </Suspense>
       <CardHeader className="w-full">
         <CardTitle>Login</CardTitle>
         <CardDescription>

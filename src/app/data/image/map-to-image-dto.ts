@@ -12,6 +12,7 @@ export function mapToImageDTO({ image }: MapImageDTOProps): ImageDTO {
     title: image.title,
     description: image.description,
     imageUrl: image.imageUrl,
+    originalUrl: image.originalUrl,
     artist: image.artist,
     screenwriter: image.screenwriter,
     colorist: image.colorist,

@@ -21,7 +21,9 @@ const mapToFlatDTO = <WithImages extends boolean = false>({
     description: data.description,
     visibleInFlat: data.visibleInFlat,
     index: data.index,
-    horizontalPage: data.backImage?.horizontalPage === data.frontImage?.horizontalPage,
+    // Both images share the orientation (enforced on create); either one works.
+    horizontalPage:
+      data.backImage?.horizontalPage ?? data.frontImage?.horizontalPage ?? false,
     backImageId: data.backImageId,
     frontImageId: data.frontImageId,
     ...(withImages && {

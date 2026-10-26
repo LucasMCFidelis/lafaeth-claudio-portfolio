@@ -1,9 +1,13 @@
 import { Metadata } from "next";
 
-import getManyComics from "@/app/data/comics/get-many-comics";
-import { WhereCondition } from "@/app/data/where-condition";
+import getVisibleComicsCached from "@/app/data/comics/get-visible-comics";
+import AnimatedSuspense from "@/components/common/animated-suspense";
 import ComicsList from "@/components/common/comics-list";
-import { comicsTable } from "@/db/schema";
+import GridSkeleton from "@/components/common/grid-skeleton";
+import PageTransition from "@/components/common/page-transition";
+import PrefetchBoundary from "@/components/common/prefetch-boundary";
+import { comicsQueries } from "@/queries/comics";
+import { cacheTags } from "@/queries/tags";
 
 export const metadata: Metadata = {
   title: "Portfolio Lafaeth Claudio - Quadrinhos",
@@ -11,19 +15,25 @@ export const metadata: Metadata = {
     "Página dos projetos de quadrinhos no portfolio do Design, Ilustrador e Quadrinista Lafaeth Claudio. Essa página é destinada aos projetos de quadrinhos desenvolvidos pelo autor",
 };
 
-const ComicsPage = async () => {
-  const where: WhereCondition<typeof comicsTable> = {
-    field: "visibleInComics",
-    value: true,
-  };
-  const comics = await getManyComics({ where, withImage: true });
-
+const ComicsPage = () => {
   return (
-    <div className="px-5 flex-1 flex flex-col">
-      <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
-        <ComicsList initialData={comics} where={where} withImage={true} />
+    <PageTransition>
+      <div className="px-5 flex-1 flex flex-col">
+        <AnimatedSuspense fallback={<GridSkeleton />}>
+          <PrefetchBoundary
+            tags={[cacheTags.comics, cacheTags.images]}
+            queries={[
+              {
+                queryKey: comicsQueries.keys.visible(),
+                fetcher: getVisibleComicsCached,
+              },
+            ]}
+          >
+            <ComicsList variant="visible" />
+          </PrefetchBoundary>
+        </AnimatedSuspense>
       </div>
-    </div>
+    </PageTransition>
   );
 };
 

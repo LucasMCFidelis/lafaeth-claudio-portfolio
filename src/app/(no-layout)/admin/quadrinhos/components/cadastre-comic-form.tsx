@@ -1,7 +1,6 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -21,8 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { usePostComic } from "@/hooks/mutations/use-post-comic";
-import { getComicsVisibleQueryKey } from "@/hooks/queries/use-comics-visible";
-import { useImage } from "@/hooks/queries/use-image";
+import { useImage } from "@/hooks/queries/use-images";
 
 import { ImageFormField } from "../../components/image-form-field";
 
@@ -31,19 +29,13 @@ const CadastreComicForm = () => {
     resolver: zodResolver(cadastreComicSchema),
   });
 
-  const queryClient = useQueryClient();
   const postComicMutation = usePostComic();
   const { data: image } = useImage(formCadastreComic.watch("imageId"));
 
   function onSubmit(data: CadastreComicDTO) {
     postComicMutation.mutate(data, {
-      onSuccess: (newComic) => {
+      onSuccess: () => {
         formCadastreComic.reset();
-        if (newComic.visibleInComics) {
-          queryClient.invalidateQueries({
-            queryKey: getComicsVisibleQueryKey(),
-          });
-        }
         toast.success("Quadrinho cadastrado com sucesso");
       },
       onError: (error) =>

@@ -13,24 +13,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useUpdateComicsOrder } from "@/hooks/mutations/use-update-comics-order";
-import {
-  getComicsVisibleQueryKey,
-  useComicsVisible,
-} from "@/hooks/queries/use-comics-visible";
+import { useVisibleComics } from "@/hooks/queries/use-comics";
+import { comicsQueries } from "@/queries/comics";
 
 import SortableItem from "./sortable-item";
 import SortableRootList, {
   getSortingIsDisabledQueryStateParams,
 } from "./sortable-root-list";
 
-interface SortableComicsProps {
-  initialData?: Array<ComicDTO>;
-}
-
-const SortableComics = ({ initialData }: SortableComicsProps) => {
-  const { data: comics = [] } = useComicsVisible(
-    initialData && { initialData }
-  );
+const SortableComics = () => {
+  const { data: comics } = useVisibleComics();
   const updateComicsOrderMutation = useUpdateComicsOrder();
   const [sortingIsDisabled, setSortingIsDisabled] = useQueryState(
     ...getSortingIsDisabledQueryStateParams()
@@ -46,7 +38,7 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
     setSortingIsDisabled((prev) => !prev);
     if (!sortingIsDisabled) {
       queryClient.invalidateQueries({
-        queryKey: getComicsVisibleQueryKey(),
+        queryKey: comicsQueries.keys.visible(),
       });
     }
   };
@@ -71,7 +63,7 @@ const SortableComics = ({ initialData }: SortableComicsProps) => {
           </DialogHeader>
           <SortableRootList
             items={sortableComics}
-            getQueryKeyFunction={getComicsVisibleQueryKey}
+            getQueryKeyFunction={comicsQueries.keys.visible}
             className={`max-w-full ${sortingIsDisabled && "hidden"} `}
           >
             <div className="w-full flex-1 grid gap-6 md:grid-cols-2 lg:grid-cols-3 ">
