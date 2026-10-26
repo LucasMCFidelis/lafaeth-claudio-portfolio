@@ -33,7 +33,7 @@ const ProjectArticle = ({
           galleryHref={galleryHref}
           sizes="92vw"
           priority
-          imageClassName="h-svh object-cover"
+          imageClassName="h-min object-contain md:h-svh md:object-cover"
         />
       )}
       <ProjectImagesColumns
