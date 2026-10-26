@@ -25,6 +25,8 @@ export type ProjectSummaryDTO = {
 export type ProjectDTO = ProjectSummaryDTO & {
   description: string;
   projectType: string | null;
+  /** Columns of the image grid on the project page (the cover is a banner). */
+  imageColumns: 1 | 2;
   startDate: string;
   endDate: string | null;
   images: ProjectImageDTO[];

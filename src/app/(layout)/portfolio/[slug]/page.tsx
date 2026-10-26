@@ -62,7 +62,11 @@ const ProjectContent = async ({ params }: { params: Params }) => {
           imageClassName="h-svh object-cover"
         />
       )}
-      <ProjectImagesColumns images={project.images} galleryHref={galleryHref} />
+      <ProjectImagesColumns
+        images={project.images}
+        columns={project.imageColumns}
+        galleryHref={galleryHref}
+      />
       <ProjectNavigation prev={prev} next={next} />
     </article>
   );

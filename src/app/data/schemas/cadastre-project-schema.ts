@@ -20,6 +20,7 @@ export const projectFieldsSchema = z.object({
   endDate: z.union([monthSchema, z.literal("")]).optional(),
   description: z.string().trim().min(1, "Descrição é obrigatória"),
   visibleInProjects: z.boolean().catch(false),
+  imageColumns: z.union([z.literal(1), z.literal(2)]).catch(2),
 });
 
 export const endAfterStart = (data: {

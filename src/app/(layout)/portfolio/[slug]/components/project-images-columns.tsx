@@ -5,33 +5,39 @@ import ProjectImage from "./project-image";
 
 interface ProjectImagesColumnsProps {
   images: ProjectImageDTO[];
+  columns: 1 | 2;
   galleryHref: string;
 }
 
-const COLUMNS = 2;
+/** One column fills the article (w-11/12); two columns split it from md up. */
+const SIZES = {
+  1: "92vw",
+  2: "(max-width: 768px) 100vw, 50vw",
+} as const;
 
 const ProjectImagesColumns = ({
   images,
+  columns,
   galleryHref,
 }: ProjectImagesColumnsProps) => {
   if (images.length === 0) return null;
 
-  const columns = Array.from({ length: COLUMNS }, (_, column) =>
+  const imageColumns = Array.from({ length: columns }, (_, column) =>
     images
       .map((image, index) => ({ image, index }))
-      .filter(({ index }) => index % COLUMNS === column)
+      .filter(({ index }) => index % columns === column)
   );
 
   return (
     <div className="flex flex-col gap-6 md:flex-row md:items-start">
-      {columns.map((items, column) => (
+      {imageColumns.map((items, column) => (
         <div key={column} className="contents md:flex md:flex-1 md:flex-col md:gap-6">
           {items.map(({ image, index }) => (
             <ProjectImage
               key={image.id}
               image={image}
               galleryHref={galleryHref}
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes={SIZES[columns]}
               className={staggerClassName}
               style={{ order: index, ...staggerStyle(index) }}
             />

@@ -3,6 +3,7 @@
 import { useFormContext } from "react-hook-form";
 
 import { CadastreProjectInput } from "@/app/data/schemas/cadastre-project-schema";
+import { Button } from "@/components/ui/button";
 import {
   FormControl,
   FormDescription,
@@ -133,6 +134,35 @@ const ProjectFormFields = ({
                 {...field}
               />
             </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="imageColumns"
+        render={({ field }) => (
+          <FormItem className="md:col-span-2">
+            <FormLabel>Colunas das imagens</FormLabel>
+            <FormControl>
+              <div role="group" aria-label="Colunas das imagens" className="flex gap-2">
+                {([1, 2] as const).map((columns) => (
+                  <Button
+                    key={columns}
+                    type="button"
+                    variant={field.value === columns ? "default" : "outline"}
+                    aria-pressed={field.value === columns}
+                    disabled={disabled}
+                    onClick={() => field.onChange(columns)}
+                  >
+                    {columns === 1 ? "1 coluna" : "2 colunas"}
+                  </Button>
+                ))}
+              </div>
+            </FormControl>
+            <FormDescription>
+              A primeira imagem continua como banner da página.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )}

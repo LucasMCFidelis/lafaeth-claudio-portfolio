@@ -36,6 +36,7 @@ export const postProject = async (
       endDate: dataValidated.endDate || null,
       description: dataValidated.description,
       visibleInProjects: dataValidated.visibleInProjects,
+      imageColumns: dataValidated.imageColumns,
     })
     .returning();
 

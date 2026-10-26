@@ -51,6 +51,7 @@ export const mapToProjectAdmin = (
   title: row.title,
   description: row.description,
   projectType: row.projectType,
+  imageColumns: row.imageColumns === 1 ? 1 : 2,
   startDate: row.startDate,
   endDate: row.endDate,
   visibleInProjects: row.visibleInProjects,
