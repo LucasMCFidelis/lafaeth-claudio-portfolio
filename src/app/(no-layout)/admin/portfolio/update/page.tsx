@@ -45,7 +45,8 @@ const UpdateProjectContent = async ({
         },
       ]}
     >
-      <div className="flex flex-col gap-10">
+      {/* Keyed so the form restarts when "Duplicar" opens the copy here. */}
+      <div key={projectId} className="flex flex-col gap-10">
         <UpdateProjectForm projectId={projectId} />
         <ProjectImagesManager projectId={projectId} />
       </div>
