@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { memo } from "react";
+import { memo, Suspense } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -18,13 +18,12 @@ const menuItemsList: Array<{ label: string; href: string }> = [
 const isActiveItem = (pathname: string, href: string) =>
   pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 
-function MenuItemsListComponent() {
-  const pathname = usePathname();
-
+/** Without a pathname (Suspense fallback) no item is highlighted. */
+function MenuLinks({ pathname }: { pathname?: string }) {
   return (
     <>
       {menuItemsList.map((item) => {
-        const isActive = isActiveItem(pathname, item.href);
+        const isActive = !!pathname && isActiveItem(pathname, item.href);
         return (
           <Link
             key={item.href}
@@ -40,6 +39,21 @@ function MenuItemsListComponent() {
         );
       })}
     </>
+  );
+}
+
+function ActiveMenuLinks() {
+  return <MenuLinks pathname={usePathname()} />;
+}
+
+// usePathname suspends on routes whose params are only known at request
+// time (e.g. /portfolio/preview/[id]); the boundary keeps the build passing.
+// On the other routes the pathname is known when prerendering.
+function MenuItemsListComponent() {
+  return (
+    <Suspense fallback={<MenuLinks />}>
+      <ActiveMenuLinks />
+    </Suspense>
   );
 }
 

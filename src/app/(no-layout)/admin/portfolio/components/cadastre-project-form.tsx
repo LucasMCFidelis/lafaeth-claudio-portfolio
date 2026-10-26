@@ -42,7 +42,7 @@ const CadastreProjectForm = () => {
           });
           return;
         }
-        toast.success("Projeto cadastrado. Agora adicione as imagens.");
+        toast.success("Rascunho criado. Agora adicione as imagens.");
         router.push(`/admin/portfolio/update?projectId=${result.project.id}`);
       },
       onError: (error) =>

@@ -85,6 +85,8 @@ const ProjectsGrid = ({
                 entity="project"
                 id={project.id}
                 visible={project.visibleInProjects}
+                visibleLabel="Publicado"
+                hiddenLabel="Rascunho"
               />
               <ExpandItemButton
                 typeLink
