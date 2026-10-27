@@ -12,12 +12,15 @@ interface SortableItemProps<T extends BasicItemToSortable> {
   item: T;
   disabled?: boolean;
   className?: string;
+  /** Overlay content (e.g. badges) that moves with the item while dragging. */
+  children?: React.ReactNode;
 }
 
 const SortableItem = <T extends BasicItemToSortable>({
   item,
   disabled,
   className,
+  children,
 }: SortableItemProps<T>) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item.id, disabled });
@@ -44,6 +47,7 @@ const SortableItem = <T extends BasicItemToSortable>({
           className="object-contain object-top"
         />
       )}
+      {children}
     </button>
   );
 };
