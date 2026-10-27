@@ -98,7 +98,7 @@ const IllustrationsGrid = ({
             imageId={illustration.image!.id}
             imageUrl={illustration.image!.imageUrl}
             visibleInIllustrations={illustration.visibleInIllustrations}
-            horizontalIllustration={illustration.horizontalIllustration}
+            horizontalPage={illustration.horizontalIllustration}
             disableLink={displayButtonOpenModal}
             index={index}
           >

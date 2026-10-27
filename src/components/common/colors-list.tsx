@@ -88,6 +88,8 @@ const ColorsGrid = ({ colors, displayButtonOpenModal }: ColorsGridProps) => {
             title={color.image!.title}
             imageId={color.image!.id}
             imageUrl={color.image!.imageUrl}
+            credits={color.image!}
+            observation={color.observations}
             visibleInColors={color.visibleInColors}
             horizontalPage={color.image!.horizontalPage}
             disableLink={displayButtonOpenModal}

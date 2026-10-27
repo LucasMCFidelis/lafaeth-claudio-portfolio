@@ -13,6 +13,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
+  type SortingStrategy,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { type QueryKey, useQueryClient } from "@tanstack/react-query";
@@ -26,6 +27,8 @@ import { BasicItemToSortable } from "./basic-item-to-sortable";
 interface SortableRootListProps<T extends BasicItemToSortable> {
   items: Array<T>;
   getQueryKeyFunction: () => QueryKey;
+  /** dnd-kit strategy; grids use `rectSortingStrategy`. */
+  strategy?: SortingStrategy;
   className?: string;
   children: React.ReactNode;
 }
@@ -39,6 +42,7 @@ export const getSortingIsDisabledQueryStateParams = (initialState?: boolean) =>
 export default function SortableRootList<T extends BasicItemToSortable>({
   items,
   getQueryKeyFunction,
+  strategy = verticalListSortingStrategy,
   className,
   children,
 }: SortableRootListProps<T>) {
@@ -81,7 +85,7 @@ export default function SortableRootList<T extends BasicItemToSortable>({
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
-        <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        <SortableContext items={items} strategy={strategy}>
           <div
             className={cn(
               "w-full flex-1 max-w-screen flex flex-col gap-6",

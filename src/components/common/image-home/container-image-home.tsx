@@ -4,12 +4,14 @@ import { DetailedHTMLProps, HTMLAttributes } from "react";
 import { staggerClassName, staggerStyle } from "@/helpers/stagger";
 import { cn } from "@/lib/utils";
 
+import ArtworkCaption from "../artwork-caption";
 import ArtworkTransition from "../artwork-transition";
 
 interface ContainerImageHomeProps
   extends DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   children: React.ReactNode;
   imageId?: string;
+  imageTitle?: string;
   disableLink?: boolean;
   /** Position in the home grid; when set, the card fades up in turn. */
   index?: number;
@@ -18,6 +20,7 @@ interface ContainerImageHomeProps
 const ContainerImageHome = ({
   children,
   imageId,
+  imageTitle,
   className,
   style,
   disableLink = false,
@@ -34,6 +37,7 @@ const ContainerImageHome = ({
         className
       )}
     >
+      {imageTitle && <ArtworkCaption title={imageTitle} />}
       {children}
     </div>
   );
