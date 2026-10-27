@@ -39,7 +39,11 @@ const UpdateIllustrationContent = async ({
         },
       ]}
     >
-      <UpdateIllustrationForm illustrationId={illustrationId} />
+      {/* Keyed so the form restarts when another item is opened (Activity keeps the page mounted). */}
+      <UpdateIllustrationForm
+        key={illustrationId}
+        illustrationId={illustrationId}
+      />
     </PrefetchBoundary>
   );
 };

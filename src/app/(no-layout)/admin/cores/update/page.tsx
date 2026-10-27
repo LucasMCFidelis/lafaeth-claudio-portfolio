@@ -35,7 +35,8 @@ const UpdateColorContent = async ({
         },
       ]}
     >
-      <UpdateColorForm colorId={colorId} />
+      {/* Keyed so the form restarts when another item is opened (Activity keeps the page mounted). */}
+      <UpdateColorForm key={colorId} colorId={colorId} />
     </PrefetchBoundary>
   );
 };
