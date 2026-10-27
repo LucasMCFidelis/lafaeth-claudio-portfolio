@@ -35,6 +35,7 @@ const UpdateIllustrationForm = ({
     imageId: illustration.imageId ?? "",
     description: illustration.description ?? "",
     redirectUrl: illustration.redirectUrl ?? "",
+    horizontalIllustration: illustration.horizontalIllustration,
     visibleInIllustrations: illustration.visibleInIllustrations,
   };
 

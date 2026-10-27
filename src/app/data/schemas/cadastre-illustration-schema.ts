@@ -5,6 +5,8 @@ export const cadastreIllustrationSchema = z.object({
   description: z.string().optional(),
   // Optional link to where the illustration was published.
   redirectUrl: z.union([z.url("Link inválido"), z.literal("")]).optional(),
+  // Saved on the illustration only; the image's horizontalPage is not changed.
+  horizontalIllustration: z.boolean().catch(false),
   visibleInIllustrations: z.boolean().catch(false),
 });
 

@@ -29,6 +29,7 @@ export const updateIllustration = async (
       imageId: dataValidated.imageId,
       description: dataValidated.description || null,
       redirectUrl: dataValidated.redirectUrl || null,
+      horizontalOverride: dataValidated.horizontalIllustration,
       visibleInIllustrations: dataValidated.visibleInIllustrations,
       // A hidden illustration loses its position on the public page.
       ...(!dataValidated.visibleInIllustrations && { index: null }),

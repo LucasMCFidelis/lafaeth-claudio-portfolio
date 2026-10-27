@@ -186,6 +186,9 @@ export const illustrationsTable = pgTable("illustrations", {
   imageId: uuid("image_id").references(() => imagesTable.id, {
     onDelete: "set null",
   }),
+  // Orientation shown in the illustrations grid, independent of the image.
+  // Null follows the image's horizontalPage.
+  horizontalOverride: boolean("horizontal_override"),
   redirectUrl: text("redirect_url"),
   description: text("description"),
   visibleInIllustrations: boolean("visible_in_illustrations")

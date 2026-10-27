@@ -18,6 +18,9 @@ const mapToIllustrationDTO = <WithImage extends boolean>({
     id: data.id,
     redirectUrl: data.redirectUrl,
     visibleInIllustrations: data.visibleInIllustrations,
+    horizontalOverride: data.horizontalOverride,
+    horizontalIllustration:
+      data.horizontalOverride ?? data.image?.horizontalPage ?? false,
     index: data.index,
     description: data.description,
     imageId: data.imageId,

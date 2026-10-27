@@ -20,6 +20,7 @@ const CadastreIllustrationForm = () => {
     defaultValues: {
       description: "",
       redirectUrl: "",
+      horizontalIllustration: false,
       visibleInIllustrations: true,
     },
   });
@@ -43,7 +44,10 @@ const CadastreIllustrationForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <IllustrationFormFields disabled={postIllustrationMutation.isPending}>
+        <IllustrationFormFields
+          disabled={postIllustrationMutation.isPending}
+          followImageOrientation
+        >
           <Button
             type="submit"
             className="w-full"

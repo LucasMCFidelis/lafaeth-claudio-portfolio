@@ -6,6 +6,10 @@ export type IllustrationDTO<WithImage extends boolean = true> = {
   redirectUrl: string | null;
   description: string | null;
   visibleInIllustrations: boolean;
+  /** Orientation chosen for the illustration; null follows the image. */
+  horizontalOverride: boolean | null;
+  /** Orientation shown in the grid: the override, or the image's horizontalPage. */
+  horizontalIllustration: boolean;
   index: number | null;
 } & (WithImage extends true
   ? { image: ImageDTO | null }
