@@ -85,22 +85,22 @@ const FlatItem = ({
         !visibleInFlat && "opacity-50"
       )}
       base={
-        backImageUrl && (
-          <FadeImage
-            src={backImageUrl}
-            alt={`${title} - flat`}
-            onLoad={readAspectRatio}
-            {...imageProps}
-          />
-        )
-      }
-      overlay={
         frontImageUrl && (
           <FadeImage
             src={frontImageUrl}
             alt={`${title} - line`}
             // The flat image sets the shape; the line only does it alone.
             onLoad={backImageUrl ? undefined : readAspectRatio}
+            {...imageProps}
+          />
+        )
+      }
+      overlay={
+        backImageUrl && (
+          <FadeImage
+            src={backImageUrl}
+            alt={`${title} - flat`}
+            onLoad={readAspectRatio}
             {...imageProps}
           />
         )
