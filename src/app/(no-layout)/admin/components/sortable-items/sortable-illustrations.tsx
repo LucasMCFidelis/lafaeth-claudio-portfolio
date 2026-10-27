@@ -32,7 +32,7 @@ const SortableIllustrations = () => {
     id: illustration.id,
     title: illustration.image?.title || "",
     imageUrl: illustration.image?.imageUrl || "",
-    horizontalPage: illustration.horizontalIllustration ?? false,
+    horizontalPage: illustration.image?.horizontalPage ?? false,
   }));
 
   const toggleSortingState = () => {

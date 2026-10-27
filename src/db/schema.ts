@@ -186,9 +186,6 @@ export const illustrationsTable = pgTable("illustrations", {
   imageId: uuid("image_id").references(() => imagesTable.id, {
     onDelete: "set null",
   }),
-  horizontalIllustration: boolean("horizontal_illustration")
-    .notNull()
-    .default(false),
   redirectUrl: text("redirect_url"),
   description: text("description"),
   visibleInIllustrations: boolean("visible_in_illustrations")

@@ -75,7 +75,7 @@ const IllustrationsGrid = ({
   );
   const itemStyles = centeredGridStyles(
     illustrationsWithImage.map(
-      (illustration) => illustration.horizontalIllustration
+      (illustration) => illustration.image!.horizontalPage
     )
   );
 
@@ -98,7 +98,7 @@ const IllustrationsGrid = ({
             imageId={illustration.image!.id}
             imageUrl={illustration.image!.imageUrl}
             visibleInIllustrations={illustration.visibleInIllustrations}
-            horizontalIllustration={illustration.horizontalIllustration}
+            horizontalPage={illustration.image!.horizontalPage}
             disableLink={displayButtonOpenModal}
             index={index}
           >

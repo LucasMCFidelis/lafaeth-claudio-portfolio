@@ -6,7 +6,6 @@ export type IllustrationDTO<WithImage extends boolean = true> = {
   redirectUrl: string | null;
   description: string | null;
   visibleInIllustrations: boolean;
-  horizontalIllustration: boolean;
   index: number | null;
 } & (WithImage extends true
   ? { image: ImageDTO | null }

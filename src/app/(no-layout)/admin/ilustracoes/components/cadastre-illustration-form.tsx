@@ -20,7 +20,6 @@ const CadastreIllustrationForm = () => {
     defaultValues: {
       description: "",
       redirectUrl: "",
-      horizontalIllustration: false,
       visibleInIllustrations: true,
     },
   });

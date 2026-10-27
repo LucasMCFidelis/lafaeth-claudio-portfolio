@@ -17,7 +17,7 @@ interface IllustrationItemProps {
   imageId: string;
   imageUrl: string;
   title: string;
-  horizontalIllustration: boolean;
+  horizontalPage: boolean;
   visibleInIllustrations?: boolean;
   disableLink?: boolean;
   /** Position in the grid: drives the entrance delay and eager loading. */
@@ -30,7 +30,7 @@ const IllustrationItem = ({
   imageUrl,
   title,
   visibleInIllustrations,
-  horizontalIllustration,
+  horizontalPage,
   disableLink,
   index = 0,
   children,
@@ -42,14 +42,14 @@ const IllustrationItem = ({
         "group relative overflow-hidden",
         staggerClassName,
         !visibleInIllustrations && "opacity-50",
-        horizontalIllustration ? "aspect-[29.5/21]" : "aspect-[21/29.5]"
+        horizontalPage ? "aspect-[29.5/21]" : "aspect-[21/29.5]"
       )}
     >
       <FadeImage
         src={imageUrl}
         alt={title}
         fill
-        sizes={horizontalIllustration ? wideGridImageSizes : gridImageSizes}
+        sizes={horizontalPage ? wideGridImageSizes : gridImageSizes}
         {...imageLoadingProps(index < PRIORITY_ITEMS)}
         className="object-contain group-hover:scale-[1.02]"
       />

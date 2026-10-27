@@ -88,23 +88,6 @@ const IllustrationFormFields = ({
         />
         <FormField
           control={form.control}
-          name="horizontalIllustration"
-          render={({ field }) => (
-            <FormItem className="flex items-center">
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={disabled}
-                />
-              </FormControl>
-              <FormLabel>Ilustração horizontal (ocupa 2 colunas)</FormLabel>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="visibleInIllustrations"
           render={({ field }) => (
             <FormItem className="flex items-center">
