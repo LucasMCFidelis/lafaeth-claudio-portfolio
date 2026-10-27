@@ -51,7 +51,7 @@ const IllustrationItem = ({
         fill
         sizes={horizontalPage ? wideGridImageSizes : gridImageSizes}
         {...imageLoadingProps(index < PRIORITY_ITEMS)}
-        className="object-contain group-hover:scale-[1.02]"
+        className="object-cover group-hover:scale-[1.02]"
       />
       <ArtworkCaption title={title} />
       {children}
