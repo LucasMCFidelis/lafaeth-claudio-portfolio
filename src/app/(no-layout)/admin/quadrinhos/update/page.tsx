@@ -35,7 +35,8 @@ const UpdateComicContent = async ({
         },
       ]}
     >
-      <UpdateComicForm comicId={comicId} />
+      {/* Keyed so the form restarts when another item is opened (Activity keeps the page mounted). */}
+      <UpdateComicForm key={comicId} comicId={comicId} />
     </PrefetchBoundary>
   );
 };
