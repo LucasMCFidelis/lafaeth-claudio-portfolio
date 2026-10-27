@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   CadastreFlatDTO,
   cadastreFlatSchema,
@@ -23,6 +24,11 @@ import { usePostFlat } from "@/hooks/mutations/use-post-flat";
 import { useImage } from "@/hooks/queries/use-images";
 
 import { ImageFormField } from "../../components/image-form-field";
+import {
+  FlatImageField,
+  getEmptyFlatFieldsFromImage,
+  getFlatImageDefaults,
+} from "./flat-image-defaults";
 
 const CadastreFlatForm = () => {
   const postFlatMutation = usePostFlat();
@@ -37,12 +43,29 @@ const CadastreFlatForm = () => {
     },
   });
 
-  const { data: frontImage, refetch: refetchFront } = useImage(
-    formCadastreFlat.watch("frontImageId")
-  );
-  const { data: backImage, refetch: refetchBack } = useImage(
-    formCadastreFlat.watch("backImageId")
-  );
+  const { data: frontImage } = useImage(formCadastreFlat.watch("frontImageId"));
+  const { data: backImage } = useImage(formCadastreFlat.watch("backImageId"));
+
+  /** Writes the image into the given field only, then fills empty fields. */
+  function selectImage(field: FlatImageField, image: ImageDTO) {
+    const { getValues, setValue, formState } = formCadastreFlat;
+    setValue(field, image.id, {
+      shouldDirty: true,
+      shouldValidate: formState.isSubmitted,
+    });
+    const { title, description } = getEmptyFlatFieldsFromImage(
+      getValues(),
+      image
+    );
+    if (title) setValue("title", title, { shouldDirty: true });
+    if (description) {
+      setValue("description", description, { shouldDirty: true });
+    }
+  }
+
+  function getRegistrationDefaults(otherImage?: ImageDTO | null) {
+    return getFlatImageDefaults(formCadastreFlat.getValues(), otherImage);
+  }
 
   function onSubmit(data: CadastreFlatDTO) {
     postFlatMutation.mutate(data, {
@@ -72,11 +95,12 @@ const CadastreFlatForm = () => {
                 <ImageFormField
                   label="Imagem da Line"
                   image={frontImage}
-                  relatedImage={backImage}
-                  onSelectImage={(id) => {
-                    formCadastreFlat.setValue("frontImageId", id);
-                    refetchFront();
-                  }}
+                  onSelectImage={(_, image) =>
+                    selectImage("frontImageId", image)
+                  }
+                  getRegistrationDefaults={() =>
+                    getRegistrationDefaults(backImage)
+                  }
                 />
               )}
             />
@@ -87,11 +111,12 @@ const CadastreFlatForm = () => {
                 <ImageFormField
                   label="Imagem do Flat"
                   image={backImage}
-                  relatedImage={frontImage}
-                  onSelectImage={(id) => {
-                    formCadastreFlat.setValue("backImageId", id);
-                    refetchBack();
-                  }}
+                  onSelectImage={(_, image) =>
+                    selectImage("backImageId", image)
+                  }
+                  getRegistrationDefaults={() =>
+                    getRegistrationDefaults(frontImage)
+                  }
                 />
               )}
             />

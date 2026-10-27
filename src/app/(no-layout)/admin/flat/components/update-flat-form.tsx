@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   UpdateFlatDTO,
   updateFlatSchema,
@@ -28,6 +29,11 @@ import { useFormIsEditable } from "@/hooks/states/use-form-is-editable";
 import ActionsUpdateForm from "../../components/actions-update-forms";
 import DeleteItemButton from "../../components/delete-item-button";
 import { ImageFormField } from "../../components/image-form-field";
+import {
+  FlatImageField,
+  getEmptyFlatFieldsFromImage,
+  getFlatImageDefaults,
+} from "./flat-image-defaults";
 
 interface UpdateFlatFormProps {
   flatId: string;
@@ -54,14 +60,43 @@ const UpdateFlatForm = ({ flatId }: UpdateFlatFormProps) => {
     defaultValues: formDefaultValues,
   });
 
-  const { data: frontImage, refetch: refetchFront } = useImage(
-    formUpdateFlat.watch("frontImageId"),
-    currentFlat.frontImage ? { initialData: currentFlat.frontImage } : undefined
+  // initialData only for the saved image: with another id it would show the
+  // saved image in place of the one just chosen.
+  const frontImageId = formUpdateFlat.watch("frontImageId");
+  const backImageId = formUpdateFlat.watch("backImageId");
+  const { data: frontImage } = useImage(
+    frontImageId,
+    currentFlat.frontImage && frontImageId === currentFlat.frontImageId
+      ? { initialData: currentFlat.frontImage }
+      : undefined
   );
-  const { data: backImage, refetch: refetchBack } = useImage(
-    formUpdateFlat.watch("backImageId"),
-    currentFlat.backImage ? { initialData: currentFlat.backImage } : undefined
+  const { data: backImage } = useImage(
+    backImageId,
+    currentFlat.backImage && backImageId === currentFlat.backImageId
+      ? { initialData: currentFlat.backImage }
+      : undefined
   );
+
+  /** Writes the image into the given field only, then fills empty fields. */
+  function selectImage(field: FlatImageField, image: ImageDTO) {
+    const { getValues, setValue, formState } = formUpdateFlat;
+    setValue(field, image.id, {
+      shouldDirty: true,
+      shouldValidate: formState.isSubmitted,
+    });
+    const { title, description } = getEmptyFlatFieldsFromImage(
+      getValues(),
+      image
+    );
+    if (title) setValue("title", title, { shouldDirty: true });
+    if (description) {
+      setValue("description", description, { shouldDirty: true });
+    }
+  }
+
+  function getRegistrationDefaults(otherImage?: ImageDTO | null) {
+    return getFlatImageDefaults(formUpdateFlat.getValues(), otherImage);
+  }
 
   function onSubmit(data: UpdateFlatDTO) {
     updateFlatMutation.mutate(data, {
@@ -91,12 +126,13 @@ const UpdateFlatForm = ({ flatId }: UpdateFlatFormProps) => {
                 <ImageFormField
                   label="Imagem da Line"
                   image={frontImage}
-                  relatedImage={backImage}
                   disabled={!formIsEditable}
-                  onSelectImage={(id) => {
-                    formUpdateFlat.setValue("frontImageId", id);
-                    refetchFront();
-                  }}
+                  onSelectImage={(_, image) =>
+                    selectImage("frontImageId", image)
+                  }
+                  getRegistrationDefaults={() =>
+                    getRegistrationDefaults(backImage)
+                  }
                   triggerTextToSelect="Selecionar outra imagem para Line"
                 />
               )}
@@ -108,12 +144,13 @@ const UpdateFlatForm = ({ flatId }: UpdateFlatFormProps) => {
                 <ImageFormField
                   label="Imagem do Flat"
                   image={backImage}
-                  relatedImage={frontImage}
                   disabled={!formIsEditable}
-                  onSelectImage={(id) => {
-                    formUpdateFlat.setValue("backImageId", id);
-                    refetchBack();
-                  }}
+                  onSelectImage={(_, image) =>
+                    selectImage("backImageId", image)
+                  }
+                  getRegistrationDefaults={() =>
+                    getRegistrationDefaults(frontImage)
+                  }
                   triggerTextToSelect="Selecionar outra imagem para Flat"
                 />
               )}
