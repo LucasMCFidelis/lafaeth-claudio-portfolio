@@ -2,8 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -37,88 +36,93 @@ import { usePostHomeImage } from "@/hooks/mutations/use-post-home-image";
 
 import { ImageUploadInput } from "./image-upload-input";
 
+/** Text fields the modal can start with (e.g. copied from a related image). */
+export type ImageRegistrationDefaults = Partial<
+  Pick<
+    CadastreImageDTO,
+    | "title"
+    | "description"
+    | "artist"
+    | "screenwriter"
+    | "colorist"
+    | "horizontalPage"
+  >
+>;
+
+const emptyValues: CadastreImageDTO = {
+  title: "",
+  description: "",
+  imageUrl: "",
+  originalUrl: null,
+  visibleInHome: false,
+  artist: "",
+  screenwriter: "",
+  colorist: "",
+  horizontalPage: false,
+};
+
 interface CadastreImageModalProps {
   textToTrigger?: string;
-  initialData?: Partial<ImageDTO>;
-  saveImageId?: (imageId: string) => void;
+  /**
+   * Read when the modal opens, so it reflects the current state of the form
+   * that owns the modal. Empty values are ignored.
+   */
+  getInitialData?: () => ImageRegistrationDefaults | undefined;
+  /** Receives the image created by this modal instance. */
+  onImageCreated?: (image: ImageDTO) => void;
   disabled?: boolean;
 }
 
 const CadastreImageModal = ({
   textToTrigger,
-  initialData,
-  saveImageId,
+  getInitialData,
+  onImageCreated,
   disabled,
 }: CadastreImageModalProps) => {
-  const [cadastreImageModalIsOpen, setCadastreImageModalIsOpen] = useQueryState(
-    "cadastreImageModalIsOpen",
-    parseAsBoolean.withDefault(false)
-  );
+  // Local state: each instance opens on its own. A shared URL param made every
+  // modal on the page open together, and the last one got the new image.
+  const [isOpen, setIsOpen] = useState(false);
   const postHomeImageMutation = usePostHomeImage();
   const [isUploading, setIsUploading] = useState(false);
 
   const formCadastreImage = useForm<CadastreImageDTO>({
     resolver: zodResolver(cadastreImageSchema),
-    defaultValues: {
-      title: "",
-      description: "",
-      imageUrl: "",
-      originalUrl: null,
-      visibleInHome: false,
-      ...(initialData && {
-        artist: initialData.artist,
-        screenwriter: initialData.screenwriter || "",
-        colorist: initialData.colorist || "",
-        horizontalPage: initialData.horizontalPage,
-      }),
-    },
+    defaultValues: emptyValues,
   });
 
-  useEffect(() => {
-    if (initialData) {
-      formCadastreImage.reset({
-        ...formCadastreImage.getValues(),
-        artist: initialData.artist ?? "",
-        screenwriter: initialData.screenwriter ?? "",
-        colorist: initialData.colorist ?? "",
-        horizontalPage: initialData.horizontalPage ?? false,
-      });
+  function handleOpenChange(open: boolean) {
+    if (open) {
+      const initialData = Object.fromEntries(
+        Object.entries(getInitialData?.() ?? {}).filter(
+          ([, value]) => value !== undefined && value !== null && value !== ""
+        )
+      );
+      formCadastreImage.reset({ ...emptyValues, ...initialData });
     }
-  }, [initialData, formCadastreImage]);
+    setIsOpen(open);
+  }
 
-  async function onSubmit(data: CadastreImageDTO) {
-    const newImage = await postHomeImageMutation.mutateAsync(data, {
-      onSuccess: () => toast.success("Imagem cadastrada com sucesso"),
+  function onSubmit(data: CadastreImageDTO) {
+    postHomeImageMutation.mutate(data, {
+      onSuccess: (newImage) => {
+        toast.success("Imagem cadastrada com sucesso");
+        setIsOpen(false);
+        onImageCreated?.(newImage);
+      },
       onError: (error) =>
         toast.error(
           error instanceof Error ? error.message : "Erro ao cadastrar imagem"
         ),
     });
-    setCadastreImageModalIsOpen(false);
-    if (saveImageId) {
-      saveImageId(newImage.id);
-    }
   }
 
   const valueImageUrl = formCadastreImage.watch("imageUrl");
 
   return (
     <>
-      <Dialog
-        open={cadastreImageModalIsOpen}
-        onOpenChange={(value) => {
-          setCadastreImageModalIsOpen(value);
-          formCadastreImage.reset();
-        }}
-      >
+      <Dialog open={isOpen} onOpenChange={handleOpenChange}>
         <DialogTrigger asChild>
-          <Button
-            className="w-full"
-            onClick={() => {
-              setCadastreImageModalIsOpen(true);
-            }}
-            disabled={disabled}
-          >
+          <Button className="w-full" disabled={disabled}>
             {textToTrigger ? textToTrigger : "Adicionar imagem"}
           </Button>
         </DialogTrigger>

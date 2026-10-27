@@ -1,18 +1,29 @@
+"use client";
+
+import { useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { Button } from "@/components/ui/button";
 import { FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
+import { imagesQueries } from "@/queries/images";
 
-import CadastreImageModal from "./cadastre-image-modal";
+import CadastreImageModal, {
+  ImageRegistrationDefaults,
+} from "./cadastre-image-modal";
 import { SelectImageDialog } from "./select-image-dialog";
 
 interface ImageFormFieldProps {
   label: string;
   image?: ImageDTO | null;
-  relatedImage?: ImageDTO | null;
-  onSelectImage: (id: string) => void;
+  /**
+   * Called with the image picked or registered through THIS field only; the
+   * caller writes it into the form field this component represents.
+   */
+  onSelectImage: (id: string, image: ImageDTO) => void;
+  /** Pre-fills the "register image" modal when it opens. */
+  getRegistrationDefaults?: () => ImageRegistrationDefaults | undefined;
   disabled?: boolean;
 
   triggerTextToSelect?: string;
@@ -22,12 +33,20 @@ interface ImageFormFieldProps {
 export function ImageFormField({
   label,
   image,
-  relatedImage,
   onSelectImage,
+  getRegistrationDefaults,
   disabled,
   triggerTextToSelect,
   className,
 }: ImageFormFieldProps) {
+  const queryClient = useQueryClient();
+
+  function handleImage(selected: ImageDTO) {
+    // The form loads the preview by id; seeding the cache shows it right away.
+    queryClient.setQueryData(imagesQueries.keys.detail(selected.id), selected);
+    onSelectImage(selected.id, selected);
+  }
+
   return (
     <FormItem className={cn("flex flex-col h-72", className)}>
       <FormLabel>{label}</FormLabel>
@@ -47,20 +66,13 @@ export function ImageFormField({
       {!disabled && (
         <div className="w-full grid gap-4">
           <CadastreImageModal
-            {...(relatedImage && {
-              initialData: {
-                artist: relatedImage.artist,
-                screenwriter: relatedImage.screenwriter,
-                colorist: relatedImage.colorist,
-                horizontalPage: relatedImage.horizontalPage,
-              },
-            })}
-            saveImageId={onSelectImage}
+            getInitialData={getRegistrationDefaults}
+            onImageCreated={handleImage}
             textToTrigger={image ? "Cadastrar outra imagem" : undefined}
             disabled={disabled}
           />
           <SelectImageDialog
-            onSelect={(img) => onSelectImage(img.id)}
+            onSelect={handleImage}
             {...(triggerTextToSelect && {
               trigger: (
                 <Button variant="outline" disabled={disabled}>
