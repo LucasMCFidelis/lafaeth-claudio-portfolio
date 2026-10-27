@@ -27,7 +27,7 @@ export const postIllustration = async (
       imageId: dataValidated.imageId,
       description: dataValidated.description || null,
       redirectUrl: dataValidated.redirectUrl || null,
-      horizontalIllustration: dataValidated.horizontalIllustration,
+      horizontalOverride: dataValidated.horizontalIllustration,
       visibleInIllustrations: dataValidated.visibleInIllustrations,
     })
     .returning();

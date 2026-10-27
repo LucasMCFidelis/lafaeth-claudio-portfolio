@@ -44,7 +44,10 @@ const CadastreIllustrationForm = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <IllustrationFormFields disabled={postIllustrationMutation.isPending}>
+        <IllustrationFormFields
+          disabled={postIllustrationMutation.isPending}
+          followImageOrientation
+        >
           <Button
             type="submit"
             className="w-full"
