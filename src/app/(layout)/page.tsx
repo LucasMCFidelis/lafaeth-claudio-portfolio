@@ -58,7 +58,7 @@ export default async function Home() {
         </Card>
         <div className="w-full grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {imagesHome.map((image, index) => (
-            <ContainerImageHome key={image.id} imageId={image.id} index={index}>
+            <ContainerImageHome key={image.id} imageId={image.id} imageTitle={image.title} index={index}>
               <ImageHome
                 src={image.imageUrl}
                 alt={image.title}

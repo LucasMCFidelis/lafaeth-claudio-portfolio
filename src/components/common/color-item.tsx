@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ImageDTO } from "@/app/data/image/image-dto";
 import {
   gridImageSizes,
   imageLoadingProps,
@@ -17,6 +18,8 @@ interface ColorItemProps {
   imageId: string;
   imageUrl: string;
   title: string;
+  credits?: Pick<ImageDTO, "artist" | "screenwriter" | "colorist">;
+  observation?: string | null;
   visibleInColors?: boolean;
   horizontalPage: boolean;
   disableLink?: boolean;
@@ -29,6 +32,8 @@ const ColorItem = ({
   imageId,
   imageUrl,
   title,
+  credits,
+  observation,
   visibleInColors,
   horizontalPage,
   disableLink,
@@ -53,7 +58,7 @@ const ColorItem = ({
         {...imageLoadingProps(index < PRIORITY_ITEMS)}
         className="object-contain group-hover:scale-[1.02]"
       />
-      <ArtworkCaption title={title} />
+      <ArtworkCaption title={title} credits={credits} observation={observation} />
       {children}
     </div>
   );
