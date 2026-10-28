@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { ImageDTO } from "@/app/data/image/image-dto";
 import { staggerClassName, staggerStyle } from "@/helpers/stagger";
 import { cn } from "@/lib/utils";
@@ -17,27 +19,29 @@ interface HomeBannerProps {
  */
 const HomeBanner = ({ image, className }: HomeBannerProps) => {
   return (
-    <div
-      style={staggerStyle(0)}
-      className={cn(
-        "relative w-full overflow-hidden bg-muted shadow-md dark:shadow-none",
-        "aspect-[4/3] sm:aspect-[21/9] lg:aspect-[4/1]",
-        staggerClassName,
-        className
-      )}
-    >
-      <FadeImage
-        src={image.imageUrl}
-        alt={image.title}
-        fill
-        // Full screen width: ask for the largest version the original has.
-        sizes="100vw"
-        // The banner is the largest element above the fold (LCP).
-        loading="eager"
-        fetchPriority="high"
-        className="object-cover"
-      />
-    </div>
+    <Link href={`/gallery?id=${image.id}`}>
+      <div
+        style={staggerStyle(0)}
+        className={cn(
+          "relative w-full overflow-hidden bg-muted shadow-md dark:shadow-none",
+          "aspect-[4/3] sm:aspect-[21/9] lg:aspect-[4/1]",
+          staggerClassName,
+          className
+        )}
+      >
+        <FadeImage
+          src={image.imageUrl}
+          alt={image.title}
+          fill
+          // Full screen width: ask for the largest version the original has.
+          sizes="100vw"
+          // The banner is the largest element above the fold (LCP).
+          loading="eager"
+          fetchPriority="high"
+          className="object-cover"
+        />
+      </div>
+    </Link>
   );
 };
 
