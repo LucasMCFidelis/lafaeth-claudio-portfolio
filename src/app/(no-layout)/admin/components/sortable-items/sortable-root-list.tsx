@@ -17,8 +17,8 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { type QueryKey, useQueryClient } from "@tanstack/react-query";
-import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect } from "react";
+import { parseAsBoolean } from "nuqs";
+import { useId } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -47,14 +47,9 @@ export default function SortableRootList<T extends BasicItemToSortable>({
   children,
 }: SortableRootListProps<T>) {
   const queryClient = useQueryClient();
-  const [mounted, setMounted] = useQueryState(
-    "mounted",
-    parseAsBoolean.withDefault(false)
-  );
-
-  useEffect(() => {
-    setMounted(true);
-  }, [setMounted]);
+  // Without a stable id, dnd-kit numbers its aria-describedby with a global
+  // counter, which differs between the server and the client.
+  const dndContextId = useId();
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -76,11 +71,10 @@ export default function SortableRootList<T extends BasicItemToSortable>({
     }
   };
 
-  if (!mounted) return null;
-
   return (
     <>
       <DndContext
+        id={dndContextId}
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}

@@ -35,7 +35,8 @@ const UpdateFlatContent = async ({
         },
       ]}
     >
-      <UpdateFlatForm flatId={flatId} />
+      {/* Keyed so the form restarts when another item is opened (Activity keeps the page mounted). */}
+      <UpdateFlatForm key={flatId} flatId={flatId} />
     </PrefetchBoundary>
   );
 };
