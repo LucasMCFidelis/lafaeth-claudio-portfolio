@@ -27,29 +27,40 @@ const ContainerImageHome = ({
   index,
   ...rest
 }: ContainerImageHomeProps) => {
+  if (!disableLink && !imageId) {
+    throw new Error("imageId is required with link enabled");
+  }
+
+  const media = (
+    <div className="relative aspect-square overflow-hidden rounded-xl bg-muted shadow-md dark:shadow-none dark:ring-1 dark:ring-white/5">
+      {children}
+    </div>
+  );
+
   const content = (
     <div
       {...rest}
       style={index === undefined ? style : { ...staggerStyle(index), ...style }}
       className={cn(
-        "group relative aspect-square overflow-hidden rounded-xl bg-muted shadow-md dark:shadow-none dark:ring-1 dark:ring-white/5",
+        "group relative",
         index !== undefined && staggerClassName,
         className
       )}
     >
-      {imageTitle && <ArtworkCaption title={imageTitle} />}
-      {children}
+      {disableLink || !imageId ? (
+        media
+      ) : (
+        <ArtworkTransition imageId={imageId}>{media}</ArtworkTransition>
+      )}
+      {imageTitle && (
+        <ArtworkCaption title={imageTitle} className="rounded-xl touch:rounded-none" />
+      )}
     </div>
   );
 
   if (disableLink) return content;
-  if (!imageId) throw new Error("imageId is required with link enabled");
 
-  return (
-    <Link href={`/gallery?id=${imageId}`}>
-      <ArtworkTransition imageId={imageId}>{content}</ArtworkTransition>
-    </Link>
-  );
+  return <Link href={`/gallery?id=${imageId}`}>{content}</Link>;
 };
 
 export default ContainerImageHome;

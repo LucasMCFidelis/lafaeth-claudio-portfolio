@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ImageDTO } from "@/app/data/image/image-dto";
+import { wideItemMediaClassName } from "@/helpers/centered-grid";
 import {
   gridImageSizes,
   imageLoadingProps,
@@ -40,14 +41,13 @@ const ColorItem = ({
   index = 0,
   children,
 }: ColorItemProps) => {
-  const card = (
+  const media = (
     <div
-      style={staggerStyle(index)}
       className={cn(
-        "group relative overflow-hidden",
-        staggerClassName,
-        !visibleInColors && "opacity-50",
-        horizontalPage ? "aspect-[29.5/21]" : "aspect-[21/29.5]"
+        "relative overflow-hidden",
+        horizontalPage
+          ? cn("aspect-[29.5/21]", wideItemMediaClassName)
+          : "aspect-[21/29.5]"
       )}
     >
       <FadeImage
@@ -58,6 +58,24 @@ const ColorItem = ({
         {...imageLoadingProps(index < PRIORITY_ITEMS)}
         className="object-contain group-hover:scale-[1.02]"
       />
+    </div>
+  );
+
+  const card = (
+    <div
+      style={staggerStyle(index)}
+      className={cn(
+        "group relative overflow-hidden",
+        horizontalPage && "@container",
+        staggerClassName,
+        !visibleInColors && "opacity-50"
+      )}
+    >
+      {disableLink ? (
+        media
+      ) : (
+        <ArtworkTransition imageId={imageId}>{media}</ArtworkTransition>
+      )}
       <ArtworkCaption title={title} credits={credits} observation={observation} />
       {children}
     </div>
@@ -66,11 +84,7 @@ const ColorItem = ({
   if (disableLink) return card;
   if (!imageId) throw new Error("imageId is required with link enabled");
 
-  return (
-    <Link href={`/gallery/cores?id=${imageId}`}>
-      <ArtworkTransition imageId={imageId}>{card}</ArtworkTransition>
-    </Link>
-  );
+  return <Link href={`/gallery/cores?id=${imageId}`}>{card}</Link>;
 };
 
 export default ColorItem;

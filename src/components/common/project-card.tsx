@@ -28,15 +28,8 @@ const ProjectCard = ({
 }: ProjectCardProps) => {
   const { slug, title, cover, visibleInProjects } = project;
 
-  const card = (
-    <div
-      style={staggerStyle(index)}
-      className={cn(
-        "group relative aspect-square overflow-hidden bg-muted",
-        staggerClassName,
-        !visibleInProjects && "opacity-50"
-      )}
-    >
+  const media = (
+    <div className="relative aspect-square overflow-hidden bg-muted">
       {cover && (
         <FadeImage
           src={cover.imageUrl}
@@ -47,6 +40,23 @@ const ProjectCard = ({
           className="object-cover group-hover:scale-[1.02]"
         />
       )}
+    </div>
+  );
+
+  const card = (
+    <div
+      style={staggerStyle(index)}
+      className={cn(
+        "group relative overflow-hidden",
+        staggerClassName,
+        !visibleInProjects && "opacity-50"
+      )}
+    >
+      {cover && !disableLink ? (
+        <ArtworkTransition imageId={cover.id}>{media}</ArtworkTransition>
+      ) : (
+        media
+      )}
       <ArtworkCaption title={title} className={cn(!cover && "opacity-100")} />
       {children}
     </div>
@@ -56,11 +66,7 @@ const ProjectCard = ({
 
   return (
     <Link href={`/portfolio/${slug}`} aria-label={title}>
-      {cover ? (
-        <ArtworkTransition imageId={cover.id}>{card}</ArtworkTransition>
-      ) : (
-        card
-      )}
+      {card}
     </Link>
   );
 };

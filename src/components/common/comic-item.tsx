@@ -32,15 +32,8 @@ const ComicItem = ({
   index = 0,
   children,
 }: ComicItemProps) => {
-  const card = (
-    <div
-      style={staggerStyle(index)}
-      className={cn(
-        "group relative aspect-[21/29.5] overflow-hidden",
-        staggerClassName,
-        !visibleInComics && "opacity-50"
-      )}
-    >
+  const media = (
+    <div className="relative aspect-[21/29.5] overflow-hidden">
       <FadeImage
         src={imageUrl}
         alt={title || "Quadrinho"}
@@ -49,6 +42,23 @@ const ComicItem = ({
         {...imageLoadingProps(index < PRIORITY_ITEMS)}
         className="object-cover group-hover:scale-[1.02]"
       />
+    </div>
+  );
+
+  const card = (
+    <div
+      style={staggerStyle(index)}
+      className={cn(
+        "group relative overflow-hidden",
+        staggerClassName,
+        !visibleInComics && "opacity-50"
+      )}
+    >
+      {disableLink ? (
+        media
+      ) : (
+        <ArtworkTransition imageId={imageId}>{media}</ArtworkTransition>
+      )}
       <ArtworkCaption title={title} />
       {children}
     </div>
@@ -57,11 +67,7 @@ const ComicItem = ({
   if (disableLink) return card;
   if (!imageId) throw new Error("imageId is required with link enabled");
 
-  return (
-    <Link href={`/gallery/quadrinhos?id=${imageId}`}>
-      <ArtworkTransition imageId={imageId}>{card}</ArtworkTransition>
-    </Link>
-  );
+  return <Link href={`/gallery/quadrinhos?id=${imageId}`}>{card}</Link>;
 };
 
 export default ComicItem;

@@ -15,7 +15,8 @@ const ArtworkCaptionBase = ({ children, className }: { children: React.ReactNode
     <div
       className={cn(
         "absolute inset-0 z-20 flex flex-col gap-3 items-center justify-center bg-primary/70 px-3 text-center font-heading font-medium text-primary-foreground backdrop-blur-sm dark:bg-background/75 dark:text-foreground opacity-0 transition-opacity duration-300 ease-out hover:opacity-100",
-        "touch:inset-x-0 touch:top-auto touch:bottom-0 touch:py-1.5 touch:text-sm touch:opacity-100",
+        // Touch screens have no hover: the caption goes below the image, without the overlay.
+        "touch:static touch:gap-1 touch:bg-transparent touch:dark:bg-transparent touch:px-1 touch:pt-2 touch:text-foreground touch:backdrop-blur-none touch:opacity-100",
         className
       )}
     >
@@ -44,8 +45,10 @@ const Credits = ({ artist, screenwriter, colorist }: ArtworkCredits) => {
 };
 
 /**
- * Title over an artwork card: covers the image on hover; on touch screens,
- * where there is no hover, it stays visible as a strip at the bottom.
+ * Title of an artwork card: covers the image on hover; on touch screens,
+ * where there is no hover, it stays visible below the image.
+ * Render it as a sibling of the image box, inside a `relative` card that has
+ * the same height as that box on hover screens.
  * Credits come from the list that renders the card (no fetch per card).
  */
 const ArtworkCaption = ({ title, className, credits, observation }: ArtworkCaptionProps) => {

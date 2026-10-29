@@ -15,6 +15,16 @@ export const centeredGridClassName = "grid gap-6 md:grid-cols-4 lg:grid-cols-6";
 export const centeredGridItemClassName =
   "md:[grid-area:var(--grid-area-md)] lg:[grid-area:var(--grid-area-lg)]";
 
+/**
+ * Image box of a wide item (two columns, 29.5/21) on touch screens at `lg`,
+ * where it shares a row with single-column items (21/29.5). By its own aspect
+ * it would be a bit taller than them (it also spans the gap), which pushed its
+ * caption below theirs. Here it gets their height: half its width without the
+ * gap (`gap-6`), times 29.5/21. The card needs the `@container` class.
+ */
+export const wideItemMediaClassName =
+  "touch:lg:h-[calc((100cqw_-_1.5rem)/2*29.5/21)]";
+
 /** Visual columns at each breakpoint (same as `md:grid-cols-2 lg:grid-cols-3`). */
 const COLUMNS = { md: 2, lg: 3 } as const;
 
